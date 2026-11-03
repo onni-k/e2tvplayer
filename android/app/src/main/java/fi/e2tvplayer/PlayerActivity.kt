@@ -152,6 +152,16 @@ class PlayerActivity : Activity() {
                 }
                 return b.build()
             }
+
+            // Video aina laitteen omalla (rauta)dekooderilla, FFmpeg vain äänelle
+            override fun buildVideoRenderers(context: Context, extensionRendererMode: Int,
+                                             mediaCodecSelector: androidx.media3.exoplayer.mediacodec.MediaCodecSelector,
+                                             enableDecoderFallback: Boolean, eventHandler: android.os.Handler,
+                                             eventListener: androidx.media3.exoplayer.video.VideoRendererEventListener,
+                                             allowedVideoJoiningTimeMs: Long, out: java.util.ArrayList<androidx.media3.exoplayer.Renderer>) {
+                super.buildVideoRenderers(context, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF, mediaCodecSelector,
+                    enableDecoderFallback, eventHandler, eventListener, allowedVideoJoiningTimeMs, out)
+            }
         }
             .setEnableDecoderFallback(true)
             .setExtensionRendererMode(
