@@ -484,8 +484,11 @@ class PlayerActivity : Activity() {
                 if (first) {
                     okDown = true
                     longFired = false
-                    ui.postDelayed(longPress, 700)
-                } else if (!down) {
+                    ui.postDelayed(longPress, android.view.ViewConfiguration.getLongPressTimeout().toLong() + 100)
+                } else if (down) {
+                    // pidetty pohjassa: kaukosäädin lähettää toistoja (ja pitkän painalluksen lipun)
+                    if (okDown && !longFired && (e.isLongPress || e.repeatCount > 0)) { ui.removeCallbacks(longPress); longPress.run() }
+                } else {
                     ui.removeCallbacks(longPress)
                     if (okDown && !longFired) { if (live) toggleInfo() else togglePause() }
                     okDown = false
