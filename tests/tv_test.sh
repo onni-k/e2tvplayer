@@ -24,7 +24,11 @@ key KEYCODE_DPAD_DOWN                # Tekstitys-rivi
 key KEYCODE_DPAD_RIGHT               # pois -> suomi
 shot 06_valikko_suomi
 key KEYCODE_BACK
-shot 07_tekstitys 3
+shot 07_tekstitys 2
+key KEYCODE_BACK                     # listaan ja uudelleen alusta: tallennettu kieli kytkee tekstityksen
+key KEYCODE_DPAD_CENTER
+shot 07b_tekstitys_alusta 5
+shot 07c_tekstitys_10s 4
 key KEYCODE_DPAD_RIGHT               # +15 s
 shot 08_kelaus 1
 key KEYCODE_DPAD_CENTER              # tauko + tiedot
@@ -32,7 +36,8 @@ shot 09_tauko 2
 key KEYCODE_BACK                     # takaisin listaan
 shot 10_paluu 2
 key KEYCODE_DPAD_UP
-key KEYCODE_DPAD_UP                  # välilehdet
+key KEYCODE_DPAD_UP                  # välilehdet (aktiivinen: Tallenteet)
+shot 10b_valilehdet 0
 key KEYCODE_DPAD_RIGHT               # Kanavat
 key KEYCODE_DPAD_CENTER
 shot 11_kanavat 3

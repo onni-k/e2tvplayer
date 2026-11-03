@@ -537,6 +537,12 @@ class MainActivity : Activity() {
             if (event.action == KeyEvent.ACTION_UP) back()
             return true
         }
+        // ▲ listan ylimmältä riviltä: aina aktiiviseen välilehteen (ei lähimpään)
+        if (event.keyCode == KeyEvent.KEYCODE_DPAD_UP && event.action == KeyEvent.ACTION_DOWN &&
+            list.hasFocus() && currentIndex() == 0) {
+            (if (mode == "movies") tabRec else tabCh).requestFocus()
+            return true
+        }
         // TV-kaukosäätimen värinäppäimet ja valikkonappi niissä laitteissa, joissa ne ovat
         if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
             val pos = currentIndex()
