@@ -47,6 +47,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "17"
@@ -64,6 +65,7 @@ dependencies {
     // FFmpeg-äänidekooderi (AC-3, E-AC-3, AAC, MP2 ...) PCM:ksi: ääni kuuluu, vaikka TV ei osaisi Dolbya
     implementation("org.jellyfin.media3:media3-ffmpeg-decoder:$media3+")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
     implementation("androidx.annotation:annotation:1.8.0")
 }
 
