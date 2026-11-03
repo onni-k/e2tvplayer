@@ -1,0 +1,73 @@
+# E2TVPlayer
+
+Enigma2-boksin (OpenViX ym.) tallenteet ja live-TV tekstityksineen televisioon OpenWebifin kautta.
+
+| Osa | Hakemisto | Mitä |
+|---|---|---|
+| Boksin lisäosa | `enigma2/` | OpenWebif-laajennus (Python 3). Jakaa TV-sovellukset, purkaa DVB-tekstitykset Samsungille ja välittää live-kuvan. |
+| Samsung Smart TV 2011–2014 (Orsay) | `enigma2/src/E2TVPlayer/widget/` | HTML/JS-sovellus, jonka boksi jakaa TV:n developer-tilan *User App Sync* -toiminnolle. |
+| Google TV / Android TV | `android/` | Kotlin + Media3 ExoPlayer. Toistaa TS-tallenteet ja live-kanavat; DVB-tekstitykset ja ääniraidat suoraan virrasta. |
+
+GitHub Actions rakentaa jokaisesta pushista APK:n ja boksin `.ipk`-paketin (APK mukana). Tagi `v*` tekee julkaisun.
+
+## Asennus boksiin
+
+```
+opkg install /tmp/enigma2-plugin-extensions-e2tvplayer_<versio>_all.ipk
+```
+Käynnistä GUI uudelleen. Paketti korvaa vanhan `enigma2-plugin-extensions-e2samsungtv`-paketin.
+**Lisäosat → E2TVPlayer** näyttää boksin IP:n ja varoittaa, jos OpenWebif ei ole portissa 80 tai
+kirjautuminen on päällä. Selaimella `http://<boksi>/e2tvplayer/` näkyvät asennusohjeet.
+
+## Google TV / Android TV
+
+1. Asenna televisioon Google Playsta **Downloader** (AFTVnews) ja salli sille tuntemattomien sovellusten asennus
+   (Asetukset → Järjestelmä → Tietoja → paina *Android TV OS -koontiversio* 7 kertaa → Asetukset → Sovellukset →
+   Suojaus ja rajoitukset → Tuntemattomat lähteet → Downloader).
+2. Kirjoita Downloaderiin `<boksin IP>/e2tvplayer` ja valitse **Lataa E2TVPlayer.apk**.
+3. Sovellus etsii boksin lähiverkosta itse; tarvittaessa osoitteen voi antaa Asetuksista.
+
+| Näppäin | Lista | Tallenne | Live |
+|---|---|---|---|
+| OK | toista | tauko + ohjelmatiedot | ohjelmatiedot |
+| pitkä OK | valikko (poista, alusta, järjestys) | ääni ja tekstitys | ääni ja tekstitys |
+| ◀ ▶ | – | −/+ 15 s | – |
+| ▲ ▼ | liiku, ylhäällä välilehdet | +/− 5 min | kanava |
+| BACK | ylempi kansio / lopetuskysely | lopeta (kohta tallentuu) | lopeta |
+
+Valittu tekstitys- ja äänikieli muistetaan. Värinäppäimet, MENU ja INFO toimivat niissä TV:issä, joissa ne ovat.
+
+## Samsung Smart TV (2011–2014)
+
+1. TV: Valikko → Smart Hub → Samsung-tili → Kirjaudu, tunnus `develop` (salasana tyhjä tai `000000`).
+2. Smart Hub → pidä OK pohjassa jonkin sovelluksen päällä → **IP Setting** → boksin IP.
+3. Pidä OK taas pohjassa → **Start User App Sync**, ja käynnistä TV uudelleen.
+
+| Näppäin toistossa | Toiminto |
+|---|---|
+| OK / ▶❚❚ | tauko / jatka |
+| ◀ ▶ / ▲ ▼ / ◀◀ ▶▶ | 15 s / 5 min / 1 min |
+| INFO | ohjelmatiedot |
+| TOOLS | ääni / tekstitys / ajoitus |
+| RETURN / EXIT | takaisin listaan; listassa lopetuskysely |
+
+Samsungin soitin ei näytä DVB-tekstityksiä, joten boksi purkaa ne kuviksi (`subs.py`, tallenteet;
+`live.py`, live-välitys `/e2tvplayer/live`) ja sovellus piirtää ne videon päälle.
+
+## Boksin HTTP-osoitteet
+
+| Osoite | |
+|---|---|
+| `/widgetlist.xml`, `/e2tvplayer/E2Tallenteet.zip` | Samsung-sovellus |
+| `/e2tvplayer/E2TVPlayer.apk` | Google TV -sovellus |
+| `/e2tvplayer/info` | tunnistus (Google TV -sovelluksen boksihaku) |
+| `/e2tvplayer/subs`, `/subimg` | tallenteen tekstitykset (Samsung) |
+| `/e2tvplayer/live`, `/livesubs`, `/liveimg` | live-välitys ja sen tekstitykset (Samsung) |
+
+Vanha polku `/e2samsungtv/` toimii edelleen, jotta aiemmin asennettu Samsung-sovellus ei mene rikki.
+
+## Rakentaminen
+
+- Boksin paketti: `sh enigma2/build_ipk.sh` (APK liitetään, jos `E2TVPLAYER_APK` osoittaa siihen).
+- APK: `cd android && ./gradlew assembleRelease` (JDK 17 + Android SDK 34). Allekirjoitusavain
+  `android/e2tvplayer.keystore` on repossa, jotta päivitykset asentuvat vanhan päälle.

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF000000">
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="false"
+        app:resize_mode="fit"
+        app:show_buffering="never"
+        app:surface_type="surface_view"
+        app:use_controller="false" />
+
+    <ProgressBar
+        android:id="@+id/buffering"
+        style="@android:style/Widget.DeviceDefault.ProgressBar.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <!-- INFO: ohjelmatiedot -->
+    <LinearLayout
+        android:id="@+id/info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="26dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/panel_bg"
+        android:orientation="vertical"
+        android:padding="18dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/iTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_hi"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/iMeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/text_sub"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/iDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:lineSpacingExtra="3dp"
+            android:maxLines="9"
+            android:ellipsize="end"
+            android:textColor="#FFC9D1D9"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/iNext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/dir"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- Ääni ja tekstitys -->
+    <LinearLayout
+        android:id="@+id/tracks"
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/menu_bg"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ääni ja tekstitys"
+            android:textColor="@color/text_hi"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:id="@+id/trRows"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="▲▼ rivi   ◀▶ vaihda   OK/BACK sulje"
+            android:textColor="@color/text_dim"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <!-- Alapalkki -->
+    <RelativeLayout
+        android:id="@+id/osd"
+        android:layout_width="match_parent"
+        android:layout_height="118dp"
+        android:layout_gravity="bottom"
+        android:background="@color/osd"
+        android:paddingLeft="40dp"
+        android:paddingTop="14dp"
+        android:paddingRight="40dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/oState"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:gravity="right"
+            android:textColor="@color/dir"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/oTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/oState"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/text_hi"
+            android:textSize="21sp" />
+
+        <TextView
+            android:id="@+id/oSub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/oTitle"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/text_sub"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/oTime"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/oSub"
+            android:layout_marginTop="4dp"
+            android:gravity="right"
+            android:textColor="@color/text"
+            android:textSize="15sp" />
+
+        <ProgressBar
+            android:id="@+id/oBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:layout_below="@id/oSub"
+            android:layout_marginTop="11dp"
+            android:layout_marginRight="16dp"
+            android:layout_toLeftOf="@id/oTime"
+            android:max="1000"
+            android:progressDrawable="@drawable/progress_track" />
+
+        <TextView
+            android:id="@+id/oKeys"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/oTime"
+            android:layout_marginTop="8dp"
+            android:singleLine="true"
+            android:textColor="#FF7D8A99"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/toast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="26dp"
+        android:background="@drawable/panel_bg"
+        android:paddingLeft="18dp"
+        android:paddingTop="10dp"
+        android:paddingRight="18dp"
+        android:paddingBottom="10dp"
+        android:textColor="@color/text_hi"
+        android:textSize="15sp"
+        android:visibility="gone" />
+</FrameLayout>

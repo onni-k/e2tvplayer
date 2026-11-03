@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>E2TVPlayer</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<script type="text/javascript" src="$MANAGER_WIDGET/Common/API/Widget.js"></script>
+	<script type="text/javascript" src="$MANAGER_WIDGET/Common/API/TVKeyValue.js"></script>
+	<script type="text/javascript" src="$MANAGER_WIDGET/Common/API/Plugin.js"></script>
+	<script type="text/javascript" src="js/boxconfig.js"></script>
+	<script type="text/javascript" src="js/util.js"></script>
+	<script type="text/javascript" src="js/api.js"></script>
+	<script type="text/javascript" src="js/listview.js"></script>
+	<script type="text/javascript" src="js/player.js"></script>
+	<script type="text/javascript" src="js/subs.js"></script>
+	<script type="text/javascript" src="js/views.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+</head>
+<body onload="App.onLoad();" onunload="App.onUnload();">
+	<object id="pluginPlayer" border="0" classid="clsid:SAMSUNG-INFOLINK-PLAYER" style="position:absolute;left:0;top:0;width:0;height:0;"></object>
+	<object id="pluginTVMW" border="0" classid="clsid:SAMSUNG-INFOLINK-TVMW" style="position:absolute;left:0;top:0;width:0;height:0;"></object>
+	<object id="pluginNNavi" border="0" classid="clsid:SAMSUNG-INFOLINK-NNAVI" style="position:absolute;left:0;top:0;width:0;height:0;"></object>
+
+	<a href="javascript:void(0);" id="anchor"></a>
+
+	<div id="app">
+		<div id="header">
+			<div id="title">E2<span>TV</span>Player</div>
+			<div id="crumb"></div>
+			<div id="clock"></div>
+		</div>
+		<div id="nowbar"></div>
+
+		<!-- Tallenteet / kanavat: lista vasemmalla, tiedot oikealla -->
+		<div id="browser">
+			<div id="listbox">
+				<div id="list"></div>
+				<div id="scroll"><div id="scrollthumb"></div></div>
+				<div id="empty"></div>
+			</div>
+			<div id="details">
+				<div id="d-title"></div>
+				<div id="d-meta"></div>
+				<div id="d-desc"></div>
+			</div>
+		</div>
+
+		<!-- Asetukset -->
+		<div id="settings">
+			<div class="s-head">Boksin osoite</div>
+			<div class="s-help">Numeronäppäimet syöttävät, vasen/oikea vaihtaa kenttää, ylös/alas muuttaa arvoa.</div>
+			<div id="s-fields"></div>
+			<div id="s-info"></div>
+			<div class="s-keys"><span class="k k-ok">OK</span> Tallenna &nbsp; <span class="k k-red"></span> Palauta oletus &nbsp; <span class="k k-green"></span> Näytön koko &nbsp; <span class="k k-ret">RETURN</span> Peruuta</div>
+		</div>
+
+		<div id="footer"></div>
+	</div>
+
+	<!-- Boksin purkamat tekstitykset videon päällä -->
+	<div id="sublayer"><img id="subimg" src="" alt="" /></div>
+	<!-- Toiston päälle tuleva palkki -->
+	<div id="osd">
+		<div id="osd-title"></div>
+		<div id="osd-sub"></div>
+		<div id="osd-bar"><div id="osd-fill"></div></div>
+		<div id="osd-time"></div>
+		<div id="osd-state"></div>
+		<div id="osd-keys">&#9664;&#9654; 15 s &nbsp; &#9650;&#9660; 5 min &nbsp; &#9194;&#9193; 1 min &nbsp; OK tauko &nbsp; RETURN lopeta</div>
+	</div>
+	<!-- INFO-paneeli toiston aikana -->
+	<div id="info">
+		<div id="i-title"></div>
+		<div id="i-meta"></div>
+		<div id="i-desc"></div>
+		<div id="i-next"></div>
+	</div>
+	<!-- MENU/TOOLS: ääni ja tekstitys -->
+	<div id="tracks">
+		<div class="tr-head">Ääni ja tekstitys</div>
+		<div id="tr-rows"></div>
+		<div id="tr-diag"></div>
+		<div class="tr-keys">▲▼ rivi &nbsp; ◀▶ vaihda &nbsp; OK/RETURN sulje</div>
+	</div>
+	<div id="subs"></div>
+	<div id="busy"><div id="busy-text">Ladataan&hellip;</div></div>
+	<div id="dialog">
+		<div id="dlg-title"></div>
+		<div id="dlg-text"></div>
+		<div id="dlg-buttons"></div>
+	</div>
+	<div id="toast"></div>
+</body>
+</html>

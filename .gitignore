@@ -1,0 +1,10 @@
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+*.iml
+enigma2/dist/
+dist/
+__pycache__/
+*.pyc

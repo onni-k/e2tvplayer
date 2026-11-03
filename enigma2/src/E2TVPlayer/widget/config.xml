@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget>
+	<cpname>E2TVPlayer</cpname>
+	<cpauthjs></cpauthjs>
+	<ver>0.1.005</ver>
+	<mgrver></mgrver>
+	<emp></emp>
+	<type>user</type>
+	<category>lifestyle</category>
+	<autoUpdate>n</autoUpdate>
+	<fullwidget>y</fullwidget>
+	<srcctl>y</srcctl>
+	<ticker>n</ticker>
+	<childlock>n</childlock>
+	<audiomute>n</audiomute>
+	<videomute>n</videomute>
+	<dcont>y</dcont>
+	<movie>y</movie>
+	<network>y</network>
+	<hubsite>n</hubsite>
+	<ThumbIcon>icon/thumb_106x87.png</ThumbIcon>
+	<BigThumbIcon>icon/thumb_115x95.png</BigThumbIcon>
+	<ListIcon>icon/list_85x70.png</ListIcon>
+	<BigListIcon>icon/list_95x78.png</BigListIcon>
+	<widgetname>E2TVPlayer</widgetname>
+	<description>Enigma2-boksin tallenteet ja kanavat OpenWebifin kautta</description>
+	<width>1280</width>
+	<height>720</height>
+	<author>
+		<name>E2TVPlayer</name>
+		<email></email>
+		<link></link>
+		<organization></organization>
+	</author>
+</widget>
