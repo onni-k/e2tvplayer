@@ -21,7 +21,7 @@ try:
 except ImportError:  # pragma: no cover - vain testausta varten
 	resource = None
 
-VERSION = "0.1.005"
+VERSION = "0.1.006"
 APP_ID = "E2Tallenteet"   # TV:n sisäinen tunnus pidetään ennallaan: päivitys korvaa vanhan sovelluksen
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"
