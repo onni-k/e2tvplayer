@@ -61,6 +61,8 @@ dependencies {
     val media3 = "1.3.1"
     implementation("androidx.media3:media3-exoplayer:$media3")
     implementation("androidx.media3:media3-ui:$media3")
+    // FFmpeg-äänidekooderi (AC-3, E-AC-3, AAC, MP2 ...) PCM:ksi: ääni kuuluu, vaikka TV ei osaisi Dolbya
+    implementation("org.jellyfin.media3:media3-ffmpeg-decoder:$media3+")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.annotation:annotation:1.8.0")
 }

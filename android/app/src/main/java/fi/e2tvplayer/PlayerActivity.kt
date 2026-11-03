@@ -24,6 +24,11 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.analytics.AnalyticsListener
+import androidx.media3.exoplayer.audio.AudioCapabilities
+import androidx.media3.exoplayer.audio.AudioSink
+import androidx.media3.exoplayer.audio.DefaultAudioSink
+import android.content.Context
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.extractor.DefaultExtractorsFactory
@@ -106,6 +111,25 @@ class PlayerActivity : Activity() {
             lengthSec = i.getLongExtra("length", 0L)
         }
 
+        buildPlayer()
+        if (live) {
+            playChannel(index)
+        } else {
+            currentUrl = i.getStringExtra("url") ?: ""
+            player.setMediaItem(MediaItem.fromUri(currentUrl), i.getLongExtra("start", 0L))
+            player.prepare()
+            player.playWhenReady = true
+            showOsd()
+        }
+    }
+
+    private var currentUrl = ""
+    private var audioDecoder = ""
+
+    /** "pcm": sovellus purkaa äänen (FFmpeg) ja lähettää PCM:ää; "tv": Dolby läpivienti TV:lle / laitteen omat dekooderit */
+    private fun audioMode(): String = Box.prefs.getString("audioMode", "pcm") ?: "pcm"
+
+    private fun buildPlayer() {
         val http = DefaultHttpDataSource.Factory()
             .setUserAgent("E2TVPlayer")
             .setConnectTimeoutMs(8000)
@@ -115,19 +139,62 @@ class PlayerActivity : Activity() {
             .setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES)
             .setTsExtractorTimestampSearchBytes(1500 * TsExtractor.TS_PACKET_SIZE)
         val sources = DefaultMediaSourceFactory(DefaultDataSource.Factory(this, http), extractors)
-        val renderers = DefaultRenderersFactory(this).setEnableDecoderFallback(true)
+        val pcm = audioMode() == "pcm"
+        val renderers = object : DefaultRenderersFactory(this) {
+            override fun buildAudioSink(context: Context, enableFloatOutput: Boolean, enableAudioTrackPlaybackParams: Boolean): AudioSink {
+                val b = DefaultAudioSink.Builder(context)
+                    .setEnableFloatOutput(enableFloatOutput)
+                    .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
+                // PCM-tilassa ei koskaan läpivientiä: kaikki ääni puretaan PCM:ksi
+                if (pcm) {
+                    @Suppress("DEPRECATION")
+                    b.setAudioCapabilities(AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES)
+                }
+                return b.build()
+            }
+        }
+            .setEnableDecoderFallback(true)
+            .setExtensionRendererMode(
+                if (pcm) DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
+                else DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
+            )
         player = ExoPlayer.Builder(this, renderers).setMediaSourceFactory(sources).build()
         video.player = player
         player.addListener(listener)
-        applyPreferences()
+        player.addAnalyticsListener(object : AnalyticsListener {
+            override fun onAudioInputFormatChanged(eventTime: AnalyticsListener.EventTime, format: Format,
+                                                   decoderReuseEvaluation: androidx.media3.exoplayer.DecoderReuseEvaluation?) {
+                android.util.Log.i("E2TVPlayer", "audio format: ${format.sampleMimeType} ${format.language} ${format.channelCount}ch")
+            }
 
+            override fun onAudioSinkError(eventTime: AnalyticsListener.EventTime, audioSinkError: Exception) {
+                android.util.Log.e("E2TVPlayer", "audio sink error", audioSinkError)
+            }
+
+            override fun onAudioDecoderInitialized(eventTime: AnalyticsListener.EventTime, decoderName: String,
+                                                   initializedTimestampMs: Long, initializationDurationMs: Long) {
+                audioDecoder = decoderName
+                android.util.Log.i("E2TVPlayer", "audio decoder: $decoderName (mode ${audioMode()})")
+                if (tracks.visibility == View.VISIBLE) renderTracks()
+            }
+        })
+        applyPreferences()
+    }
+
+    /** Äänen purkutavan vaihto: uusi soitin samasta kohdasta */
+    private fun rebuildPlayer() {
+        val pos = player.currentPosition
+        val playing = player.playWhenReady
+        player.removeListener(listener)
+        player.release()
+        audioDecoder = ""
+        buildPlayer()
         if (live) {
             playChannel(index)
         } else {
-            player.setMediaItem(MediaItem.fromUri(i.getStringExtra("url") ?: ""), i.getLongExtra("start", 0L))
+            player.setMediaItem(MediaItem.fromUri(currentUrl), pos)
             player.prepare()
-            player.playWhenReady = true
-            showOsd()
+            player.playWhenReady = playing
         }
     }
 
@@ -374,6 +441,22 @@ class PlayerActivity : Activity() {
         return s
     }
 
+    /** Kaikki ääniraidat ja niiden tuki – näytetään valikon alareunassa vianetsintää varten */
+    private fun audioDiag(): String {
+        val parts = ArrayList<String>()
+        for (g in player.currentTracks.groups) {
+            if (g.type != C.TRACK_TYPE_AUDIO) continue
+            for (t in 0 until g.length) {
+                val f = g.getTrackFormat(t)
+                val c = codec(f).ifEmpty { f.sampleMimeType ?: "?" }
+                parts.add(Fmt.lang(f.language) + " " + c + (if (g.isTrackSupported(t)) "" else " (ei tuettu)") +
+                    (if (g.isTrackSelected(t)) " ✓" else ""))
+            }
+        }
+        val dec = if (audioDecoder.isEmpty()) "" else "   ·   purkaja: " + audioDecoder
+        return (if (parts.isEmpty()) "Ei ääniraitoja" else parts.joinToString(", ")) + dec
+    }
+
     private fun options(type: Int): List<Opt> {
         val out = ArrayList<Opt>()
         if (type == C.TRACK_TYPE_TEXT) out.add(Opt("pois", null, -1, ""))
@@ -422,9 +505,29 @@ class PlayerActivity : Activity() {
             lp.bottomMargin = 6
             trRows.addView(tv, lp)
         }
+        val mode = TextView(this)
+        mode.text = "Äänen purku".padEnd(12) + "◀ " + (if (audioMode() == "pcm") "sovellus (PCM)" else "TV / Dolby-läpivienti") + " ▶"
+        mode.textSize = 17f
+        mode.setPadding(24, 14, 24, 14)
+        mode.setTextColor(0xFFFFFFFF.toInt())
+        mode.setBackgroundColor(if (trackRow == 2) 0xFF2A5C99.toInt() else 0xFF1E2836.toInt())
+        trRows.addView(mode, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+        val diag = TextView(this)
+        diag.text = audioDiag()
+        diag.textSize = 12f
+        diag.setPadding(4, 10, 4, 0)
+        diag.setTextColor(0xFF8B98A8.toInt())
+        trRows.addView(diag)
     }
 
     private fun changeTrack(d: Int) {
+        if (trackRow == 2) {
+            Box.prefs.edit().putString("audioMode", if (audioMode() == "pcm") "tv" else "pcm").apply()
+            rebuildPlayer()
+            renderTracks()
+            toast(if (audioMode() == "pcm") "Ääni puretaan sovelluksessa" else "Ääni TV:n / laitteen purettavaksi")
+            return
+        }
         val type = if (trackRow == 0) C.TRACK_TYPE_AUDIO else C.TRACK_TYPE_TEXT
         val opts = options(type)
         if (opts.size < 2) return
@@ -461,7 +564,8 @@ class PlayerActivity : Activity() {
         // valikko auki: vain valikon näppäimet
         if (tracks.visibility == View.VISIBLE) {
             if (first) when (k) {
-                KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN -> { trackRow = 1 - trackRow; renderTracks() }
+                KeyEvent.KEYCODE_DPAD_UP -> { trackRow = (trackRow + 2) % 3; renderTracks() }
+                KeyEvent.KEYCODE_DPAD_DOWN -> { trackRow = (trackRow + 1) % 3; renderTracks() }
                 KeyEvent.KEYCODE_DPAD_LEFT -> changeTrack(-1)
                 KeyEvent.KEYCODE_DPAD_RIGHT -> changeTrack(1)
                 KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_MENU, KeyEvent.KEYCODE_CAPTIONS ->

@@ -23,6 +23,12 @@ shot 05_valikko
 key KEYCODE_DPAD_DOWN                # Tekstitys-rivi
 key KEYCODE_DPAD_RIGHT               # pois -> suomi
 shot 06_valikko_suomi
+key KEYCODE_DPAD_DOWN                # Äänen purku -rivi + ääniraitojen diagnostiikka
+shot 06b_aanen_purku
+key KEYCODE_DPAD_UP
+key KEYCODE_DPAD_UP                  # Ääni-rivi
+key KEYCODE_DPAD_RIGHT               # vaihda ääniraita (fin E-AC-3 -> swe AAC)
+shot 06c_aaniraita
 key KEYCODE_BACK
 shot 07_tekstitys 2
 key KEYCODE_BACK                     # listaan ja uudelleen alusta: tallennettu kieli kytkee tekstityksen
@@ -57,5 +63,5 @@ key KEYCODE_BACK                     # nippuja vain yksi -> tallenteet
 key KEYCODE_BACK                     # lopetuskysely
 shot 17_lopetus 2
 adb logcat -d > "$OUT/logcat.txt"
-grep -E "AndroidRuntime|FATAL|ExoPlayerImpl|E2TV|PlaybackException" "$OUT/logcat.txt" | head -80 > "$OUT/logcat_tarkeat.txt"
+grep -E "FATAL|ExoPlayerImpl|E2TVPlayer|PlaybackException|Ffmpeg|ffmpeg|AudioTrack: |DefaultAudioSink" "$OUT/logcat.txt" | head -80 > "$OUT/logcat_tarkeat.txt"
 exit 0

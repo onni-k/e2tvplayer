@@ -75,7 +75,7 @@
     <!-- Ääni ja tekstitys -->
     <LinearLayout
         android:id="@+id/tracks"
-        android:layout_width="400dp"
+        android:layout_width="560dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@drawable/menu_bg"
