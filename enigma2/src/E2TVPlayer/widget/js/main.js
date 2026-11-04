@@ -34,12 +34,44 @@ var App = {
 
 		if (!Api.host) {
 			App.go('settings');
-			Dialog.alert('Boksin osoite puuttuu', 'Syötä Enigma2-boksin IP-osoite.');
+			if (Api.canDiscover()) {
+				App.discover();
+			} else {
+				Dialog.alert('Boksin osoite puuttuu', 'Syötä Enigma2-boksin IP-osoite.');
+			}
 			return;
 		}
 		App.refreshStatus();
 		App.statusTimer = setInterval(App.refreshStatus, 30000);
 		App.go('movies');
+	},
+
+	/* Etsii lähiverkosta boksin, jossa E2TVPlayer on (Tizen: TV:n oma IP tiedetään) */
+	discover: function () {
+		U.busy(true, 'Etsitään boksia…');
+		Api.discover(function (found) {
+			U.busy(false);
+			var use = function (h) {
+				Api.host = h;
+				Store.set('host', h);
+				Views.movies.reset();
+				App.refreshStatus();
+				if (!App.statusTimer) { App.statusTimer = setInterval(App.refreshStatus, 30000); }
+				App.go('movies');
+			};
+			if (found.length === 1) {
+				U.toast('Boksi löytyi: ' + found[0]);
+				use(found[0]);
+			} else if (found.length > 1) {
+				var b = [], i;
+				for (i = 0; i < found.length && i < 4; i++) {
+					(function (h) { b.push({ label: h, fn: function () { use(h); } }); })(found[i]);
+				}
+				Dialog.open('Valitse boksi', 'Lähiverkosta löytyi useampi boksi.', b, 0);
+			} else {
+				Dialog.alert('Boksia ei löytynyt', 'Syötä Enigma2-boksin IP-osoite.');
+			}
+		});
 	},
 
 	onUnload: function () {

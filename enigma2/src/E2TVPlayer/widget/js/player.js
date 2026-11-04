@@ -498,6 +498,7 @@ var Player = {
 		switch (k) {
 			case tvKey.KEY_ENTER:
 			case tvKey.KEY_PAUSE:
+			case tvKey.KEY_PLAYPAUSE:
 			case tvKey.KEY_PLAY:
 				if (k === tvKey.KEY_PLAY && !Player.paused) { Player.showOsd(); } else { Player.togglePause(); }
 				return true;

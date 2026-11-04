@@ -31,6 +31,7 @@ jobs:
         run: |
           E2TVPLAYER_APK=$PWD/android/app/build/outputs/apk/release/E2TVPlayer.apk OUT=$PWD/dist sh enigma2/build_ipk.sh
           cp android/app/build/outputs/apk/release/E2TVPlayer.apk dist/
+          python3 enigma2/tools/build_wgt.py dist/E2TVPlayer.wgt
           "$ANDROID_HOME"/build-tools/34.0.0/aapt dump badging dist/E2TVPlayer.apk | grep -E "package|leanback|launchable|sdkVersion" | tee dist/badging.txt
           ls -la dist
 
@@ -46,6 +47,20 @@ jobs:
           files: |
             dist/*.apk
             dist/*.ipk
+            dist/*.wgt
+
+  web-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Samsung (Orsay) ja Tizen -sovellusten testit
+        working-directory: tests/web
+        run: |
+          npm install --no-audit --no-fund
+          npm test
 
   tv-test:
     needs: build

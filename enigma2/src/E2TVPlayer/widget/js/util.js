@@ -221,7 +221,7 @@ var Screen = {
 		document.body.style.zoom = '';
 		var m = Screen.mode(), w = Screen.detect(), s = 1;
 		if (m === '960') { s = 0.75; }
-		else if (m === 'auto' && w > 0 && w < 1200) { s = w / 1280; }
+		else if (m === 'auto' && w > 0 && Math.abs(w - 1280) > 40) { s = w / 1280; }   /* Orsay 960 -> 0.75, Tizen 1920 -> 1.5 */
 		Screen.scale = s;
 		document.body.style.zoom = s === 1 ? '' : String(s);
 	},

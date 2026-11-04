@@ -6,6 +6,7 @@ Enigma2-boksin (OpenViX ym.) tallenteet ja live-TV tekstityksineen televisioon O
 |---|---|---|
 | Boksin lisäosa | `enigma2/` | OpenWebif-laajennus (Python 3). Jakaa TV-sovellukset, purkaa DVB-tekstitykset Samsungille ja välittää live-kuvan. |
 | Samsung Smart TV 2011–2014 (Orsay) | `enigma2/src/E2TVPlayer/widget/` | HTML/JS-sovellus, jonka boksi jakaa TV:n developer-tilan *User App Sync* -toiminnolle. |
+| Samsung Tizen (2015–) | `enigma2/src/E2TVPlayer/tizen/` | Sama HTML/JS-sovellus Tizenin soittimella (AVPlay). Boksi rakentaa paketin `/e2tvplayer/E2TVPlayer.wgt` lennossa, osoite valmiina. |
 | Google TV / Android TV | `android/` | Kotlin + Media3 ExoPlayer. Toistaa TS-tallenteet ja live-kanavat; DVB-tekstitykset ja ääniraidat suoraan virrasta. |
 
 GitHub Actions rakentaa jokaisesta pushista APK:n ja boksin `.ipk`-paketin (APK mukana). Tagi `v*` tekee julkaisun.
@@ -36,6 +37,17 @@ kirjautuminen on päällä. Selaimella `http://<boksi>/e2tvplayer/` näkyvät as
 | BACK | ylempi kansio / lopetuskysely | lopeta (kohta tallentuu) | lopeta |
 
 Valittu tekstitys- ja äänikieli muistetaan. Värinäppäimet, MENU ja INFO toimivat niissä TV:issä, joissa ne ovat.
+
+## Samsung Tizen (2015–)
+
+1. TV: Apps → paina kaukosäätimellä **1 2 3 4 5** → Developer mode **On**, Host PC IP = tietokoneen IP → käynnistä TV uudelleen.
+2. Lataa tietokoneelle `http://<boksi>/e2tvplayer/E2TVPlayer.wgt`.
+3. Asenna se [Samsung Jellyfin Installerilla](https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer)
+   (oma .wgt). Ohjelma kirjautuu Samsung-tilille ja allekirjoittaa paketin televisiolle.
+
+Näppäimet ja toiminnot kuten vanhassa Samsungissa (TOOLS = ääni ja tekstitys, INFO = ohjelmatiedot).
+Tekstitykset puretaan boksissa kuten vanhalla Samsungilla, koska Tizenin soitin ei näytä DVB-tekstityksiä.
+Jos osoitetta ei ole paketissa, sovellus etsii boksin lähiverkosta.
 
 ## Samsung Smart TV (2011–2014)
 

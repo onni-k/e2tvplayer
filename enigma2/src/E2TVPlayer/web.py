@@ -21,7 +21,7 @@ try:
 except ImportError:  # pragma: no cover - vain testausta varten
 	resource = None
 
-VERSION = "0.1.006"
+VERSION = "0.1.007"
 APP_ID = "E2Tallenteet"   # TV:n sisäinen tunnus pidetään ennallaan: päivitys korvaa vanhan sovelluksen
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"
@@ -116,6 +116,73 @@ def build_zip(host):
 	return data
 
 
+TIZEN_DIR = os.path.join(PLUGIN_DIR, "tizen")
+_wgt_cache = {}
+
+
+def tizen_version():
+	"""Tizen hyväksyy vain numeroversion x.y.z: 0.1.007 -> 0.1.7"""
+	parts = [str(int(p)) if p.isdigit() else "0" for p in VERSION.split(".")[:3]]
+	while len(parts) < 3:
+		parts.append("0")
+	return ".".join(parts)
+
+
+def tizen_index():
+	"""Tizenin index.html tehdään Orsay-version pohjalta, jotta ne pysyvät samoina."""
+	with open(os.path.join(WIDGET_DIR, "index.html"), "rb") as f:
+		html = f.read().decode("utf-8")
+	out = []
+	inserted = False
+	for line in html.split("\n"):
+		if "$MANAGER_WIDGET" in line:
+			if not inserted:
+				out.append('\t<script type="text/javascript" src="$WEBAPIS/webapis/webapis.js"></script>')
+				out.append('\t<script type="text/javascript" src="js/tizen-shim.js"></script>')
+				inserted = True
+			continue
+		if "clsid:SAMSUNG-INFOLINK-PLAYER" in line:
+			out.append('\t<object id="av-player" type="application/avplayer" style="position:absolute;left:0;top:0;width:1280px;height:720px;"></object>')
+			out.append('\t<div id="pluginPlayer" style="display:none"></div>')
+			continue
+		if "clsid:SAMSUNG-INFOLINK-TVMW" in line:
+			out.append('\t<div id="pluginTVMW" style="display:none"></div>')
+			continue
+		if "clsid:SAMSUNG-INFOLINK-" in line:
+			continue
+		out.append(line)
+	return "\n".join(out)
+
+
+def build_wgt(host):
+	"""Tizen-sovelluspaketti (allekirjoittamaton .wgt). Boksin osoite mukana kuten Orsay-zipissä.
+	Allekirjoitus ja asennus tehdään esim. Samsung Jellyfin Installerilla (custom .wgt)."""
+	key = (host, _widget_mtime(), os.path.getmtime(TIZEN_DIR))
+	cached = _wgt_cache.get(host)
+	if cached and cached[0] == key:
+		return cached[1]
+	buf = io.BytesIO()
+	zf = zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED)
+	try:
+		with open(os.path.join(TIZEN_DIR, "config.xml"), "rb") as f:
+			zf.writestr("config.xml", f.read().decode("utf-8").replace("@VERSION@", tizen_version()))
+		zf.write(os.path.join(TIZEN_DIR, "icon.png"), "icon.png")
+		zf.write(os.path.join(TIZEN_DIR, "tizen-shim.js"), "js/tizen-shim.js")
+		zf.writestr("index.html", tizen_index())
+		for full, rel in _widget_files():
+			if rel.startswith("js/") or rel.startswith("css/"):
+				if rel == "js/boxconfig.js":
+					continue
+				zf.write(full, rel)
+		zf.writestr("js/boxconfig.js", box_config_js(host))
+	finally:
+		zf.close()
+	data = buf.getvalue()
+	_wgt_cache.clear()
+	_wgt_cache[host] = (key, data)
+	return data
+
+
 def apk_path():
 	p = os.path.join(PLUGIN_DIR, "android", "E2TVPlayer.apk")
 	return p if os.path.isfile(p) else None
@@ -181,6 +248,13 @@ if resource is not None:
 				request.setHeader(b"Content-Length", str(len(data)).encode("ascii"))
 				request.setHeader(b"Cache-Control", b"no-cache")
 				return data
+			if path and path[-1].lower().endswith(".wgt"):
+				data = build_wgt(host)
+				log("Tizen app downloaded (%d bytes)" % len(data))
+				request.setHeader(b"Content-Type", b"application/widget")
+				request.setHeader(b"Content-Disposition", b'attachment; filename="E2TVPlayer.wgt"')
+				request.setHeader(b"Content-Length", str(len(data)).encode("ascii"))
+				return data
 			if path and path[-1].lower().endswith(".apk"):
 				apk = apk_path()
 				if not apk:
@@ -213,6 +287,12 @@ if resource is not None:
 				"<title>%(t)s</title></head>"
 				"<body style='font-family:sans-serif;max-width:40em;margin:2em auto;padding:0 1em'>"
 				"<h1>%(t)s %(v)s</h1>" + apk_html +
+				"<h2>Samsung Tizen (2015&ndash;)</h2>"
+				"<ol><li>Laita TV developer-tilaan: Apps &rarr; paina 1, 2, 3, 4, 5 &rarr; Developer mode <b>On</b> ja "
+				"Host PC IP = tietokoneesi IP. Käynnistä TV uudelleen.</li>"
+				"<li>Lataa paketti: <a href='/%(m)s/E2TVPlayer.wgt'><b>E2TVPlayer.wgt</b></a></li>"
+				"<li>Asenna se tietokoneelta <a href='https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer'>"
+				"Samsung Jellyfin Installerilla</a> (valitse oma .wgt). Ohjelma hoitaa Samsungin varmenteen.</li></ol>"
 				"<h2>Samsung Smart TV (2011&ndash;2014)</h2>"
 				"<p>TV hakee sovelluksen osoitteesta "
 				"<a href='/widgetlist.xml'>http://%(h)s/widgetlist.xml</a>.</p>"

@@ -57,6 +57,40 @@ var Api = {
 		}
 	},
 
+	canDiscover: function () {
+		try { return typeof webapis !== 'undefined' && !!webapis.network && !!webapis.network.getIp(); } catch (e) { return false; }
+	},
+
+	/* Kysyy /e2tvplayer/info jokaiselta lähiverkon osoitteelta (x.y.z.1-254) */
+	discover: function (done) {
+		var ip = '';
+		try { ip = webapis.network.getIp(); } catch (e) { ip = ''; }
+		var m = /^(\d+\.\d+\.\d+)\.\d+$/.exec(ip || '');
+		if (!m) { done([]); return; }
+		var prefix = m[1], left = 254, found = [], n;
+		var finish = function () {
+			left--;
+			if (left === 0) {
+				found.sort(function (a, b) { return Number(a.split('.')[3]) - Number(b.split('.')[3]); });
+				done(found);
+			}
+		};
+		for (n = 1; n <= 254; n++) {
+			(function (h) {
+				var x = new XMLHttpRequest(), fin = false;
+				var end = function () { if (!fin) { fin = true; finish(); } };
+				var t = setTimeout(function () { try { x.abort(); } catch (e) { } end(); }, 2500);
+				x.onreadystatechange = function () {
+					if (x.readyState !== 4 || fin) { return; }
+					clearTimeout(t);
+					try { if (x.status === 200 && JSON.parse(x.responseText).app === 'E2TVPlayer') { found.push(h); } } catch (e) { }
+					end();
+				};
+				try { x.open('GET', 'http://' + h + '/e2tvplayer/info', true); x.send(null); } catch (e) { clearTimeout(t); end(); }
+			})(prefix + '.' + n);
+		}
+	},
+
 	status: function (ok, fail) { Api.get('/api/statusinfo', null, ok, fail, 8000); },
 
 	movies: function (dir, ok, fail) { Api.get('/api/movielist', dir ? { dirname: dir } : null, ok, fail, 30000); },

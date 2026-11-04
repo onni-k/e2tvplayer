@@ -8,3 +8,5 @@ enigma2/dist/
 dist/
 __pycache__/
 *.pyc
+node_modules/
+package-lock.json
