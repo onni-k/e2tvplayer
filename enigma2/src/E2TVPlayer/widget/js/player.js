@@ -328,6 +328,12 @@ var Player = {
 			list = [];
 			for (i = 0; i < n && i < 16; i++) {
 				var lang = U.langName(Player.call('GetStreamLanguageInfo', types[t], i));
+				/* TV ei aina kerro TS-virran ääniraidan kieltä: boksi tietää sen kanavataulusta */
+				var ba = types[t] === Player.AUDIO && Subs.audio && Subs.audio.length === n ? Subs.audio[i] : null;
+				if (ba) {
+					if (!lang || /^raita /.test(lang)) { lang = ba.lang ? U.langName(ba.lang) : ''; }
+					if (ba.codec) { lang = (lang || ('raita ' + (i + 1))) + ' · ' + ba.codec; }
+				}
 				list.push({ index: i, label: lang || ('raita ' + (i + 1)) });
 			}
 			if (types[t] === Player.AUDIO) { Player.audio = list; } else { Player.subs = list; }

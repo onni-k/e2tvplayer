@@ -25,7 +25,7 @@ CHUNK = PKT * 8192          # ~1.5 Mt kerrallaan
 PTS_WRAP = 1 << 33
 CACHE_DIR = ".e2tvplayer"
 OLD_CACHE_DIRS = (".e2samsungtv",)
-CACHE_VERSION = 1
+CACHE_VERSION = 2
 
 
 def log(msg):
@@ -667,10 +667,18 @@ def parse_pmt(p, info):
 		j = de
 		if st in (0x01, 0x02, 0x1b, 0x24, 0x10) and info["video_pid"] is None:
 			info["video_pid"] = epid
+		codec = AUDIO_TYPES.get(st)
+		lang = ""
 		while d + 2 <= de:
 			tag, ln = p[d], p[d + 1]
 			body = p[d + 2:d + 2 + ln]
 			d += 2 + ln
+			if tag == 0x0a and ln >= 3:
+				lang = body[0:3].decode("latin-1", "ignore")
+				if ln >= 4 and body[3] == 3 and codec:
+					codec += " (kuvailutulkkaus)"
+			elif st == 0x06 and tag in AUDIO_DESC:
+				codec = AUDIO_DESC[tag]
 			if tag == 0x59:
 				for k in range(0, len(body) - 7, 8):
 					lang = body[k:k + 3].decode("latin-1", "ignore")
@@ -686,6 +694,13 @@ def parse_pmt(p, info):
 					if ttype in (2, 5):
 						info["teletext"].append({"pid": epid, "lang": body[k:k + 3].decode("latin-1", "ignore"),
 							"page": "%d%02x" % ((body[k + 3] & 7) or 8, body[k + 4])})
+		if codec:
+			# ääniraidat PMT-järjestyksessä: TV-soittimet numeroivat ne samoin
+			info.setdefault("audio", []).append({"pid": epid, "lang": lang, "codec": codec})
+
+
+AUDIO_TYPES = {0x03: "MPEG", 0x04: "MPEG", 0x0f: "AAC", 0x11: "AAC", 0x81: "Dolby Digital", 0x87: "Dolby Digital+"}
+AUDIO_DESC = {0x6a: "Dolby Digital", 0x7a: "Dolby Digital+", 0x7c: "AAC", 0x7b: "DTS"}
 
 
 # ---------------------------------------------------------------- purkutyö
@@ -721,6 +736,7 @@ class Job(threading.Thread):
 		self.progress = 0.0
 		self.tracks = []
 		self.teletext = []
+		self.audio = []
 		self.cues = {}          # avain -> lista
 		self.dw, self.dh = 720, 576
 		self.last_used = time.time()
@@ -739,6 +755,7 @@ class Job(threading.Thread):
 				return False
 			self.tracks = idx.get("tracks", [])
 			self.teletext = idx.get("teletext", [])
+			self.audio = idx.get("audio", [])
 			self.cues = idx.get("cues", {})
 			self.dw, self.dh = idx.get("dw", 720), idx.get("dh", 576)
 			self.status = "done"
@@ -750,7 +767,7 @@ class Job(threading.Thread):
 	def save_index(self, status):
 		try:
 			with self.lock:
-				idx = {"stat": self.stat_key(), "status": status, "tracks": self.tracks, "teletext": self.teletext,
+				idx = {"stat": self.stat_key(), "status": status, "tracks": self.tracks, "teletext": self.teletext, "audio": self.audio,
 					"cues": self.cues, "dw": self.dw, "dh": self.dh}
 			tmp = os.path.join(self.cache, "index.json.tmp")
 			with open(tmp, "w") as f:
@@ -782,6 +799,7 @@ class Job(threading.Thread):
 			info = read_psi(self.path)
 			with self.lock:
 				self.teletext = info["teletext"]
+				self.audio = [{"lang": a["lang"], "codec": a["codec"]} for a in info.get("audio", [])]
 				self.tracks = [{"key": t["key"], "lang": t["lang"], "label": track_label(t)} for t in info["tracks"]]
 				for t in self.tracks:
 					self.cues[t["key"]] = []
@@ -928,7 +946,7 @@ class Job(threading.Thread):
 		self.last_used = time.time()
 		with self.lock:
 			out = {"status": self.status, "progress": round(self.progress, 3), "error": self.error,
-				"tracks": list(self.tracks), "teletext": len(self.teletext), "dw": self.dw, "dh": self.dh}
+				"tracks": list(self.tracks), "teletext": len(self.teletext), "audio": list(self.audio), "dw": self.dw, "dh": self.dh}
 			if key is not None:
 				cues = self.cues.get(key, [])
 				out["cues"] = cues[start:]

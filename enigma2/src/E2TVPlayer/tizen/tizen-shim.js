@@ -81,7 +81,12 @@
 	function trackLang(t) {
 		var info = {};
 		try { info = typeof t.extra_info === 'string' ? JSON.parse(t.extra_info) : (t.extra_info || {}); } catch (e) { info = {}; }
-		return info.language || info.track_lang || info.lang || '';
+		var l = info.language || info.track_lang || info.lang || '';
+		if (!l && typeof t.extra_info === 'string') {
+			var m = /lang(?:uage)?["']?\s*[:=]\s*["']?([A-Za-z]{2,3})/.exec(t.extra_info);
+			if (m) { l = m[1]; }
+		}
+		return l;
 	}
 
 	function makePlayer(el) {
@@ -196,5 +201,6 @@
 	}
 
 	if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', setup); } else { setup(); }
+	try { document.documentElement.className += ' tizen'; } catch (e) { }
 	window.E2_TIZEN = true;
 })();

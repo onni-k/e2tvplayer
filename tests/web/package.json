@@ -2,7 +2,10 @@
   "name": "e2tvplayer-web-tests",
   "private": true,
   "scripts": {
-    "test": "node es5check.js && node samsung.test.js && python3 ../../enigma2/tools/build_wgt.py /tmp/e2wgt && node tizen.test.js /tmp/e2wgt"
+    "test": "node es5check.js && node samsung.test.js && python3 ../../enigma2/tools/build_wgt.py /tmp/e2wgt && node tizen.test.js /tmp/e2wgt && node loader.test.js /tmp/e2wgt"
   },
-  "devDependencies": { "acorn": "8.12.1", "jsdom": "24.1.1" }
+  "devDependencies": {
+    "acorn": "8.12.1",
+    "jsdom": "24.1.1"
+  }
 }

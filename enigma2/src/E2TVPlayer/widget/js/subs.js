@@ -16,6 +16,7 @@ var Subs = {
 	gen: 0,              /* estää vanhojen vastausten sotkemasta uutta toistoa */
 	liveId: null,        /* live-lähetyksen istunto boksilla */
 	liveGen: 0,
+	audio: [],          /* boksin tieto ääniraidoista: [{lang, codec}] PMT-järjestyksessä */
 
 	start: function (item) {
 		Subs.stop();
@@ -31,6 +32,7 @@ var Subs = {
 		Subs.file = null;
 		Subs.liveId = null;
 		Subs.liveGen = 0;
+		Subs.audio = [];
 		Subs.tracks = [];
 		Subs.status = '';
 		Subs.progress = 0;
@@ -69,6 +71,7 @@ var Subs = {
 			Subs.status = r.status || '';
 			Subs.error = r.error || '';
 			Subs.teletext = r.teletext || 0;
+			if (r.audio) { Subs.audio = r.audio; if (Player.tracksOpen && Player.tracksOpen()) { Player.readStreams(); } }
 			Subs.dw = r.dw || 720;
 			Subs.dh = r.dh || 576;
 			if (r.gen && r.gen !== Subs.liveGen) { Subs.liveGen = r.gen; Subs.cues = []; Subs.hide(); }
@@ -109,6 +112,7 @@ var Subs = {
 			Subs.progress = Number(r.progress) || 0;
 			Subs.error = r.error || '';
 			Subs.teletext = r.teletext || 0;
+			if (r.audio) { Subs.audio = r.audio; if (Player.tracksOpen && Player.tracksOpen()) { Player.readStreams(); } }
 			Subs.dw = r.dw || 720;
 			Subs.dh = r.dh || 576;
 			var hadTracks = Subs.tracks.length > 0;

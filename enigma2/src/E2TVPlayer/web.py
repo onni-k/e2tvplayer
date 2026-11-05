@@ -21,7 +21,7 @@ try:
 except ImportError:  # pragma: no cover - vain testausta varten
 	resource = None
 
-VERSION = "0.1.007"
+VERSION = "0.1.008"
 APP_ID = "E2Tallenteet"   # TV:n sisäinen tunnus pidetään ennallaan: päivitys korvaa vanhan sovelluksen
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"
@@ -141,6 +141,12 @@ def tizen_index():
 				out.append('\t<script type="text/javascript" src="js/tizen-shim.js"></script>')
 				inserted = True
 			continue
+		# sovelluksen koodi ladataan loader.js:llä (boksista tai paketista), ei suoraan
+		if '<script type="text/javascript" src="js/' in line and "boxconfig.js" not in line:
+			if "loader" not in "".join(out[-3:]):
+				out.append('\t<script type="text/javascript" src="js/loader.js"></script>')
+			continue
+		line = line.replace('onload="App.onLoad();"', 'onload="E2Loader.start();"')
 		if "clsid:SAMSUNG-INFOLINK-PLAYER" in line:
 			out.append('\t<object id="av-player" type="application/avplayer" style="position:absolute;left:0;top:0;width:1280px;height:720px;"></object>')
 			out.append('\t<div id="pluginPlayer" style="display:none"></div>')
@@ -168,6 +174,7 @@ def build_wgt(host):
 			zf.writestr("config.xml", f.read().decode("utf-8").replace("@VERSION@", tizen_version()))
 		zf.write(os.path.join(TIZEN_DIR, "icon.png"), "icon.png")
 		zf.write(os.path.join(TIZEN_DIR, "tizen-shim.js"), "js/tizen-shim.js")
+		zf.write(os.path.join(TIZEN_DIR, "loader.js"), "js/loader.js")
 		zf.writestr("index.html", tizen_index())
 		for full, rel in _widget_files():
 			if rel.startswith("js/") or rel.startswith("css/"):
@@ -268,11 +275,22 @@ if resource is not None:
 				request.setHeader(b"Content-Disposition", b'attachment; filename="E2TVPlayer.apk"')
 				request.setHeader(b"Content-Length", str(len(data)).encode("ascii"))
 				return data
+			if len(path) == 3 and path[0] == "web" and path[1] in ("js", "css") and re.match(r"^[A-Za-z0-9_.-]+\.(js|css)$", path[2]):
+				# Tizen-sovellus lataa koodinsa täältä: päivittyy boksin lisäosan mukana
+				p = os.path.join(WIDGET_DIR, path[1], path[2])
+				if path[2] == "boxconfig.js" or not os.path.isfile(p):
+					request.setResponseCode(404)
+					return b""
+				with open(p, "rb") as f:
+					data = f.read()
+				request.setHeader(b"Content-Type", b"text/css; charset=utf-8" if path[1] == "css" else b"application/javascript; charset=utf-8")
+				request.setHeader(b"Cache-Control", b"no-cache")
+				return data
 			if path and path[0] == "info":
 				# Google TV -sovellus etsii boksin lähiverkosta tällä osoitteella
 				request.setHeader(b"Content-Type", b"application/json; charset=utf-8")
 				request.setHeader(b"Access-Control-Allow-Origin", b"*")
-				return json.dumps({"app": "E2TVPlayer", "version": VERSION, "apk": bool(apk_path()),
+				return json.dumps({"app": "E2TVPlayer", "version": VERSION, "apk": bool(apk_path()), "web": True,
 					"apkVersion": apk_version()}).encode("utf-8")
 			request.setHeader(b"Content-Type", b"text/html; charset=utf-8")
 			apk_html = (

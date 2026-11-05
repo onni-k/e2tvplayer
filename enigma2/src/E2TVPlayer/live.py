@@ -49,6 +49,7 @@ class LiveSession(object):
 		self.base_pts = None
 		self.tracks = []
 		self.teletext = 0
+		self.audio = []
 		self.decoders = {}       # pid -> [DvbSubDecoder]
 		self.dec_list = []
 		self.bufs = {}           # PSI-osiot
@@ -189,6 +190,7 @@ class LiveSession(object):
 		self.pmt_pids = {self.pmt_pids_for(pmt)} if len(self.pmt_pids) > 1 else self.pmt_pids
 		self.video_pid = info["video_pid"]
 		self.teletext = len(info["teletext"])
+		self.audio = [{"lang": a["lang"], "codec": a["codec"]} for a in info.get("audio", [])]
 		self.tracks = [{"key": t["key"], "lang": t["lang"], "label": track_label(t)} for t in info["tracks"]]
 		self.decoders = {}
 		self.dec_list = []
@@ -276,7 +278,7 @@ class LiveSession(object):
 	def snapshot(self, key=None, start=0):
 		self.last_used = time.time()
 		out = {"status": self.status, "error": self.error, "gen": self.gen, "tracks": list(self.tracks),
-			"teletext": self.teletext, "dw": self.dw, "dh": self.dh, "live": True}
+			"teletext": self.teletext, "audio": list(self.audio), "dw": self.dw, "dh": self.dh, "live": True}
 		if key is not None:
 			out["cues"] = [c for c in self.cues.get(key, []) if c["n"] >= start]
 		return out

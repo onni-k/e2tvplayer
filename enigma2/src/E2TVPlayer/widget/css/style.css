@@ -131,3 +131,12 @@ body.playing #app { display: none; }
 
 #sublayer { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; display: none; overflow: hidden; }
 #subimg { position: absolute; left: 0; top: 0; }
+
+/* Tizen: TV näyttää värit tarkasti, joten tausta tehdään sinisen sävyiseksi kuten vanhoissa Samsungeissa */
+html.tizen body { background: #12297a; background: -webkit-linear-gradient(top, #1b3a99 0%, #0e1f63 100%); background: linear-gradient(to bottom, #1b3a99 0%, #0e1f63 100%); }
+html.tizen body.playing { background: transparent; }
+html.tizen .row { border-bottom-color: rgba(255, 255, 255, 0.10); }
+html.tizen .row.sel { background: #3d8bff; border-bottom-color: #3d8bff; }
+html.tizen #nowbar, html.tizen #scroll, html.tizen .fld { background: rgba(0, 10, 40, 0.35); }
+html.tizen .row .s, html.tizen .row .r2 { color: #a9b8d6; }
+html.tizen #crumb, html.tizen #footer { color: #b6c4e0; }
