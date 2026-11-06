@@ -522,6 +522,15 @@ class PlayerActivity : Activity() {
         mode.setTextColor(0xFFFFFFFF.toInt())
         mode.setBackgroundColor(if (trackRow == 2) 0xFF2A5C99.toInt() else 0xFF1E2836.toInt())
         trRows.addView(mode, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+        val shot = TextView(this)
+        shot.text = "Kuvakaappaus".padEnd(12) + if (shotBusy) "odota…" else "OK: ota kuva 10 s päästä"
+        shot.textSize = 17f
+        shot.setPadding(24, 14, 24, 14)
+        shot.setTextColor(0xFFFFFFFF.toInt())
+        shot.setBackgroundColor(if (trackRow == 3) 0xFF2A5C99.toInt() else 0xFF1E2836.toInt())
+        val slp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        slp.topMargin = 6
+        trRows.addView(shot, slp)
         val diag = TextView(this)
         diag.text = audioDiag()
         diag.textSize = 12f
@@ -530,7 +539,105 @@ class PlayerActivity : Activity() {
         trRows.addView(diag)
     }
 
+    // ---------------------------------------------------------------- kuvakaappaus
+
+    private var shotBusy = false
+
+    private fun startShot() {
+        if (shotBusy) return
+        shotBusy = true
+        var left = 10
+        val tick = object : Runnable {
+            override fun run() {
+                if (isFinishing) { shotBusy = false; return }
+                if (left > 0) {
+                    toast("📷 $left")
+                    left--
+                    ui.postDelayed(this, 1000)
+                } else {
+                    toastView.visibility = View.GONE
+                    ui.postDelayed({ captureShot() }, 150)
+                }
+            }
+        }
+        tick.run()
+    }
+
+    /** Videokuva PixelCopyllä (SurfaceView), päälle sovelluksen näkymät: tekstitys, palkit, valikot */
+    private fun captureShot() {
+        val root = findViewById<View>(android.R.id.content)
+        val w = root.width
+        val h = root.height
+        if (w <= 0 || h <= 0) { shotBusy = false; return }
+        val full = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(full)
+        canvas.drawColor(0xFF000000.toInt())
+        val overlays = {
+            for (v in listOf<View?>(video.subtitleView, info, tracks, osd, toastView)) {
+                if (v == null || v.visibility != View.VISIBLE || v.width == 0) continue
+                val loc = IntArray(2)
+                v.getLocationInWindow(loc)
+                canvas.save()
+                canvas.translate(loc[0].toFloat(), loc[1].toFloat())
+                v.draw(canvas)
+                canvas.restore()
+            }
+            uploadShot(full)
+        }
+        val sv = video.videoSurfaceView as? android.view.SurfaceView
+        if (sv != null && sv.width > 0 && android.os.Build.VERSION.SDK_INT >= 24) {
+            val vb = android.graphics.Bitmap.createBitmap(sv.width, sv.height, android.graphics.Bitmap.Config.ARGB_8888)
+            try {
+                android.view.PixelCopy.request(sv, vb, { result ->
+                    if (result == android.view.PixelCopy.SUCCESS) {
+                        val loc = IntArray(2)
+                        sv.getLocationInWindow(loc)
+                        canvas.drawBitmap(vb, loc[0].toFloat(), loc[1].toFloat(), null)
+                    }
+                    overlays()
+                }, ui)
+            } catch (e: Exception) {
+                overlays()
+            }
+        } else {
+            overlays()
+        }
+    }
+
+    private fun uploadShot(bmp: android.graphics.Bitmap) {
+        val params = LinkedHashMap<String, String?>()
+        params["platform"] = "googletv"
+        params["novideo"] = "1"
+        params["pos"] = String.format(java.util.Locale.US, "%.2f", player.currentPosition / 1000.0)
+        params["title"] = title
+        if (!live) params["file"] = key else params["sref"] = refs.getOrNull(index)
+        val url = Box.url("/e2tvplayer/screenshot", params)
+        Thread {
+            var msg: String
+            try {
+                val out = java.io.ByteArrayOutputStream()
+                bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, out)
+                val c = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+                c.requestMethod = "POST"
+                c.doOutput = true
+                c.connectTimeout = 5000
+                c.readTimeout = 20000
+                c.setRequestProperty("Content-Type", "image/png")
+                c.outputStream.use { it.write(out.toByteArray()) }
+                val code = c.responseCode
+                val body = (if (code == 200) c.inputStream else c.errorStream)?.bufferedReader()?.use { it.readText() } ?: ""
+                c.disconnect()
+                msg = if (code == 200) "Kuva tallennettu boksiin: " + JSONObject(body).optString("name") else "Kuvan tallennus epäonnistui ($code)"
+            } catch (e: Exception) {
+                msg = "Kuvan tallennus epäonnistui: ${e.message}"
+            }
+            android.util.Log.i("E2TVPlayer", "screenshot: $msg")
+            ui.post { shotBusy = false; toast(msg) }
+        }.start()
+    }
+
     private fun changeTrack(d: Int) {
+        if (trackRow == 3) return
         if (trackRow == 2) {
             Box.prefs.edit().putString("audioMode", if (audioMode() == "pcm") "tv" else "pcm").apply()
             rebuildPlayer()
@@ -574,12 +681,15 @@ class PlayerActivity : Activity() {
         // valikko auki: vain valikon näppäimet
         if (tracks.visibility == View.VISIBLE) {
             if (first) when (k) {
-                KeyEvent.KEYCODE_DPAD_UP -> { trackRow = (trackRow + 2) % 3; renderTracks() }
-                KeyEvent.KEYCODE_DPAD_DOWN -> { trackRow = (trackRow + 1) % 3; renderTracks() }
+                KeyEvent.KEYCODE_DPAD_UP -> { trackRow = (trackRow + 3) % 4; renderTracks() }
+                KeyEvent.KEYCODE_DPAD_DOWN -> { trackRow = (trackRow + 1) % 4; renderTracks() }
                 KeyEvent.KEYCODE_DPAD_LEFT -> changeTrack(-1)
                 KeyEvent.KEYCODE_DPAD_RIGHT -> changeTrack(1)
                 KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_MENU, KeyEvent.KEYCODE_CAPTIONS ->
-                    if (!okDown) tracks.visibility = View.GONE
+                    if (!okDown) {
+                        tracks.visibility = View.GONE
+                        if (trackRow == 3 && k != KeyEvent.KEYCODE_MENU && k != KeyEvent.KEYCODE_CAPTIONS) startShot()
+                    }
             }
             if (!down && k == KeyEvent.KEYCODE_BACK) tracks.visibility = View.GONE
             if (!down && (k == KeyEvent.KEYCODE_DPAD_CENTER || k == KeyEvent.KEYCODE_ENTER)) okDown = false

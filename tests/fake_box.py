@@ -67,6 +67,21 @@ class Api(BaseHTTPRequestHandler):
         self.send_header("Content-Length", "0")
         self.end_headers()
 
+    def do_POST(self):
+        u = urlparse(self.path)
+        n = int(self.headers.get("Content-Length") or 0)
+        body = self.rfile.read(n) if n else b""
+        if u.path != "/e2tvplayer/screenshot":
+            self.send_response(404); self.send_header("Content-Length", "0"); self.end_headers(); return
+        out = os.environ.get("SHOTS", os.path.join(HERE, "..", "shots"))
+        os.makedirs(out, exist_ok=True)
+        name = "kuvakaappaus_%d" % int(time.time())
+        with open(os.path.join(out, name + ".png"), "wb") as f:
+            f.write(body)
+        with open(os.path.join(out, name + ".txt"), "w") as f:
+            f.write(self.path + "\n" + self.headers.get("Content-Type", "") + "\n")
+        self.send_json({"name": name, "ui": name + ".png", "ffmpeg": False})
+
     def send_file(self):
         size = os.path.getsize(TS)
         start, end = 0, size - 1

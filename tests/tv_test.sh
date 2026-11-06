@@ -35,6 +35,12 @@ key KEYCODE_BACK                     # listaan ja uudelleen alusta: tallennettu 
 key KEYCODE_DPAD_CENTER
 shot 07b_tekstitys_alusta 5
 shot 07c_tekstitys_10s 4
+longok                               # kuvakaappaus: valikko -> 4. rivi -> OK, 10 s viive
+key KEYCODE_DPAD_UP                  # ylös kiertää viimeiselle riville (Kuvakaappaus)
+shot 07d_kuvakaappaus_valikko 0
+key KEYCODE_DPAD_CENTER
+sleep 13
+ls -la "$OUT"/kuvakaappaus_* 2>/dev/null
 key KEYCODE_DPAD_RIGHT               # +15 s
 shot 08_kelaus 1
 key KEYCODE_DPAD_CENTER              # tauko + tiedot

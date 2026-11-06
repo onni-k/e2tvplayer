@@ -21,7 +21,7 @@ try:
 except ImportError:  # pragma: no cover - vain testausta varten
 	resource = None
 
-VERSION = "0.1.008"
+VERSION = "0.1.009"
 APP_ID = "E2Tallenteet"   # TV:n sisäinen tunnus pidetään ennallaan: päivitys korvaa vanhan sovelluksen
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"
@@ -104,7 +104,7 @@ def build_zip(host):
 	zf = zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED)
 	try:
 		for full, rel in _widget_files():
-			if rel == "js/boxconfig.js":
+			if rel == "js/boxconfig.js" or rel.startswith("lib/"):
 				continue
 			zf.write(full, rel)
 		zf.writestr("js/boxconfig.js", box_config_js(host))
@@ -117,6 +117,8 @@ def build_zip(host):
 
 
 TIZEN_DIR = os.path.join(PLUGIN_DIR, "tizen")
+# Tizen-sovelluksen boksista lataamat tiedostot järjestyksessä (vanhat paketit käyttävät omaa listaansa)
+WEB_FILES = ["js/util.js", "js/api.js", "js/listview.js", "js/player.js", "js/subs.js", "js/views.js", "js/main.js"]
 _wgt_cache = {}
 
 
@@ -241,9 +243,82 @@ if resource is not None:
 		"""/e2tvplayer/E2TVPlayer.zip ja /e2tvplayer/ (lyhyt ohjesivu)."""
 		isLeaf = True
 
+		def render_POST(self, request):
+			"""/e2tvplayer/screenshot?platform=..&file=..&pos=..&sref=..  runko: PNG/JPEG tai data-URL"""
+			from . import shots
+			path = [_to_str(p) for p in request.postpath if p]
+			request.setHeader(b"Content-Type", b"application/json; charset=utf-8")
+			request.setHeader(b"Access-Control-Allow-Origin", b"*")
+			if path != ["screenshot"]:
+				request.setResponseCode(404)
+				return b"{}"
+
+			def arg(name, default=""):
+				v = request.args.get(name.encode("ascii")) or request.args.get(name)
+				return _to_str(v[0]) if v else default
+
+			try:
+				data = request.content.read() if request.content else b""
+				ctype = _to_str(request.getHeader(b"content-type")).lower()
+				image, ext = shots.decode_body(data, ctype)
+				try:
+					pos = float(arg("pos", "0") or 0)
+				except ValueError:
+					pos = 0.0
+				meta = shots.save(arg("platform", "tv"), image, ext, arg("file") or None, pos, arg("sref") or None,
+					with_video=arg("novideo") != "1", title=arg("title"))
+				meta["dir"] = shots.shots_dir()
+				return json.dumps(meta).encode("utf-8")
+			except Exception as e:
+				log("screenshot failed: %s" % e)
+				request.setResponseCode(500)
+				return json.dumps({"error": str(e)}).encode("utf-8")
+
+		def render_OPTIONS(self, request):
+			request.setHeader(b"Access-Control-Allow-Origin", b"*")
+			request.setHeader(b"Access-Control-Allow-Methods", b"GET, POST, OPTIONS")
+			request.setHeader(b"Access-Control-Allow-Headers", b"Content-Type")
+			return b""
+
+		def render_shots(self, request, path):
+			from . import shots
+			if len(path) == 2:
+				p = shots.path_of(path[1])
+				if not p:
+					request.setResponseCode(404)
+					return b""
+				with open(p, "rb") as f:
+					data = f.read()
+				ct = {"png": b"image/png", "jpg": b"image/jpeg", "json": b"application/json"}[p.rsplit(".", 1)[1]]
+				request.setHeader(b"Content-Type", ct)
+				return data
+			d, items = shots.listing()
+			rows = []
+			for m in items:
+				imgs = [n for n in (m.get("video"), m.get("ui")) if n]
+				pics = "".join("<a href='/%s/kuva/%s'><img src='/%s/kuva/%s' style='width:480px;margin:4px;border:1px solid #333'></a>" % (MOUNT, n, MOUNT, n) for n in imgs)
+				info = "%s · %s%s" % (m.get("time", ""), m.get("platform", ""),
+					(" · %s @ %s s" % (os.path.basename(m.get("file", "")), m.get("pos"))) if m.get("file") else (" · live" if m.get("sref") else ""))
+				err = ("<br><span style='color:#c60'>%s</span>" % m["error"]) if m.get("error") else ""
+				rows.append("<div style='margin:14px 0'><b>%s</b>%s<br>%s</div>" % (info, err, pics or "<i>ei kuvaa</i>"))
+			html = ("<!DOCTYPE html><html><head><meta charset='utf-8'><title>E2TVPlayer kuvakaappaukset</title></head>"
+				"<body style='font-family:sans-serif;margin:1.5em'><h1>Kuvakaappaukset</h1><p>Kansio: <code>%s</code></p>%s</body></html>"
+				) % (d, "".join(rows) or "<p>Ei vielä kuvia. Ota kuva TV-sovelluksen ääni- ja tekstitysvalikosta.</p>")
+			request.setHeader(b"Content-Type", b"text/html; charset=utf-8")
+			request.setHeader(b"Cache-Control", b"no-cache")
+			return html.encode("utf-8")
+
 		def render_GET(self, request):
 			path = [_to_str(p) for p in request.postpath if p]
 			host = request_host(request)
+			if path and path[0] in ("kuvat", "kuva"):
+				return self.render_shots(request, path)
+			if len(path) == 3 and path[0] == "web" and path[1] == "lib" and path[2] == "html2canvas.min.js":
+				with open(os.path.join(WIDGET_DIR, "lib", path[2]), "rb") as f:
+					data = f.read()
+				request.setHeader(b"Content-Type", b"application/javascript; charset=utf-8")
+				request.setHeader(b"Cache-Control", b"max-age=86400")
+				return data
 			if path and path[0] in ("subs", "subimg"):
 				return self.render_subs(request, path[0])
 			if path and path[0] in ("live", "livesubs", "liveimg"):
@@ -290,7 +365,7 @@ if resource is not None:
 				# Google TV -sovellus etsii boksin lähiverkosta tällä osoitteella
 				request.setHeader(b"Content-Type", b"application/json; charset=utf-8")
 				request.setHeader(b"Access-Control-Allow-Origin", b"*")
-				return json.dumps({"app": "E2TVPlayer", "version": VERSION, "apk": bool(apk_path()), "web": True,
+				return json.dumps({"app": "E2TVPlayer", "version": VERSION, "apk": bool(apk_path()), "web": True, "files": WEB_FILES,
 					"apkVersion": apk_version()}).encode("utf-8")
 			request.setHeader(b"Content-Type", b"text/html; charset=utf-8")
 			apk_html = (
@@ -317,7 +392,8 @@ if resource is not None:
 				"<ol><li>Kirjaudu TV:llä Samsung-tilille käyttäjänä <b>develop</b>.</li>"
 				"<li>Smart Hub &rarr; pidä OK pohjassa jonkin sovelluksen päällä &rarr; <b>IP Setting</b> &rarr; <b>%(h)s</b></li>"
 				"<li>Pidä OK uudelleen pohjassa &rarr; <b>Start User App Sync</b>.</li></ol>"
-				"<p><a href='/%(m)s/%(z)s'>Lataa zip</a></p></body></html>"
+				"<p><a href='/%(m)s/%(z)s'>Lataa zip</a></p>"
+				"<h2>Kuvakaappaukset</h2><p><a href='/%(m)s/kuvat'>Näytä TV-sovelluksista otetut kuvat</a></p></body></html>"
 			) % {"t": APP_TITLE, "v": VERSION, "h": host, "m": MOUNT, "z": ZIP_NAME}
 			return html.encode("utf-8")
 
@@ -351,6 +427,7 @@ if resource is not None:
 					request.setResponseCode(404)
 					return b""
 				request.setHeader(b"Content-Type", b"image/png")
+				request.setHeader(b"Access-Control-Allow-Origin", b"*")   # kuvakaappaus (html2canvas) tarvitsee
 				return png
 			request.setHeader(b"Content-Type", b"application/json; charset=utf-8")
 			if s is None:
@@ -383,6 +460,7 @@ if resource is not None:
 				with open(p, "rb") as f:
 					data = f.read()
 				request.setHeader(b"Content-Type", b"image/png")
+				request.setHeader(b"Access-Control-Allow-Origin", b"*")   # kuvakaappaus (html2canvas) tarvitsee
 				request.setHeader(b"Cache-Control", b"max-age=86400")
 				return data
 			job = subs.job_for(path, start=True)

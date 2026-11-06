@@ -374,7 +374,8 @@ var Player = {
 		return 0;
 	},
 
-	trackRows: function () { return Subs.key ? 3 : 2; },
+	trackRows: function () { return Subs.key ? 4 : 3; },
+	shotRow: function () { return Player.trackRows() - 1; },
 
 	boxStatus: function () {
 		if (Subs.liveId || (Player.item && Player.item.live)) { return Player.liveStatus(); }
@@ -419,11 +420,13 @@ var Player = {
 			rows.push(row(2, 'Ajoitus', (off > 0 ? '+' : '') + off.toFixed(1).replace('.', ',') + ' s' +
 				(off === 0 ? '' : (off > 0 ? '  (aiemmin)' : '  (myöhemmin)')), true));
 		}
+		rows.push(row(Player.shotRow(), 'Kuvakaappaus', Shot.busy ? 'odota…' : 'OK: ota kuva 10 s päästä', false));
 		U.$('tr-rows').innerHTML = rows.join('');
 		U.$('tr-diag').innerHTML = U.esc(Player.boxStatus()) + '<br/>' + U.esc(Player.diag);
 	},
 
 	changeTrack: function (d) {
+		if (Player.trackRow === Player.shotRow()) { return; }
 		if (Player.trackRow === 0) {
 			var n = Player.audio.length;
 			if (n < 2) { return; }
@@ -486,6 +489,7 @@ var Player = {
 				Player.renderTracks();
 			}
 			else if (k === tvKey.KEY_LEFT) { Player.changeTrack(-1); }
+			else if (k === tvKey.KEY_ENTER && Player.trackRow === Player.shotRow()) { U.show('tracks', false); Shot.start(); }
 			else if (k === tvKey.KEY_RIGHT || k === tvKey.KEY_ENTER) { if (k === tvKey.KEY_ENTER) { U.show('tracks', false); } else { Player.changeTrack(1); } }
 			else if (k === tvKey.KEY_RETURN || Player.isMenuKey(k)) { U.show('tracks', false); }
 			else if (k === tvKey.KEY_STOP) { U.show('tracks', false); Player.stop(); }
@@ -516,5 +520,114 @@ var Player = {
 			case tvKey.KEY_RW: Player.jump(-60); return true;
 		}
 		return false;
+	}
+};
+/* Kuvakaappaus: 10 s viiveellä sovelluksen näkymä kuvaksi ja boksiin. Videokuvaa sovellus ei
+   näe (TV:n laitteistotaso), joten boksi lisää sen tallenteesta ffmpegillä, jos se on asennettu. */
+var Shot = {
+	busy: false,
+	timer: null,
+	DELAY: 10,
+
+	platform: function () { return window.E2_TIZEN ? 'tizen' : 'orsay'; },
+
+	start: function () {
+		if (Shot.busy) { return; }
+		Shot.busy = true;
+		var left = Shot.DELAY;
+		var tick = function () {
+			if (!Player.active) { Shot.busy = false; return; }
+			if (left > 0) {
+				Shot.badge('📷 ' + left);
+				left--;
+				Shot.timer = setTimeout(tick, 1000);
+			} else {
+				Shot.badge('');
+				setTimeout(Shot.capture, 150);   /* annetaan merkin kadota ruudulta */
+			}
+		};
+		tick();
+	},
+
+	badge: function (t) {
+		var b = U.$('shotbadge');
+		if (!b) {
+			b = document.createElement('div');
+			b.id = 'shotbadge';
+			b.style.cssText = 'position:absolute;right:24px;top:20px;padding:6px 12px;border-radius:6px;background:rgba(0,0,0,0.6);color:#fff;font-size:20px;display:none;';
+			document.body.appendChild(b);
+		}
+		b.innerHTML = U.esc(t);
+		b.style.display = t ? 'block' : 'none';
+	},
+
+	meta: function () {
+		var it = Player.item || {};
+		var q = { platform: Shot.platform(), pos: Math.round(Player.estimate() * 100) / 100 };
+		if (it.file) { q.file = it.file; }
+		if (it.live && it.sref) { q.sref = it.sref; }
+		return q;
+	},
+
+	capture: function () {
+		var meta = Shot.meta();
+		var send = function (dataUrl) { Shot.upload(meta, dataUrl); };
+		if (!window.Promise || !document.createElement('canvas').getContext) {
+			send(null);   /* vanha selain: boksi tallentaa pelkän videokuvan */
+			return;
+		}
+		Shot.loadLib(function (ok) {
+			if (!ok || !window.html2canvas) { send(null); return; }
+			/* html2canvas ei ymmärrä CSS-zoomia: kuvataan 1280x720-asettelu 1,5-kertaisena */
+			var body = document.body, zoom = body.style.zoom;
+			body.style.zoom = '';
+			var done = function (url) { body.style.zoom = zoom; send(url); };
+			try {
+				window.html2canvas(body, { useCORS: true, backgroundColor: null, logging: false,
+					width: 1280, height: 720, windowWidth: 1280, windowHeight: 720, scale: 1.5 })
+					.then(function (canvas) {
+						var url = null;
+						try { url = canvas.toDataURL('image/png'); } catch (e) { url = null; }
+						done(url);
+					}, function () { done(null); });
+			} catch (e) {
+				done(null);
+			}
+		});
+	},
+
+	loadLib: function (cb) {
+		if (window.html2canvas) { cb(true); return; }
+		var s = document.createElement('script');
+		s.src = Api.base() + '/e2tvplayer/web/lib/html2canvas.min.js';
+		s.onload = function () { cb(true); };
+		s.onerror = function () { cb(false); };
+		document.getElementsByTagName('head')[0].appendChild(s);
+	},
+
+	upload: function (meta, dataUrl) {
+		var q = [], k;
+		for (k in meta) { if (meta.hasOwnProperty(k)) { q.push(encodeURIComponent(k) + '=' + encodeURIComponent(meta[k])); } }
+		var x = new XMLHttpRequest();
+		x.onreadystatechange = function () {
+			if (x.readyState !== 4) { return; }
+			Shot.busy = false;
+			var r = null;
+			try { r = JSON.parse(x.responseText); } catch (e) { r = null; }
+			if (x.status === 200 && r && r.name) {
+				var what = r.ui ? 'näkymä' : 'videokuva';
+				U.toast('Kuva tallennettu boksiin (' + what + (r.ffmpeg && (meta.file || meta.sref) ? ' + videokuva' : '') + '): ' + r.name, 4000);
+			} else {
+				U.toast('Kuvan tallennus epäonnistui', 3000);
+			}
+		};
+		try {
+			x.open('POST', Api.base() + '/e2tvplayer/screenshot?' + q.join('&'), true);
+			try { x.setRequestHeader('Content-Type', 'text/plain'); } catch (eh) { }
+			x.send(dataUrl || '');
+		} catch (e) {
+			Shot.busy = false;
+			U.toast('Kuvan tallennus epäonnistui', 3000);
+		}
 	}
 };

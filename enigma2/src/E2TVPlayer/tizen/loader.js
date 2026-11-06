@@ -25,6 +25,7 @@ var E2Loader = {
 			try { info = JSON.parse(x.responseText); } catch (e) { info = null; }
 			if (x.status === 200 && info && info.app === 'E2TVPlayer' && info.web) {
 				done = true;
+				if (info.files && info.files.length) { E2Loader.FILES = info.files; }   /* uudet tiedostot boksin mukaan */
 				E2Loader.load('http://' + h + '/e2tvplayer/web/', info.version || '');
 			} else {
 				local();

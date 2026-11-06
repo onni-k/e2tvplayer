@@ -75,6 +75,16 @@ def info_text():
 	lines.append("")
 	lines.append("Päivitys: tee kohta 4 uudelleen ja käynnistä TV sen jälkeen uudelleen.")
 	lines.append("")
+	try:
+		from . import shots
+		lines.append("Kuvakaappaukset (TV-sovelluksen ääni/tekstitys-valikosta):")
+		lines.append("  %s" % shots.shots_dir())
+		lines.append("  selaimella: http://%s/e2tvplayer/kuvat" % ip)
+		if not shots.find_ffmpeg():
+			lines.append("  (videokuva Samsung-kuviin: opkg install ffmpeg)")
+	except Exception:
+		pass
+	lines.append("")
 	lines.append("Tekstitykset: boksi purkaa tallenteen DVB-tekstitykset ensimmäisellä")
 	lines.append("toistokerralla kansioon .e2tvplayer tallenteen viereen.")
 	lines.append("Sovelluksen versio: %s" % web.VERSION)

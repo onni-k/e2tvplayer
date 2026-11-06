@@ -17,7 +17,7 @@ const R={'/e2tvplayer/info':h=>h==='192.168.68.103'?{app:'E2TVPlayer'}:null,
  '/api/statusinfo':()=>({currservice_station:'Yle TV1'}),
  '/api/movielist':()=>({directory:'/media/hdd/movie/',bookmarks:[],movies:[{filename:'/media/hdd/movie/a.ts',eventname:'Elokuva',servicename:'Yle TV2',recordingtime:now-100,length:'30:00',filesize:1e9,serviceref:'1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/a.ts'}]}),
  '/e2tvplayer/subs':()=>({status:'done',progress:1,tracks:[{key:'512_1',lang:'fin',label:'suomi'}],cues:[{s:2,e:5,x:100,y:450,w:500,h:60,n:0}],dw:720,dh:576})};
-w.XMLHttpRequest=function(){}; w.XMLHttpRequest.prototype.open=function(m,u){this.u=u;urls.push(u)}; w.XMLHttpRequest.prototype.abort=function(){};
+w.XMLHttpRequest=function(){}; w.XMLHttpRequest.prototype.open=function(m,u){this.u=u;urls.push(u)}; w.XMLHttpRequest.prototype.abort=function(){}; w.XMLHttpRequest.prototype.setRequestHeader=function(){};
 w.XMLHttpRequest.prototype.send=function(){const x=this,url=new URL(x.u);const f=R[url.pathname];const r=f?f(url.hostname):null;setTimeout(()=>{x.readyState=4;x.status=r?200:0;x.responseText=JSON.stringify(r||{});x.onreadystatechange&&x.onreadystatechange();},r?5:30);};
 for(const f of ['tizen-shim','boxconfig','util','api','listview','player','subs','views','main']) w.eval(fs.readFileSync(W+'/js/'+f+'.js','utf8'));
 w.document.dispatchEvent(new w.Event('DOMContentLoaded'));
@@ -40,7 +40,18 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms)); let fail=0; const check=(c,m)=
   key(10252); check(!w.Player.paused,'ja jatkaa');
   key(10135); check($('tracks').style.display==='block' && txt('tr-rows').includes('suomi (fin)'),'TOOLS: '+txt('tr-rows'));
   key(39); check(calls.includes('track AUDIO 2'),'ääniraita vaihtui (AVPlay-indeksi 2)');
-  key(10009); key(10009); check(!w.Player.active && calls.includes('close'),'RETURN lopettaa toiston, AVPlay suljettu');
+  // kuvakaappaus: TOOLS -> viimeinen rivi -> OK, 10 s viive (kello kiihdytetään)
+  w.html2canvas = (el, o) => Promise.resolve({ toDataURL: () => 'data:image/png;base64,QUJD', o });
+  w.Shot.DELAY = 1;
+  if ($('tracks').style.display!=='block') key(10135); key(38); check(txt('tr-rows').includes('Kuvakaappaus'),'valikossa kuvakaappausrivi');
+  const posts = []; const origSend = w.XMLHttpRequest.prototype.send;
+  w.XMLHttpRequest.prototype.send = function (b) { if (this.u.includes('/e2tvplayer/screenshot')) { posts.push([this.u, b]); const x=this; setTimeout(()=>{x.readyState=4;x.status=200;x.responseText=JSON.stringify({name:'20261106-200000_tizen',ui:'a.png',ffmpeg:true});x.onreadystatechange();},5); return; } return origSend.call(this, b); };
+  key(13); check($('tracks').style.display==='none','OK sulkee valikon ja käynnistää ajastimen');
+  await sleep(1600);
+  check(posts.length===1 && /platform=tizen/.test(posts[0][0]) && /file=%2Fmedia/.test(posts[0][0]) && posts[0][1].startsWith('data:image/png'),'kuva lähetettiin boksiin: '+(posts[0]||[''])[0].split('?')[1]);
+  check(w.document.body.style.zoom==='1.5','zoom palautettiin kuvan jälkeen');
+  check(txt('toast').includes('tallennettu boksiin'),'ilmoitus: '+txt('toast'));
+  key(10009); check(!w.Player.active && calls.includes('close'),'RETURN lopettaa toiston, AVPlay suljettu');
   check(calls.includes('saver 1'),'näytönsäästäjä takaisin');
   key(10009); check(w.Dialog.isOpen,'RETURN listassa kysyy'); key(13); check(exited,'Kyllä sulkee sovelluksen');
   process.exit(fail);
