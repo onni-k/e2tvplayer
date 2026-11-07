@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 E2TVPlayer contributors
 # Simuloitu Enigma2-boksi CI-testiä varten: OpenWebif-rajapinta (portti 80),
 # tallenne Range-tuella (/file) ja live-striimi (portti 8001). Vain standardikirjasto.
 import json

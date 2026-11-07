@@ -45,8 +45,13 @@ key KEYCODE_DPAD_RIGHT               # +15 s
 shot 08_kelaus 1
 key KEYCODE_DPAD_CENTER              # tauko + tiedot
 shot 09_tauko 2
-key KEYCODE_BACK                     # takaisin listaan
+longok                               # kuvakaappaus käyntiin tauolla...
+key KEYCODE_DPAD_UP
+key KEYCODE_DPAD_CENTER
+key KEYCODE_BACK                     # ...ja heti takaisin listaan: kuva otetaan listasta
 shot 10_paluu 2
+sleep 11
+ls -la "$OUT"/kuvakaappaus_* 2>/dev/null
 key KEYCODE_DPAD_UP
 key KEYCODE_DPAD_UP                  # välilehdet (aktiivinen: Tallenteet)
 shot 10b_valilehdet 0

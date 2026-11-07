@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 E2TVPlayer contributors
 #
 # E2TVPlayer - jakaa Samsung Smart TV (Orsay, 2011-2014 / H-sarja) -sovelluksen
 # OpenWebifin kautta, jotta TV:n developer-tilan "User App Sync" voi asentaa sen.
@@ -21,7 +23,7 @@ try:
 except ImportError:  # pragma: no cover - vain testausta varten
 	resource = None
 
-VERSION = "0.1.009"
+VERSION = "0.1.010"
 APP_ID = "E2Tallenteet"   # TV:n sisäinen tunnus pidetään ennallaan: päivitys korvaa vanhan sovelluksen
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"

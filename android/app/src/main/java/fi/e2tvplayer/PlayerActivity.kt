@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 E2TVPlayer contributors
 package fi.e2tvplayer
 
 import android.app.Activity
@@ -506,7 +508,7 @@ class PlayerActivity : Activity() {
             }
             val arrows = opts.size > 1
             val tv = TextView(this)
-            tv.text = pair.first.padEnd(12) + (if (arrows) "◀ " else "") + value + (if (arrows) " ▶" else "")
+            tv.text = pair.first.padEnd(14) + (if (arrows) "◀ " else "") + value + (if (arrows) " ▶" else "")
             tv.textSize = 17f
             tv.setPadding(24, 14, 24, 14)
             tv.setTextColor(0xFFFFFFFF.toInt())
@@ -516,14 +518,14 @@ class PlayerActivity : Activity() {
             trRows.addView(tv, lp)
         }
         val mode = TextView(this)
-        mode.text = "Äänen purku".padEnd(12) + "◀ " + (if (audioMode() == "pcm") "sovellus (PCM)" else "TV / Dolby-läpivienti") + " ▶"
+        mode.text = "Äänen purku".padEnd(14) + "◀ " + (if (audioMode() == "pcm") "sovellus (PCM)" else "TV / Dolby-läpivienti") + " ▶"
         mode.textSize = 17f
         mode.setPadding(24, 14, 24, 14)
         mode.setTextColor(0xFFFFFFFF.toInt())
         mode.setBackgroundColor(if (trackRow == 2) 0xFF2A5C99.toInt() else 0xFF1E2836.toInt())
         trRows.addView(mode, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
         val shot = TextView(this)
-        shot.text = "Kuvakaappaus".padEnd(12) + if (shotBusy) "odota…" else "OK: ota kuva 10 s päästä"
+        shot.text = "Kuvakaappaus".padEnd(14) + if (Shots.busy) "odota…" else "OK: ota kuva 10 s päästä"
         shot.textSize = 17f
         shot.setPadding(24, 14, 24, 14)
         shot.setTextColor(0xFFFFFFFF.toInt())
@@ -541,39 +543,24 @@ class PlayerActivity : Activity() {
 
     // ---------------------------------------------------------------- kuvakaappaus
 
-    private var shotBusy = false
-
-    private fun startShot() {
-        if (shotBusy) return
-        shotBusy = true
-        var left = 10
-        val tick = object : Runnable {
-            override fun run() {
-                if (isFinishing) { shotBusy = false; return }
-                if (left > 0) {
-                    toast("📷 $left")
-                    left--
-                    ui.postDelayed(this, 1000)
-                } else {
-                    toastView.visibility = View.GONE
-                    ui.postDelayed({ captureShot() }, 150)
-                }
-            }
-        }
-        tick.run()
-    }
+    private fun startShot() = Shots.start()
 
     /** Videokuva PixelCopyllä (SurfaceView), päälle sovelluksen näkymät: tekstitys, palkit, valikot */
-    private fun captureShot() {
+    fun captureShot(done: (android.graphics.Bitmap, Map<String, String?>) -> Unit) {
         val root = findViewById<View>(android.R.id.content)
         val w = root.width
         val h = root.height
-        if (w <= 0 || h <= 0) { shotBusy = false; return }
-        val full = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888)
+        val params = LinkedHashMap<String, String?>()
+        params["platform"] = "googletv"
+        params["novideo"] = "1"
+        params["pos"] = String.format(java.util.Locale.US, "%.2f", player.currentPosition / 1000.0)
+        params["title"] = title
+        if (!live) params["file"] = key else params["sref"] = refs.getOrNull(index)
+        val full = android.graphics.Bitmap.createBitmap(maxOf(1, w), maxOf(1, h), android.graphics.Bitmap.Config.ARGB_8888)
         val canvas = android.graphics.Canvas(full)
         canvas.drawColor(0xFF000000.toInt())
         val overlays = {
-            for (v in listOf<View?>(video.subtitleView, info, tracks, osd, toastView)) {
+            for (v in listOf<View?>(video.subtitleView, info, tracks, osd)) {
                 if (v == null || v.visibility != View.VISIBLE || v.width == 0) continue
                 val loc = IntArray(2)
                 v.getLocationInWindow(loc)
@@ -582,7 +569,7 @@ class PlayerActivity : Activity() {
                 v.draw(canvas)
                 canvas.restore()
             }
-            uploadShot(full)
+            done(full, params)
         }
         val sv = video.videoSurfaceView as? android.view.SurfaceView
         if (sv != null && sv.width > 0 && android.os.Build.VERSION.SDK_INT >= 24) {
@@ -604,37 +591,7 @@ class PlayerActivity : Activity() {
         }
     }
 
-    private fun uploadShot(bmp: android.graphics.Bitmap) {
-        val params = LinkedHashMap<String, String?>()
-        params["platform"] = "googletv"
-        params["novideo"] = "1"
-        params["pos"] = String.format(java.util.Locale.US, "%.2f", player.currentPosition / 1000.0)
-        params["title"] = title
-        if (!live) params["file"] = key else params["sref"] = refs.getOrNull(index)
-        val url = Box.url("/e2tvplayer/screenshot", params)
-        Thread {
-            var msg: String
-            try {
-                val out = java.io.ByteArrayOutputStream()
-                bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, out)
-                val c = java.net.URL(url).openConnection() as java.net.HttpURLConnection
-                c.requestMethod = "POST"
-                c.doOutput = true
-                c.connectTimeout = 5000
-                c.readTimeout = 20000
-                c.setRequestProperty("Content-Type", "image/png")
-                c.outputStream.use { it.write(out.toByteArray()) }
-                val code = c.responseCode
-                val body = (if (code == 200) c.inputStream else c.errorStream)?.bufferedReader()?.use { it.readText() } ?: ""
-                c.disconnect()
-                msg = if (code == 200) "Kuva tallennettu boksiin: " + JSONObject(body).optString("name") else "Kuvan tallennus epäonnistui ($code)"
-            } catch (e: Exception) {
-                msg = "Kuvan tallennus epäonnistui: ${e.message}"
-            }
-            android.util.Log.i("E2TVPlayer", "screenshot: $msg")
-            ui.post { shotBusy = false; toast(msg) }
-        }.start()
-    }
+    fun showToast(msg: String) = toast(msg)
 
     private fun changeTrack(d: Int) {
         if (trackRow == 3) return
@@ -749,6 +706,11 @@ class PlayerActivity : Activity() {
 
     // ---------------------------------------------------------------- elinkaari
 
+    override fun onResume() {
+        super.onResume()
+        Shots.resumed(this)
+    }
+
     override fun onPause() {
         super.onPause()
         savePos()
@@ -763,6 +725,7 @@ class PlayerActivity : Activity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Shots.destroyed(this)
         ui.removeCallbacksAndMessages(null)
         player.removeListener(listener)
         player.release()

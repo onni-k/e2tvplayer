@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
 /* Sovelluksen käynnistys ja näppäinten jakelu. */
 var widgetAPI = new Common.API.Widget();
 var tvKey = new Common.API.TVKeyValue();

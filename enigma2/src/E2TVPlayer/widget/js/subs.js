@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
 /* Tallenteen DVB-tekstitykset. Boksi purkaa ne kuviksi (E2TVPlayer subs.py),
    ja tämä moduuli näyttää oikean kuvan videon päällä toistokohdan mukaan. */
 var Subs = {

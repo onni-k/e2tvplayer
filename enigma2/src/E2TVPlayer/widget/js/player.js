@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
 /* Toisto Orsayn SAMSUNG-INFOLINK-PLAYER -lisäosalla (2011-2014 TV:t).
    Takaisinkutsut annetaan merkkijonoina, joten niiden täytyy olla globaaleja. */
 var Player = {
@@ -536,7 +537,7 @@ var Shot = {
 		Shot.busy = true;
 		var left = Shot.DELAY;
 		var tick = function () {
-			if (!Player.active) { Shot.busy = false; return; }
+			/* laskuri jatkuu myös listanäkymässä: kuvataan se näkymä, joka on silloin ruudulla */
 			if (left > 0) {
 				Shot.badge('📷 ' + left);
 				left--;
@@ -562,8 +563,8 @@ var Shot = {
 	},
 
 	meta: function () {
-		var it = Player.item || {};
-		var q = { platform: Shot.platform(), pos: Math.round(Player.estimate() * 100) / 100 };
+		var it = Player.active ? (Player.item || {}) : {};
+		var q = { platform: Shot.platform(), pos: Player.active ? Math.round(Player.estimate() * 100) / 100 : 0 };
 		if (it.file) { q.file = it.file; }
 		if (it.live && it.sref) { q.sref = it.sref; }
 		return q;
@@ -573,6 +574,11 @@ var Shot = {
 		var meta = Shot.meta();
 		var send = function (dataUrl) { Shot.upload(meta, dataUrl); };
 		if (!window.Promise || !document.createElement('canvas').getContext) {
+			if (!meta.file && !meta.sref) {
+				Shot.busy = false;
+				U.toast('Listanäkymää ei voi kuvata tässä TV:ssä (vain toistossa videokuva)', 4000);
+				return;
+			}
 			send(null);   /* vanha selain: boksi tallentaa pelkän videokuvan */
 			return;
 		}

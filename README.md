@@ -83,3 +83,20 @@ Vanha polku `/e2samsungtv/` toimii edelleen, jotta aiemmin asennettu Samsung-sov
 - Boksin paketti: `sh enigma2/build_ipk.sh` (APK liitetään, jos `E2TVPLAYER_APK` osoittaa siihen).
 - APK: `cd android && ./gradlew assembleRelease` (JDK 17 + Android SDK 34). Allekirjoitusavain
   `android/e2tvplayer.keystore` on repossa, jotta päivitykset asentuvat vanhan päälle.
+
+## Lisenssi
+
+E2TVPlayer on vapaa ohjelma: sitä saa levittää ja muuttaa GNU General Public License -lisenssin
+version 3 tai (valintasi mukaan) minkä tahansa myöhemmän version ehdoin. Lisenssin teksti on
+tiedostossa [LICENSE](LICENSE) ja osoitteessa <https://www.gnu.org/licenses/gpl-3.0.html>.
+
+`SPDX-License-Identifier: GPL-3.0-or-later`
+
+Mukana käytetyt kolmansien osapuolten komponentit ja niiden lisenssit (yhteensopivia GPL v3:n kanssa):
+
+| Komponentti | Käyttö | Lisenssi |
+|---|---|---|
+| [html2canvas](https://html2canvas.hertzen.com) 1.4.1 | Tizenin kuvakaappaus (`enigma2/src/E2TVPlayer/widget/lib/`) | MIT |
+| [AndroidX Media3 / ExoPlayer](https://github.com/androidx/media) | Google TV -soitin | Apache-2.0 |
+| [Jellyfin media3-ffmpeg-decoder](https://github.com/jellyfin/jellyfin-androidx-media) | Google TV -äänen purku (FFmpeg) | Apache-2.0 / FFmpeg LGPL-2.1+ |
+| AndroidX RecyclerView, Annotation | Google TV -käyttöliittymä | Apache-2.0 |

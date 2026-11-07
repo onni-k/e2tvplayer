@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
 /* Tizen-sovitin: tarjoaa vanhan Samsung (Orsay) -alustan rajapinnat Tizenin päälle, jotta sama
    sovelluskoodi toimii molemmissa. Soitin = webapis.avplay, näppäimet = tizen.tvinputdevice.
    ES5, koska vanhimmat Tizen-TV:t (2015) käyttävät vanhaa WebKitiä. */

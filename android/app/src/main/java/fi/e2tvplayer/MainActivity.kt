@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 E2TVPlayer contributors
 package fi.e2tvplayer
 
 import android.app.Activity
@@ -115,11 +117,17 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        Shots.resumed(this)
         ui.removeCallbacks(ticker)
         ui.postDelayed(ticker, 30000)
         if (Box.host.isNotEmpty()) refreshStatus()
         // toistosta palattua päivitetään edistymispalkit
         if (mode == "movies" && movieData != null) renderMovies(currentIndex())
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Shots.destroyed(this)
     }
 
     override fun onPause() {

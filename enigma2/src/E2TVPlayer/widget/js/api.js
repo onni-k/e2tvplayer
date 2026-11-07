@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
 /* OpenWebif JSON-rajapinta. Orsay-sovellus saa tehdä XHR-kutsuja mihin tahansa osoitteeseen. */
 var Api = {
 	host: '',

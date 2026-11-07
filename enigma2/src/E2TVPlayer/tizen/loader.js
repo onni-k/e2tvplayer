@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
 /* Lataa sovelluksen koodin boksista, jotta Tizen-sovellus tarvitsee asentaa vain kerran:
    boksin lisäosan päivitys päivittää myös TV-sovelluksen. Jos boksi ei vastaa (tai sen
    koodi ei lataudu), käytetään paketin omaa kopiota. */

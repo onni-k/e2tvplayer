@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
 /* Apufunktiot. Pelkkää ES5:tä - Orsay-WebKit ei tunne let/const/nuolifunktioita. */
 var U = {
 	$: function (id) { return document.getElementById(id); },

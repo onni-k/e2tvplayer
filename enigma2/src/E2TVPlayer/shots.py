@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 E2TVPlayer contributors
 #
 # Kuvakaappaukset TV-sovelluksista. Sovellus lähettää oman näkymänsä kuvana (Google TV:llä
 # myös videokuvan); web-TV:issä (Tizen/Orsay) videokuva on laitteistotasolla, jota sovellus ei

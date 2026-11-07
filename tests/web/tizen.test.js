@@ -51,7 +51,11 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms)); let fail=0; const check=(c,m)=
   check(posts.length===1 && /platform=tizen/.test(posts[0][0]) && /file=%2Fmedia/.test(posts[0][0]) && posts[0][1].startsWith('data:image/png'),'kuva lähetettiin boksiin: '+(posts[0]||[''])[0].split('?')[1]);
   check(w.document.body.style.zoom==='1.5','zoom palautettiin kuvan jälkeen');
   check(txt('toast').includes('tallennettu boksiin'),'ilmoitus: '+txt('toast'));
+  // laskuri käyntiin ja heti takaisin listaan: kuva otetaan listanäkymästä
+  key(10135); key(38); key(13);
   key(10009); check(!w.Player.active && calls.includes('close'),'RETURN lopettaa toiston, AVPlay suljettu');
+  await sleep(1600);
+  check(posts.length===2 && !/file=/.test(posts[1][0]) && /pos=0/.test(posts[1][0]) && posts[1][1].startsWith('data:image/png'),'listanäkymän kuva lähetettiin: '+(posts[1]||[''])[0].split('?')[1]);
   check(calls.includes('saver 1'),'näytönsäästäjä takaisin');
   key(10009); check(w.Dialog.isOpen,'RETURN listassa kysyy'); key(13); check(exited,'Kyllä sulkee sovelluksen');
   process.exit(fail);

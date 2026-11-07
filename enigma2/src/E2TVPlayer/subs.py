@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 E2TVPlayer contributors
 #
 # DVB-tekstitysten (ETSI EN 300 743) purku Enigma2-tallenteesta.
 #

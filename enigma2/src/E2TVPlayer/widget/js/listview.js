@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
 /* Yksinkertainen virtuaalilista: piirretään vain näkyvät rivit. */
 function ListView(listId, thumbId, rows, renderRow) {
 	this.el = U.$(listId);

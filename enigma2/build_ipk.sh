@@ -30,6 +30,7 @@ Section: extra
 Priority: optional
 Maintainer: okumpune <okumpune@gmail.com>
 Depends: enigma2-plugin-extensions-openwebif
+License: GPL-3.0-or-later
 Replaces: enigma2-plugin-extensions-e2samsungtv
 Conflicts: enigma2-plugin-extensions-e2samsungtv
 Description: E2TVPlayer - recordings and live TV with subtitles on Samsung Smart TV (Orsay) and Google TV via OpenWebif.
