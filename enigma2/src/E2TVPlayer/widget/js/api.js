@@ -37,7 +37,7 @@ var Api = {
 			clearTimeout(timer);
 			if (xhr.status === 200) {
 				var data = null;
-				try { data = JSON.parse(xhr.responseText); } catch (e) {
+				try { data = JSON.parse(Api.unent(xhr.responseText)); } catch (e) {
 					if (fail) { fail('Virheellinen vastaus boksilta'); }
 					return;
 				}
@@ -56,6 +56,21 @@ var Api = {
 			clearTimeout(timer);
 			if (fail) { fail('Yhteys epäonnistui: ' + e); }
 		}
+	},
+
+	/* OpenWebif lähettää osan EPG-teksteistä HTML-merkintöinä (Shorty&#x27;s): puretaan ne
+	   ennen JSON-jäsennystä niin, että tulos on yhä kelvollista JSONia. */
+	unent: function (t) {
+		return String(t || '').replace(/&(#[xX][0-9a-fA-F]+|#[0-9]+|amp|quot|lt|gt|apos);/g, function (m, e) {
+			var c;
+			if (e === 'amp') { c = '&'; } else if (e === 'quot') { c = '"'; } else if (e === 'lt') { c = '<'; }
+			else if (e === 'gt') { c = '>'; } else if (e === 'apos') { c = "'"; }
+			else { c = String.fromCharCode(e.charAt(1) === 'x' || e.charAt(1) === 'X' ? parseInt(e.substr(2), 16) : parseInt(e.substr(1), 10)); }
+			if (c === '"') { return '\\"'; }
+			if (c === '\\') { return '\\\\'; }
+			if (c < ' ') { return ' '; }
+			return c;
+		});
 	},
 
 	canDiscover: function () {

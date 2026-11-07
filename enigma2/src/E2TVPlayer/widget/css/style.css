@@ -133,7 +133,10 @@ body.playing #app { display: none; }
 #subimg { position: absolute; left: 0; top: 0; }
 
 /* Tizen: TV näyttää värit tarkasti, joten tausta tehdään sinisen sävyiseksi kuten vanhoissa Samsungeissa */
-html.tizen body { background: #12297a; background: -webkit-linear-gradient(top, #1b3a99 0%, #0e1f63 100%); background: linear-gradient(to bottom, #1b3a99 0%, #0e1f63 100%); }
+/* Tausta #app-näkymään eikä bodyyn: AVPlayn <object> on bodyn päällä ja näyttää videotason (musta),
+   mutta #app on sen päällä. Toiston ajaksi #app piilotetaan, jolloin video näkyy. */
+html.tizen body { background: #000; }
+html.tizen #app { background: #12297a; background: -webkit-linear-gradient(top, #1b3a99 0%, #0e1f63 100%); background: linear-gradient(to bottom, #1b3a99 0%, #0e1f63 100%); }
 html.tizen body.playing { background: transparent; }
 html.tizen .row { border-bottom-color: rgba(255, 255, 255, 0.10); }
 html.tizen .row.sel { background: #3d8bff; border-bottom-color: #3d8bff; }

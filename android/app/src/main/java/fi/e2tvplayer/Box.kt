@@ -51,13 +51,35 @@ object Box {
         val u = url(path, params)
         pool.execute {
             try {
-                val js = JSONObject(fetch(u, timeoutMs))
+                val js = JSONObject(unent(fetch(u, timeoutMs)))
                 main.post { ok(js) }
             } catch (e: HttpError) {
                 main.post { fail(if (e.code == 401) "OpenWebif vaatii kirjautumisen – ota se pois boksin asetuksista" else "Yhteysvirhe ${e.code}") }
             } catch (e: Exception) {
                 main.post { fail("Ei yhteyttä boksiin ($host)") }
             }
+        }
+    }
+
+    /** OpenWebif lähettää osan EPG-teksteistä HTML-merkintöinä (Shorty&#x27;s): puretaan ne ennen
+     *  JSON-jäsennystä niin, että tulos on yhä kelvollista JSONia. */
+    fun unent(t: String): String = Regex("&(#[xX][0-9a-fA-F]+|#[0-9]+|amp|quot|lt|gt|apos);").replace(t) { m ->
+        val e = m.groupValues[1]
+        val c = when (e) {
+            "amp" -> "&"
+            "quot" -> "\""
+            "lt" -> "<"
+            "gt" -> ">"
+            "apos" -> "'"
+            else -> {
+                val n = if (e[1] == 'x' || e[1] == 'X') e.substring(2).toIntOrNull(16) else e.substring(1).toIntOrNull()
+                if (n == null || n < 32 || n > 0xFFFF) " " else n.toChar().toString()
+            }
+        }
+        when (c) {
+            "\"" -> "\\\""
+            "\\" -> "\\\\"
+            else -> c
         }
     }
 
