@@ -510,7 +510,7 @@ class PlayerActivity : Activity() {
             }
             val arrows = opts.size > 1
             val tv = TextView(this)
-            tv.text = pair.first.padEnd(14) + (if (arrows) "◀ " else "") + value + (if (arrows) " ▶" else "")
+            tv.text = pair.first.padEnd(17) + (if (arrows) "◀ " else "") + value + (if (arrows) " ▶" else "")
             tv.textSize = 17f
             tv.setPadding(24, 14, 24, 14)
             tv.setTextColor(0xFFFFFFFF.toInt())
@@ -520,14 +520,14 @@ class PlayerActivity : Activity() {
             trRows.addView(tv, lp)
         }
         val mode = TextView(this)
-        mode.text = T("Äänen purku").padEnd(14) + "◀ " + (if (audioMode() == "pcm") T("sovellus (PCM)") else T("TV / Dolby-läpivienti")) + " ▶"
+        mode.text = T("Äänen purku").padEnd(17) + "◀ " + (if (audioMode() == "pcm") T("sovellus (PCM)") else T("TV / Dolby-läpivienti")) + " ▶"
         mode.textSize = 17f
         mode.setPadding(24, 14, 24, 14)
         mode.setTextColor(0xFFFFFFFF.toInt())
         mode.setBackgroundColor(if (trackRow == 2) 0xFF2A5C99.toInt() else 0xFF1E2836.toInt())
         trRows.addView(mode, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
         val lng = TextView(this)
-        lng.text = T("Kieli").padEnd(14) + "◀ " + I18n.label() + " ▶"
+        lng.text = T("Kieli").padEnd(17) + "◀ " + I18n.label() + " ▶"
         lng.textSize = 17f
         lng.setPadding(24, 14, 24, 14)
         lng.setTextColor(0xFFFFFFFF.toInt())
@@ -536,7 +536,7 @@ class PlayerActivity : Activity() {
         llp.topMargin = 6
         trRows.addView(lng, llp)
         val shot = TextView(this)
-        shot.text = T("Kuvakaappaus").padEnd(14) + if (Shots.busy) T("odota…") else T("OK: ota kuva 10 s päästä")
+        shot.text = T("Kuvakaappaus").padEnd(17) + if (Shots.busy) T("odota…") else T("OK: ota kuva 10 s päästä")
         shot.textSize = 17f
         shot.setPadding(24, 14, 24, 14)
         shot.setTextColor(0xFFFFFFFF.toInt())
