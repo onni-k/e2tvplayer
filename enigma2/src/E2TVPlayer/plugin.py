@@ -38,7 +38,7 @@ class E2TVPlayerInfo(Screen):
 		Screen.__init__(self, session)
 		self.setTitle("E2TVPlayer %s" % web.VERSION)
 		self["text"] = ScrollLabel(info_text())
-		self["hint"] = Label(info.L("OK / EXIT = sulje    ylös/alas = vieritä", "OK / EXIT = close    up/down = scroll"))
+		self["hint"] = Label(info.T("OK / EXIT = sulje    ylös/alas = vieritä"))
 		self["actions"] = ActionMap(["OkCancelActions", "DirectionActions"], {
 			"ok": self.close,
 			"cancel": self.close,
@@ -64,7 +64,7 @@ def Plugins(**kwargs):
 		PluginDescriptor(where=PluginDescriptor.WHERE_SESSIONSTART, fnc=sessionstart),
 		PluginDescriptor(
 			name="E2TVPlayer",
-			description=info.L("Tallenteet ja live-TV Samsung- ja Google TV -televisioille", "Recordings and live TV for Samsung and Google TV televisions"),
+			description=info.T("Tallenteet ja live-TV Samsung- ja Google TV -televisioille"),
 			where=PluginDescriptor.WHERE_PLUGINMENU,
 			icon="plugin.png",
 			fnc=main,

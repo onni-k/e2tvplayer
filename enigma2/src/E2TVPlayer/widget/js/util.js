@@ -1,218 +1,254 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
 /* Apufunktiot. Pelkkää ES5:tä - Orsay-WebKit ei tunne let/const/nuolifunktioita. */
-/* Kieli: 'auto' (TV:n kieli), 'fi' tai 'en'. Lähdekielenä suomi; T() palauttaa
-   englanninkielisen version, kun englanti on valittu. Tämän pitää olla util.js:n alussa,
-   koska vanhat Tizen-latausohjelmat lataavat vain kiinteän tiedostolistan. */
-var I18N_EN = {
-	"Aikakatkaisu (": "Timeout (",
-	"Virheellinen vastaus boksilta": "Invalid response from the box",
-	"OpenWebif vaatii kirjautumisen - ota se pois päältä boksin asetuksista": "OpenWebif requires a login - turn it off in the box settings",
-	"Yhteysvirhe ": "Connection error ",
-	"Yhteys epäonnistui: ": "Connection failed: ",
-	"Boksin osoite puuttuu": "Box address missing",
-	"Syötä Enigma2-boksin IP-osoite.": "Enter the IP address of the Enigma2 box.",
-	"Etsitään boksia…": "Searching for the box…",
-	"Boksi löytyi: ": "Box found: ",
-	"Valitse boksi": "Choose a box",
-	"Lähiverkosta löytyi useampi boksi.": "More than one box was found on the network.",
-	"Boksia ei löytynyt": "Box not found",
-	"Lopetetaanko E2TVPlayer?": "Quit E2TVPlayer?",
-	"Kyllä": "Yes",
-	"Ei": "No",
-	"Boksi valmiustilassa": "Box in standby",
-	"<span class=\"rec\">● TALLENTAA</span> &nbsp; ": "<span class=\"rec\">● RECORDING</span> &nbsp; ",
-	"Boksi ": "Box ",
-	"<span class=\"rec\">Ei yhteyttä boksiin</span> &nbsp; ": "<span class=\"rec\">No connection to the box</span> &nbsp; ",
-	"Puskuroidaan…": "Buffering…",
-	"Toisto ei käynnistynyt": "Playback did not start",
-	"Välitys ei toiminut – toistetaan suoraan (ei tekstityksiä)": "Relay failed – playing directly (no subtitles)",
-	"Tarkista, että boksin striimaus (portti 8001) on käytössä ja viritin vapaana.": "Check that streaming (port 8001) is enabled on the box and a tuner is free.",
-	"TV ei ehkä tue tallenteen muotoa (esim. tekstitys- tai äänimuoto) tai yhteys katkesi.": "The TV may not support the recording's format (e.g. subtitle or audio format), or the connection was lost.",
-	"Toistovirhe": "Playback error",
-	"❚❚ Tauko": "❚❚ Paused",
-	"Odota hetki - puskuroidaan": "Please wait - buffering",
-	"LIVE": "LIVE",
-	"LIVE ": "LIVE ",
-	"CH +/- tai ▲▼ kanava &nbsp; INFO ohjelmatiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta": "CH +/- or ▲▼ channel &nbsp; INFO programme info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop",
-	"◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK tauko &nbsp; INFO tiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta": "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK pause &nbsp; INFO info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop",
-	"Puskuroidaan ": "Buffering ",
-	"Tallenne katsottu loppuun": "Recording watched to the end",
-	"Lähetys katkesi": "Broadcast interrupted",
-	"Yhteys boksiin epäonnistui": "Connection to the box failed",
-	"Verkkoyhteys katkesi": "Network connection lost",
-	"Tiedostoa ei löytynyt": "File not found",
-	"Toistovirhe (koodi ": "Playback error (code ",
-	" · jäljellä ": " · remaining ",
-	"Seuraavaksi ": "Next ",
-	"<span class=\"cast\">Ei ohjelmatietoja</span>": "<span class=\"cast\">No programme information</span>",
-	"ääni": "audio",
-	"tekstitys": "subtitles",
-	"TV ilmoittaa: ": "TV reports: ",
-	"Boksi: luetaan tallennetta…": "Box: reading the recording…",
-	"Boksi: tekstityksiä puretaan ": "Box: extracting subtitles ",
-	"Boksi: tekstitykset purettu": "Box: subtitles extracted",
-	" kpl)": ")",
-	"Boksi: tallenteessa ei DVB-tekstityksiä": "Box: no DVB subtitles in the recording",
-	" (vain teksti-TV-tekstitys, ei vielä tuettu)": " (teletext subtitles only, not supported yet)",
-	"Boksi: ": "Box: ",
-	"virhe": "error",
-	"Boksi: purku keskeytyi": "Box: extraction interrupted",
-	"Boksi: ei tietoa": "Box: no information",
-	"Boksi: odotetaan lähetystä…": "Box: waiting for the broadcast…",
-	"Boksi: tekstitykset puretaan lähetyksestä": "Box: subtitles extracted from the broadcast",
-	"Boksi: kanavalla ei nyt DVB-tekstityksiä": "Box: no DVB subtitles on this channel now",
-	" (vain teksti-TV, ei vielä tuettu)": " (teletext only, not supported yet)",
-	"Boksi: lähetys päättyi": "Box: broadcast ended",
-	"Tekstitykset eivät ole käytössä (suora toisto)": "Subtitles not available (direct playback)",
-	"Ääni": "Audio",
-	"Tekstitys": "Subtitles",
-	"Ajoitus": "Timing",
-	"  (aiemmin)": "  (earlier)",
-	"  (myöhemmin)": "  (later)",
-	"Kieli": "Language",
-	"  (käynnistyy uudelleen)": "  (restarts)",
-	"Kuvakaappaus": "Screenshot",
-	"odota…": "wait…",
-	"OK: ota kuva 10 s päästä": "OK: take a picture in 10 s",
-	"Listanäkymää ei voi kuvata tässä TV:ssä (vain toistossa videokuva)": "The list view cannot be captured on this TV (video frame only during playback)",
-	"näkymä": "view",
-	"Kuva tallennettu boksiin (": "Picture saved on the box (",
-	" + videokuva": " + video frame",
-	"videokuva": "video frame",
-	"Kuvan tallennus epäonnistui": "Saving the picture failed",
-	"pois": "off",
-	"oletus": "default",
-	"ei tarjolla": "not available",
-	"ei tukea": "not supported",
-	"raita ": "track ",
-	" – haetaan ": " – loading ",
-	"boksi ei vastaa": "box does not respond",
-	"Ladataan…": "Loading…",
-	"Näyttelijät": "Cast",
-	"Ohjaaja": "Director",
-	"Tuottaja": "Producer",
-	"Käsikirjoitus": "Writer",
-	"Juontaja": "Presenter",
-	"Vieraat": "Guests",
-	"Selostaja": "Commentator",
-	"Kertoja": "Narrator",
-	"Musiikki": "Music",
-	"Maa": "Country",
-	"Vuosi": "Year",
-	"suomi": "Finnish",
-	"ruotsi": "Swedish",
-	"englanti": "English",
-	"hollanti": "Dutch",
-	"saksa": "German",
-	"ranska": "French",
-	"espanja": "Spanish",
-	"italia": "Italian",
-	"venäjä": "Russian",
-	"tanska": "Danish",
-	"norja": "Norwegian",
-	"viro": "Estonian",
-	"saame": "Sami",
-	"alkuperäinen": "original",
-	"muu": "other",
-	"tuntematon": "unknown",
-	"kuvailutulkkaus": "audio description",
-	"automaattinen": "automatic",
-	"960×540 (pienennetty)": "960×540 (reduced)",
-	"Ei mitään näytettävää": "Nothing to show",
-	"<span class=\"k k-ok\">OK</span>Toista": "<span class=\"k k-ok\">OK</span>Play",
-	"<span class=\"k k-red\"></span>Poista": "<span class=\"k k-red\"></span>Delete",
-	"<span class=\"k k-green\"></span>Järjestys": "<span class=\"k k-green\"></span>Sort",
-	"<span class=\"k k-yellow\"></span>Kanavat": "<span class=\"k k-yellow\"></span>Channels",
-	"<span class=\"k k-blue\"></span>Asetukset": "<span class=\"k k-blue\"></span>Settings",
-	"<span class=\"k k-ret\">RETURN</span>Ylös": "<span class=\"k k-ret\">RETURN</span>Up",
-	"Haetaan tallenteita…": "Loading recordings…",
-	" — OK: yritä uudelleen, sininen: asetukset": " — OK: retry, blue: settings",
-	"Ylempi kansio": "Parent folder",
-	"Kansio": "Folder",
-	"Kesto ": "Duration ",
-	"<span style=\"color:#4fa3ff\">Katsottu ": "<span style=\"color:#4fa3ff\">Watched up to ",
-	" asti</span>": "</span>",
-	"Tallenteet": "Recordings",
-	"  · A–Ö": "  · A–Z",
-	"  · uusin ensin": "  · newest first",
-	"Kansiossa ei ole tallenteita": "No recordings in this folder",
-	" · kesto ": " · duration ",
-	"Jatketaanko?": "Resume?",
-	"Jatka kohdasta ": "Resume from ",
-	"Alusta": "From the start",
-	"Poistetaanko tallenne?": "Delete the recording?",
-	"Peruuta": "Cancel",
-	"Poista": "Delete",
-	"Poistetaan…": "Deleting…",
-	"Tallenne poistettu": "Recording deleted",
-	"Poisto epäonnistui": "Delete failed",
-	"Tuntematon virhe": "Unknown error",
-	"Järjestys: nimen mukaan": "Sort: by name",
-	"Järjestys: uusin ensin": "Sort: newest first",
-	"<span class=\"k k-ok\">OK</span>Katso": "<span class=\"k k-ok\">OK</span>Watch",
-	"<span class=\"k k-yellow\"></span>Tallenteet": "<span class=\"k k-yellow\"></span>Recordings",
-	"<span class=\"k k-ret\">RETURN</span>Takaisin": "<span class=\"k k-ret\">RETURN</span>Back",
-	"Haetaan kanavanippuja…": "Loading bouquets…",
-	"Kanavat": "Channels",
-	"Kanavanippu": "Bouquet",
-	"Ei kanavanippuja": "No bouquets",
-	"Haetaan kanavia…": "Loading channels…",
-	"Virhe": "Error",
-	"Kanavat › ": "Channels › ",
-	"Nipussa ei ole kanavia": "No channels in this bouquet",
-	"Asetukset": "Settings",
-	"Nykyinen: <b>": "Current: <b>",
-	"Asennettu boksista: ": "Installed from the box: ",
-	"Näytön koko: <b>": "Screen size: <b>",
-	"</b> (TV ilmoittaa leveydeksi ": "</b> (TV reports a width of ",
-	" px, skaala ": " px, scale ",
-	"Sovellus ": "App ",
-	"Testataan ": "Testing ",
-	"Yhteys toimii: ": "Connection works: ",
-	"Ei yhteyttä": "No connection",
-	". Tallennetaanko silti?": ". Save anyway?",
-	"Tallenna": "Save",
-	"Korjaa": "Fix",
-	"Näytön koko: ": "Screen size: ",
-	"<span class=\"fld-label\">portti</span>": "<span class=\"fld-label\">port</span>",
-	"Boksin osoite": "Box address",
-	"Numeronäppäimet syöttävät, vasen/oikea vaihtaa kenttää, ylös/alas muuttaa arvoa.": "Number keys enter digits, left/right moves between fields, up/down changes the value.",
-	"<span class=\"k k-ok\">OK</span> Tallenna &nbsp; <span class=\"k k-red\"></span> Palauta oletus &nbsp; <span class=\"k k-green\"></span> Näytön koko &nbsp; <span class=\"k k-ret\">RETURN</span> Peruuta": "<span class=\"k k-ok\">OK</span> Save &nbsp; <span class=\"k k-red\"></span> Reset &nbsp; <span class=\"k k-green\"></span> Screen size &nbsp; <span class=\"k k-ret\">RETURN</span> Cancel",
-	"Ääni ja tekstitys": "Audio and subtitles",
-	"▲▼ rivi &nbsp; ◀▶ vaihda &nbsp; OK/RETURN sulje": "▲▼ row &nbsp; ◀▶ change &nbsp; OK/RETURN close",
-	"Ladataan&hellip;": "Loading&hellip;"
+/* Kielet: lähdekieli suomi, käännökset po/*.po-tiedostoista (tools/i18n.py tekee I18N_DATA-lohkon).
+   Valinta 'auto' seuraa TV:n kieltä. Tämän pitää olla util.js:n alussa, koska vanhat
+   Tizen-latausohjelmat lataavat vain kiinteän tiedostolistan. */
+/* I18N-DATA-BEGIN (tools/i18n.py tekee tämän, älä muokkaa) */
+var I18N_DATA = {
+ "en": {
+  "name": "English",
+  "t": {
+   "  (aiemmin)": "  (earlier)",
+   "  (käynnistyy uudelleen)": "  (restarts)",
+   "  (myöhemmin)": "  (later)",
+   "  · A–Ö": "  · A–Z",
+   "  · uusin ensin": "  · newest first",
+   " (kuulovammaiset)": " (hard of hearing)",
+   " (vain teksti-TV, ei vielä tuettu)": " (teletext only, not supported yet)",
+   " (vain teksti-TV-tekstitys, ei vielä tuettu)": " (teletext subtitles only, not supported yet)",
+   " + videokuva": " + video frame",
+   " asti</span>": "</span>",
+   " kpl)": ")",
+   " px, skaala ": " px, scale ",
+   " · jäljellä ": " · remaining ",
+   " · kesto ": " · duration ",
+   " – haetaan ": " – loading ",
+   " — OK: yritä uudelleen, sininen: asetukset": " — OK: retry, blue: settings",
+   ". Tallennetaanko silti?": ". Save anyway?",
+   "960×540 (pienennetty)": "960×540 (reduced)",
+   "</b> (TV ilmoittaa leveydeksi ": "</b> (TV reports a width of ",
+   "<span class=\"cast\">Ei ohjelmatietoja</span>": "<span class=\"cast\">No programme information</span>",
+   "<span class=\"fld-label\">portti</span>": "<span class=\"fld-label\">port</span>",
+   "<span class=\"k k-blue\"></span>Asetukset": "<span class=\"k k-blue\"></span>Settings",
+   "<span class=\"k k-green\"></span>Järjestys": "<span class=\"k k-green\"></span>Sort",
+   "<span class=\"k k-ok\">OK</span> Tallenna &nbsp; <span class=\"k k-red\"></span> Palauta oletus &nbsp; <span class=\"k k-green\"></span> Näytön koko &nbsp; <span class=\"k k-ret\">RETURN</span> Peruuta": "<span class=\"k k-ok\">OK</span> Save &nbsp; <span class=\"k k-red\"></span> Reset &nbsp; <span class=\"k k-green\"></span> Screen size &nbsp; <span class=\"k k-ret\">RETURN</span> Cancel",
+   "<span class=\"k k-ok\">OK</span>Katso": "<span class=\"k k-ok\">OK</span>Watch",
+   "<span class=\"k k-ok\">OK</span>Toista": "<span class=\"k k-ok\">OK</span>Play",
+   "<span class=\"k k-red\"></span>Poista": "<span class=\"k k-red\"></span>Delete",
+   "<span class=\"k k-ret\">RETURN</span>Takaisin": "<span class=\"k k-ret\">RETURN</span>Back",
+   "<span class=\"k k-ret\">RETURN</span>Ylös": "<span class=\"k k-ret\">RETURN</span>Up",
+   "<span class=\"k k-yellow\"></span>Kanavat": "<span class=\"k k-yellow\"></span>Channels",
+   "<span class=\"k k-yellow\"></span>Tallenteet": "<span class=\"k k-yellow\"></span>Recordings",
+   "<span class=\"rec\">Ei yhteyttä boksiin</span> &nbsp; ": "<span class=\"rec\">No connection to the box</span> &nbsp; ",
+   "<span class=\"rec\">● TALLENTAA</span> &nbsp; ": "<span class=\"rec\">● RECORDING</span> &nbsp; ",
+   "<span style=\"color:#4fa3ff\">Katsottu ": "<span style=\"color:#4fa3ff\">Watched up to ",
+   "Aikakatkaisu (": "Timeout (",
+   "Ajoitus": "Timing",
+   "Alusta": "From the start",
+   "Asennettu boksista: ": "Installed from the box: ",
+   "Asetukset": "Settings",
+   "Boksi ": "Box ",
+   "Boksi löytyi: ": "Box found: ",
+   "Boksi valmiustilassa": "Box in standby",
+   "Boksi: ": "Box: ",
+   "Boksi: ei tietoa": "Box: no information",
+   "Boksi: kanavalla ei nyt DVB-tekstityksiä": "Box: no DVB subtitles on this channel now",
+   "Boksi: luetaan tallennetta…": "Box: reading the recording…",
+   "Boksi: lähetys päättyi": "Box: broadcast ended",
+   "Boksi: odotetaan lähetystä…": "Box: waiting for the broadcast…",
+   "Boksi: purku keskeytyi": "Box: extraction interrupted",
+   "Boksi: tallenteessa ei DVB-tekstityksiä": "Box: no DVB subtitles in the recording",
+   "Boksi: tekstitykset puretaan lähetyksestä": "Box: subtitles extracted from the broadcast",
+   "Boksi: tekstitykset purettu": "Box: subtitles extracted",
+   "Boksi: tekstityksiä puretaan ": "Box: extracting subtitles ",
+   "Boksia ei löytynyt": "Box not found",
+   "Boksin osoite": "Box address",
+   "Boksin osoite puuttuu": "Box address missing",
+   "CH +/- tai ▲▼ kanava &nbsp; INFO ohjelmatiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta": "CH +/- or ▲▼ channel &nbsp; INFO programme info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop",
+   "Ei": "No",
+   "Ei kanavanippuja": "No bouquets",
+   "Ei mitään näytettävää": "Nothing to show",
+   "Ei yhteyttä": "No connection",
+   "Etsitään boksia…": "Searching for the box…",
+   "Haetaan kanavanippuja…": "Loading bouquets…",
+   "Haetaan kanavia…": "Loading channels…",
+   "Haetaan tallenteita…": "Loading recordings…",
+   "Jatka kohdasta ": "Resume from ",
+   "Jatketaanko?": "Resume?",
+   "Juontaja": "Presenter",
+   "Järjestys: nimen mukaan": "Sort: by name",
+   "Järjestys: uusin ensin": "Sort: newest first",
+   "Kanavanippu": "Bouquet",
+   "Kanavat": "Channels",
+   "Kanavat › ": "Channels › ",
+   "Kansio": "Folder",
+   "Kansiossa ei ole tallenteita": "No recordings in this folder",
+   "Kertoja": "Narrator",
+   "Kesto ": "Duration ",
+   "Kieli": "Language",
+   "Korjaa": "Fix",
+   "Kuva tallennettu boksiin (": "Picture saved on the box (",
+   "Kuvakaappaus": "Screenshot",
+   "Kuvan tallennus epäonnistui": "Saving the picture failed",
+   "Kyllä": "Yes",
+   "Käsikirjoitus": "Writer",
+   "LIVE": "LIVE",
+   "LIVE ": "LIVE ",
+   "Ladataan&hellip;": "Loading&hellip;",
+   "Ladataan…": "Loading…",
+   "Listanäkymää ei voi kuvata tässä TV:ssä (vain toistossa videokuva)": "The list view cannot be captured on this TV (video frame only during playback)",
+   "Lopetetaanko E2TVPlayer?": "Quit E2TVPlayer?",
+   "Lähetys katkesi": "Broadcast interrupted",
+   "Lähiverkosta löytyi useampi boksi.": "More than one box was found on the network.",
+   "Maa": "Country",
+   "Musiikki": "Music",
+   "Nipussa ei ole kanavia": "No channels in this bouquet",
+   "Numeronäppäimet syöttävät, vasen/oikea vaihtaa kenttää, ylös/alas muuttaa arvoa.": "Number keys enter digits, left/right moves between fields, up/down changes the value.",
+   "Nykyinen: <b>": "Current: <b>",
+   "Näyttelijät": "Cast",
+   "Näytön koko: ": "Screen size: ",
+   "Näytön koko: <b>": "Screen size: <b>",
+   "OK: ota kuva 10 s päästä": "OK: take a picture in 10 s",
+   "Odota hetki - puskuroidaan": "Please wait - buffering",
+   "Ohjaaja": "Director",
+   "OpenWebif vaatii kirjautumisen - ota se pois päältä boksin asetuksista": "OpenWebif requires a login - turn it off in the box settings",
+   "Peruuta": "Cancel",
+   "Poista": "Delete",
+   "Poistetaanko tallenne?": "Delete the recording?",
+   "Poistetaan…": "Deleting…",
+   "Poisto epäonnistui": "Delete failed",
+   "Puskuroidaan ": "Buffering ",
+   "Puskuroidaan…": "Buffering…",
+   "Selostaja": "Commentator",
+   "Seuraavaksi ": "Next ",
+   "Sovellus ": "App ",
+   "Syötä Enigma2-boksin IP-osoite.": "Enter the IP address of the Enigma2 box.",
+   "TV ei ehkä tue tallenteen muotoa (esim. tekstitys- tai äänimuoto) tai yhteys katkesi.": "The TV may not support the recording's format (e.g. subtitle or audio format), or the connection was lost.",
+   "TV ilmoittaa: ": "TV reports: ",
+   "Tallenna": "Save",
+   "Tallenne katsottu loppuun": "Recording watched to the end",
+   "Tallenne poistettu": "Recording deleted",
+   "Tallenteet": "Recordings",
+   "Tarkista, että boksin striimaus (portti 8001) on käytössä ja viritin vapaana.": "Check that streaming (port 8001) is enabled on the box and a tuner is free.",
+   "Tekstitykset eivät ole käytössä (suora toisto)": "Subtitles not available (direct playback)",
+   "Tekstitys": "Subtitles",
+   "Testataan ": "Testing ",
+   "Tiedostoa ei löytynyt": "File not found",
+   "Toisto ei käynnistynyt": "Playback did not start",
+   "Toistovirhe": "Playback error",
+   "Toistovirhe (koodi ": "Playback error (code ",
+   "Tuntematon virhe": "Unknown error",
+   "Tuottaja": "Producer",
+   "Valitse boksi": "Choose a box",
+   "Verkkoyhteys katkesi": "Network connection lost",
+   "Vieraat": "Guests",
+   "Virhe": "Error",
+   "Virheellinen vastaus boksilta": "Invalid response from the box",
+   "Vuosi": "Year",
+   "Välitys ei toiminut – toistetaan suoraan (ei tekstityksiä)": "Relay failed – playing directly (no subtitles)",
+   "Yhteys boksiin epäonnistui": "Connection to the box failed",
+   "Yhteys epäonnistui: ": "Connection failed: ",
+   "Yhteys toimii: ": "Connection works: ",
+   "Yhteysvirhe ": "Connection error ",
+   "Ylempi kansio": "Parent folder",
+   "alkuperäinen": "original",
+   "automaattinen": "automatic",
+   "boksi ei vastaa": "box does not respond",
+   "ei tarjolla": "not available",
+   "ei tukea": "not supported",
+   "englanti": "English",
+   "espanja": "Spanish",
+   "hollanti": "Dutch",
+   "italia": "Italian",
+   "kuvailutulkkaus": "audio description",
+   "muu": "other",
+   "norja": "Norwegian",
+   "näkymä": "view",
+   "odota…": "wait…",
+   "oletus": "default",
+   "pois": "off",
+   "raita ": "track ",
+   "ranska": "French",
+   "ruotsi": "Swedish",
+   "saame": "Sami",
+   "saksa": "German",
+   "su ma ti ke to pe la": "Sun Mon Tue Wed Thu Fri Sat",
+   "suomi": "Finnish",
+   "tanska": "Danish",
+   "tekstitys": "subtitles",
+   "tuntematon": "unknown",
+   "venäjä": "Russian",
+   "videokuva": "video frame",
+   "virhe": "error",
+   "viro": "Estonian",
+   "Ääni": "Audio",
+   "Ääni ja tekstitys": "Audio and subtitles",
+   "ääni": "audio",
+   "▲▼ rivi &nbsp; ◀▶ vaihda &nbsp; OK/RETURN sulje": "▲▼ row &nbsp; ◀▶ change &nbsp; OK/RETURN close",
+   "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK tauko &nbsp; INFO tiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta": "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK pause &nbsp; INFO info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop",
+   "❚❚ Tauko": "❚❚ Paused"
+  }
+ }
 };
+/* I18N-DATA-END */
+/* Samsung Orsay: pluginAPI.GetLanguage() palauttaa TV:n valikkokielen numerona */
+var ORSAY_LANGS = { 0: 'en', 1: 'fr', 5: 'de', 24: 'fi', 25: 'sv' };
+var ISO3 = { fin: 'fi', swe: 'sv', sve: 'sv', eng: 'en', ger: 'de', deu: 'de', fre: 'fr', fra: 'fr' };
 var I18n = {
 	pending: false,
-	_en: null,
+	_cur: null,
+	langs: function () {
+		var l = ['fi'], k;
+		for (k in I18N_DATA) { if (I18N_DATA.hasOwnProperty(k) && k !== 'fi') { l.push(k); } }
+		return l;
+	},
+	has: function (c) { return c === 'fi' || I18N_DATA.hasOwnProperty(c); },
+	name: function (c) { return c === 'fi' ? 'suomi' : (I18N_DATA[c] ? I18N_DATA[c].name : c); },
 	pref: function () {
 		var v = 'auto';
 		try { if (typeof Store !== 'undefined') { v = Store.get('lang', 'auto'); } } catch (e) { }
-		return (v === 'fi' || v === 'en') ? v : 'auto';
+		return (v !== 'auto' && I18n.has(v)) ? v : 'auto';
+	},
+	/* TV:n kieli kaksikirjaimisena, '' jos ei selviä */
+	tvLang: function () {
+		var l = '';
+		try {
+			if (typeof pluginAPI !== 'undefined' && pluginAPI && typeof pluginAPI.GetLanguage === 'function') {
+				var c = pluginAPI.GetLanguage();
+				if (c !== null && c !== undefined && c !== '') {
+					if (typeof c === 'number' || /^\d+$/.test(String(c))) { l = ORSAY_LANGS[parseInt(c, 10)] || 'en'; }
+					else { l = String(c); }
+				}
+			}
+		} catch (e) { }
+		if (!l) {
+			try { l = String(navigator.language || navigator.userLanguage || navigator.browserLanguage || ''); } catch (e2) { }
+		}
+		l = l.toLowerCase();
+		if (ISO3[l.substring(0, 3)]) { return ISO3[l.substring(0, 3)]; }
+		return l.substring(0, 2);
 	},
 	sys: function () {
-		var l = '';
-		try { l = String(navigator.language || navigator.userLanguage || navigator.browserLanguage || ''); } catch (e) { }
-		l = l.toLowerCase();
+		var l = I18n.tvLang();
 		if (!l) { return 'fi'; }
-		return (l.indexOf('fi') === 0 || l.indexOf('fin') === 0) ? 'fi' : 'en';
+		if (I18n.has(l)) { return l; }
+		return I18n.has('en') ? 'en' : 'fi';
 	},
-	en: function () {
-		if (I18n._en === null) { var p = I18n.pref(); I18n._en = (p === 'auto' ? I18n.sys() : p) === 'en'; }
-		return I18n._en;
+	cur: function () {
+		if (I18n._cur === null) { var p = I18n.pref(); I18n._cur = p === 'auto' ? I18n.sys() : p; }
+		return I18n._cur;
 	},
+	en: function () { return I18n.cur() !== 'fi'; },   /* "ei suomi": desimaalipiste ym. */
 	label: function (v) {
-		if (v === 'fi') { return 'suomi'; }
-		if (v === 'en') { return 'English'; }
-		return T('automaattinen') + ' (' + (I18n.sys() === 'en' ? 'English' : 'suomi') + ')';
+		if (v === 'auto') { return T('automaattinen') + ' (' + I18n.name(I18n.sys()) + ')'; }
+		return I18n.name(v);
 	},
 	cycle: function (d) {
-		var o = ['auto', 'fi', 'en'], i = 0, cur = Store.get('lang', 'auto');
+		var o = ['auto'].concat(I18n.langs()), i = 0, cur = I18n.pref();
 		for (var j = 0; j < o.length; j++) { if (o[j] === cur) { i = j; } }
 		i = (i + (d < 0 ? -1 : 1) + o.length) % o.length;
 		Store.set('lang', o[i]);
-		var p = o[i] === 'auto' ? I18n.sys() : o[i];
-		I18n.pending = ((p === 'en') !== I18n.en());
+		I18n.pending = ((o[i] === 'auto' ? I18n.sys() : o[i]) !== I18n.cur());
 	},
 	/* kielen vaihto käynnistää sovelluksen uudelleen, mutta ei kesken toiston */
 	applyIfIdle: function () {
@@ -220,14 +256,14 @@ var I18n = {
 		if (typeof Player !== 'undefined' && Player.active) { return; }
 		try { window.location.reload(); } catch (e) { }
 	},
-	STATIC: [['.s-head', 'Boksin osoite'],
-		['.s-help', 'Numeronäppäimet syöttävät, vasen/oikea vaihtaa kenttää, ylös/alas muuttaa arvoa.'],
-		['.s-keys', '<span class="k k-ok">OK</span> Tallenna &nbsp; <span class="k k-red"></span> Palauta oletus &nbsp; <span class="k k-green"></span> Näytön koko &nbsp; <span class="k k-ret">RETURN</span> Peruuta'],
-		['.tr-head', 'Ääni ja tekstitys'], ['.tr-keys', '▲▼ rivi &nbsp; ◀▶ vaihda &nbsp; OK/RETURN sulje'],
-		['#busy-text', 'Ladataan&hellip;']],
+	STATIC: [['.s-head', N('Boksin osoite')],
+		['.s-help', N('Numeronäppäimet syöttävät, vasen/oikea vaihtaa kenttää, ylös/alas muuttaa arvoa.')],
+		['.s-keys', N('<span class="k k-ok">OK</span> Tallenna &nbsp; <span class="k k-red"></span> Palauta oletus &nbsp; <span class="k k-green"></span> Näytön koko &nbsp; <span class="k k-ret">RETURN</span> Peruuta')],
+		['.tr-head', N('Ääni ja tekstitys')], ['.tr-keys', N('▲▼ rivi &nbsp; ◀▶ vaihda &nbsp; OK/RETURN sulje')],
+		['#busy-text', N('Ladataan&hellip;')]],
 	applyStatic: function () {
-		if (!I18n.en()) { return; }
-		try { document.documentElement.lang = 'en'; } catch (e0) { }
+		if (I18n.cur() === 'fi') { return; }
+		try { document.documentElement.lang = I18n.cur(); } catch (e0) { }
 		for (var i = 0; i < I18n.STATIC.length; i++) {
 			var els = [];
 			try { els = document.querySelectorAll(I18n.STATIC[i][0]); } catch (e) { }
@@ -235,9 +271,21 @@ var I18n = {
 		}
 	}
 };
+/* boksin tekstitysnimien liitteet (TL) */
+var SUB_SUFFIXES = [N(' (kuulovammaiset)')];
+/* N(): merkitsee tekstin käännettäväksi kääntämättä sitä vielä */
+function N(s) { return s; }
 function T(s) {
-	if (!I18n.en()) { return s; }
-	return I18N_EN.hasOwnProperty(s) ? I18N_EN[s] : s;
+	var c = I18n.cur();
+	if (c === 'fi') { return s; }
+	var t = I18N_DATA[c] && I18N_DATA[c].t;
+	return (t && t.hasOwnProperty(s)) ? t[s] : s;
+}
+/* Boksin suomenkielinen nimi (esim. "ruotsi (kuulovammaiset)") käännettynä */
+function TL(s) {
+	if (!s || T(s) !== s) { return T(s); }
+	var m = /^(.*?)( \(.*\))$/.exec(s);
+	return m ? T(m[1]) + T(m[2]) : s;
 }
 
 var U = {
@@ -250,14 +298,12 @@ var U = {
 
 	pad: function (n) { return n < 10 ? '0' + n : '' + n; },
 
-	WEEKDAYS: ['su', 'ma', 'ti', 'ke', 'to', 'pe', 'la'],
-	WEEKDAYS_EN: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
 
 	/* unix-sekunnit -> "ma 2.11.2026 20:00" */
 	fmtDate: function (ts, withYear) {
 		if (!ts) { return ''; }
 		var d = new Date(ts * 1000);
-		var s = (I18n.en() ? U.WEEKDAYS_EN : U.WEEKDAYS)[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
+		var s = T('su ma ti ke to pe la').split(' ')[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
 		if (withYear) { s += d.getFullYear(); }
 		return s + ' ' + U.pad(d.getHours()) + ':' + U.pad(d.getMinutes());
 	},
@@ -370,9 +416,9 @@ var Store = {
 /* Kuvaustekstin muotoilu. DVB:n laajennetut kentät tulevat OpenWebifistä usein suoraan
    tekstin perään ("...haasteet?actor: Rose Nieminenactor: Mikko Heino"). */
 U.CAST_LABELS = {
-	actor: 'Näyttelijät', actors: 'Näyttelijät', director: 'Ohjaaja', producer: 'Tuottaja',
-	writer: 'Käsikirjoitus', scriptwriter: 'Käsikirjoitus', presenter: 'Juontaja', guest: 'Vieraat',
-	commentator: 'Selostaja', narrator: 'Kertoja', composer: 'Musiikki', country: 'Maa', year: 'Vuosi'
+	actor: N('Näyttelijät'), actors: N('Näyttelijät'), director: N('Ohjaaja'), producer: N('Tuottaja'),
+	writer: N('Käsikirjoitus'), scriptwriter: N('Käsikirjoitus'), presenter: N('Juontaja'), guest: N('Vieraat'),
+	commentator: N('Selostaja'), narrator: N('Kertoja'), composer: N('Musiikki'), country: N('Maa'), year: N('Vuosi')
 };
 U.descParts = function (text) {
 	var s = String(text || '').replace(/\u008a/g, '\n').replace(/\r/g, '');
@@ -410,10 +456,10 @@ U.descHtml = function (text) {
 
 /* Kielikoodit: Player voi palauttaa merkkijonon tai kolme ASCII-tavua lukuna. */
 U.LANGS = {
-	fin: 'suomi', swe: 'ruotsi', sve: 'ruotsi', eng: 'englanti', dut: 'hollanti', nld: 'hollanti',
-	ger: 'saksa', deu: 'saksa', fre: 'ranska', fra: 'ranska', spa: 'espanja', ita: 'italia',
-	rus: 'venäjä', dan: 'tanska', nor: 'norja', est: 'viro', sme: 'saame', smi: 'saame',
-	qaa: 'alkuperäinen', mis: 'muu', und: 'tuntematon', nar: 'kuvailutulkkaus', qad: 'kuvailutulkkaus'
+	fin: N('suomi'), swe: N('ruotsi'), sve: N('ruotsi'), eng: N('englanti'), dut: N('hollanti'), nld: N('hollanti'),
+	ger: N('saksa'), deu: N('saksa'), fre: N('ranska'), fra: N('ranska'), spa: N('espanja'), ita: N('italia'),
+	rus: N('venäjä'), dan: N('tanska'), nor: N('norja'), est: N('viro'), sme: N('saame'), smi: N('saame'),
+	qaa: N('alkuperäinen'), mis: N('muu'), und: N('tuntematon'), nar: N('kuvailutulkkaus'), qad: N('kuvailutulkkaus')
 };
 U.langName = function (v) {
 	var code = '';

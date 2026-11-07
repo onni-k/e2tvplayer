@@ -8,11 +8,12 @@
 # joten boksi purkaa ne itse: jokainen tekstitysruutu tallennetaan PNG-kuvaksi ja
 # näyttöajat JSON-listaksi. TV-sovellus piirtää kuvat videon päälle oikeaan aikaan.
 #
-# Tulokset tallennetaan tallennekansion alle piilokansioon .e2tvplayer/<tallenne>/,
+# Tulokset tallennetaan kansioon /media/hdd/e2tvplayer/tekstitykset/<tallenne>_<tunniste>/,
 # joten purku tehdään vain kerran tallennetta kohden.
 
 from __future__ import absolute_import, print_function
 
+import hashlib
 import json
 import os
 import re
@@ -25,8 +26,7 @@ import zlib
 PKT = 188
 CHUNK = PKT * 8192          # ~1.5 Mt kerrallaan
 PTS_WRAP = 1 << 33
-CACHE_DIR = ".e2tvplayer"
-OLD_CACHE_DIRS = (".e2samsungtv",)
+OLD_CACHE_DIRS = (".e2samsungtv", ".e2tvplayer")   # aiemmin tallenteen viereen tehdyt kansiot
 CACHE_VERSION = 2
 
 
@@ -720,9 +720,33 @@ def track_label(t):
 	return name
 
 
+_swept = []
+
+
+def sweep_old_caches():
+	"""Poistaa kerran aiempien versioiden tallenteiden viereen tekemät .e2tvplayer-kansiot."""
+	if _swept:
+		return
+	_swept.append(1)
+	import glob
+	for root in glob.glob("/media/*/movie"):
+		for d, dirs, files in os.walk(root):
+			for old in OLD_CACHE_DIRS:
+				if old in dirs:
+					shutil.rmtree(os.path.join(d, old), ignore_errors=True)
+					dirs.remove(old)
+			dirs[:] = [x for x in dirs if not x.startswith(".")]
+
+
+def cache_root():
+	from .shots import data_dir
+	return data_dir("tekstitykset")
+
+
 def cache_dir_for(path):
-	base = os.path.splitext(os.path.basename(path))[0]
-	return os.path.join(os.path.dirname(path), CACHE_DIR, base)
+	base = os.path.splitext(os.path.basename(path))[0][:80]
+	tag = hashlib.md5(os.path.abspath(path).encode("utf-8", "replace")).hexdigest()[:8]
+	return os.path.join(cache_root(), "%s_%s" % (base, tag))
 
 
 class Job(threading.Thread):
@@ -769,7 +793,7 @@ class Job(threading.Thread):
 	def save_index(self, status):
 		try:
 			with self.lock:
-				idx = {"stat": self.stat_key(), "status": status, "tracks": self.tracks, "teletext": self.teletext, "audio": self.audio,
+				idx = {"path": self.path, "stat": self.stat_key(), "status": status, "tracks": self.tracks, "teletext": self.teletext, "audio": self.audio,
 					"cues": self.cues, "dw": self.dw, "dh": self.dh}
 			tmp = os.path.join(self.cache, "index.json.tmp")
 			with open(tmp, "w") as f:
@@ -782,15 +806,22 @@ class Job(threading.Thread):
 		"""Poistaa välimuistista tallenteet, joita ei enää ole."""
 		for old in OLD_CACHE_DIRS:   # aiempien versioiden välimuisti pois
 			shutil.rmtree(os.path.join(os.path.dirname(self.path), old), ignore_errors=True)
-		root = os.path.join(os.path.dirname(self.path), CACHE_DIR)
+		sweep_old_caches()
+		root = cache_root()
 		try:
 			names = os.listdir(root)
 		except OSError:
 			return
-		movies = set(os.path.splitext(n)[0] for n in os.listdir(os.path.dirname(self.path)) if n.endswith(".ts"))
 		for n in names:
-			if n not in movies:
-				shutil.rmtree(os.path.join(root, n), ignore_errors=True)
+			d = os.path.join(root, n)
+			try:
+				with open(os.path.join(d, "index.json")) as f:
+					p = json.load(f).get("path")
+			except Exception:
+				p = None
+			# poistetaan, jos tallenne on poistettu (tai keskeneräinen purku ilman indeksiä on vanha)
+			if (p and not os.path.exists(p)) or (not p and time.time() - os.path.getmtime(d) > 86400):
+				shutil.rmtree(d, ignore_errors=True)
 
 	# --- itse purku ---
 	def run(self):

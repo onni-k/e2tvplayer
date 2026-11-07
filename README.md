@@ -13,9 +13,20 @@ GitHub Actions rakentaa jokaisesta pushista APK:n ja boksin `.ipk`-paketin (APK 
 
 ## Kieli / Language
 
-TV-sovellukset ovat suomeksi ja englanniksi. Kieli valitaan TOOLS-valikosta (Google TV: pitkä OK tai Asetukset); oletuksena seurataan TV:n kieltä. Boksin sivut ja lisäosan ruutu seuraavat Enigma2:n järjestelmäkieltä.
+TV-sovellukset ja boksin sivut on käännetty `po/`-kansion .po-tiedostoilla; lähdekieli on suomi.
+Kieli valitaan TV:llä TOOLS-valikosta (Google TV: pitkä OK tai Asetukset), oletuksena TV:n kieli.
+Boksin sivut ja lisäosan ruutu seuraavat Enigma2:n järjestelmäkieltä. Jos kieltä ei ole käännetty, käytetään englantia.
 
-The TV apps are available in Finnish and English. Choose the language in the TOOLS menu (Google TV: long OK or Settings); by default the TV's language is used. The box pages and the plugin screen follow the Enigma2 system language.
+The apps and box pages are translated with the .po files in `po/` (source language Finnish).
+To add a language:
+
+```
+python3 tools/i18n.py new sv Svenska     # creates po/sv.po
+# translate po/sv.po (e.g. with Poedit)
+python3 tools/i18n.py update             # regenerates the app data
+```
+
+`update` also adds new texts from the code to every .po file; CI fails if the generated data is out of date.
 
 ## Asennus boksiin
 

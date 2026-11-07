@@ -92,7 +92,7 @@ class MainActivity : Activity() {
         tabRec.text = T("Tallenteet")
         tabCh.text = T("Kanavat")
         tabSet.text = T("Asetukset")
-        langEn = I18n.en()
+        langCur = I18n.cur()
         findViewById<TextView>(R.id.title).text =
             Html.fromHtml("E2<font color='#4FA3FF'>TV</font>Player")
 
@@ -119,11 +119,11 @@ class MainActivity : Activity() {
         override fun run() { tick(); ui.postDelayed(this, 30000) }
     }
 
-    private var langEn = false
+    private var langCur = ""
 
     override fun onResume() {
         super.onResume()
-        if (I18n.en() != langEn) { recreate(); return }
+        if (I18n.cur() != langCur) { recreate(); return }
         Shots.resumed(this)
         ui.removeCallbacks(ticker)
         ui.postDelayed(ticker, 30000)
@@ -507,7 +507,7 @@ class MainActivity : Activity() {
             .setPositiveButton(T("Tallenna")) { _, _ -> setHost(edit.text.toString()) }
             .setNeutralButton(T("Etsi boksi")) { _, _ -> findBox(first = false) }
             .setNegativeButton(T("Peruuta"), null)
-            .setOnDismissListener { if (I18n.pref() != langAtOpen && I18n.en() != langEn) recreate() }
+            .setOnDismissListener { if (I18n.pref() != langAtOpen && I18n.cur() != langCur) recreate() }
             .show()
     }
 

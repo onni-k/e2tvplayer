@@ -23,7 +23,7 @@ try:
 except ImportError:  # pragma: no cover - vain testausta varten
 	resource = None
 
-VERSION = "0.1.012"
+VERSION = "0.1.013"
 APP_ID = "E2Tallenteet"   # TV:n sisäinen tunnus pidetään ennallaan: päivitys korvaa vanhan sovelluksen
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"
@@ -299,15 +299,14 @@ if resource is not None:
 			for m in items:
 				imgs = [n for n in (m.get("video"), m.get("ui")) if n]
 				pics = "".join("<a href='/%s/kuva/%s'><img src='/%s/kuva/%s' style='width:480px;margin:4px;border:1px solid #333'></a>" % (MOUNT, n, MOUNT, n) for n in imgs)
-				info = "%s · %s%s" % (m.get("time", ""), m.get("platform", ""),
+				desc = "%s · %s%s" % (m.get("time", ""), m.get("platform", ""),
 					(" · %s @ %s s" % (os.path.basename(m.get("file", "")), m.get("pos"))) if m.get("file") else (" · live" if m.get("sref") else ""))
 				err = ("<br><span style='color:#c60'>%s</span>" % m["error"]) if m.get("error") else ""
-				rows.append("<div style='margin:14px 0'><b>%s</b>%s<br>%s</div>" % (info, err, pics or "<i>%s</i>" % info.L("ei kuvaa", "no picture")))
-			ttl = info.L("Kuvakaappaukset", "Screenshots")
+				rows.append("<div style='margin:14px 0'><b>%s</b>%s<br>%s</div>" % (desc, err, pics or "<i>%s</i>" % info.T("ei kuvaa")))
+			ttl = info.T("Kuvakaappaukset")
 			html = ("<!DOCTYPE html><html><head><meta charset='utf-8'><title>E2TVPlayer %s</title></head>"
 				"<body style='font-family:sans-serif;margin:1.5em'><h1>%s</h1><p>%s <code>%s</code></p>%s</body></html>"
-				) % (ttl, ttl, info.L("Kansio:", "Folder:"), d, "".join(rows) or "<p>%s</p>" % info.L(
-					"Ei vielä kuvia. Ota kuva TV-sovelluksen TOOLS-valikosta.", "No pictures yet. Take one from the TOOLS menu of the TV app."))
+				) % (ttl, ttl, info.T("Kansio:"), d, "".join(rows) or "<p>%s</p>" % info.T("Ei vielä kuvia. Ota kuva TV-sovelluksen TOOLS-valikosta."))
 			request.setHeader(b"Content-Type", b"text/html; charset=utf-8")
 			request.setHeader(b"Cache-Control", b"no-cache")
 			return html.encode("utf-8")
@@ -347,7 +346,7 @@ if resource is not None:
 				if not apk:
 					request.setResponseCode(404)
 					request.setHeader(b"Content-Type", b"text/plain; charset=utf-8")
-					return info.L(u"Google TV -sovellusta ei ole tässä paketissa.", u"The Google TV app is not in this package.").encode("utf-8")
+					return info.T(u"Google TV -sovellusta ei ole tässä paketissa.").encode("utf-8")
 				with open(apk, "rb") as f:
 					data = f.read()
 				log("Google TV app downloaded (%d bytes)" % len(data))

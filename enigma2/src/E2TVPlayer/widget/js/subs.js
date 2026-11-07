@@ -161,7 +161,7 @@ var Subs = {
 	},
 
 	label: function (t) {
-		var s = t.label;
+		var s = TL(t.label);
 		if (Subs.running()) { s += T(' – haetaan ') + Math.round(Subs.progress * 100) + ' %'; }
 		return s;
 	},

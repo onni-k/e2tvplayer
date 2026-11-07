@@ -23,16 +23,21 @@ def log(msg):
 	print("[E2TVPlayer] shots: %s" % msg)
 
 
-def shots_dir():
+def data_dir(sub):
+	"""Lisäosan datakansio: /media/hdd/e2tvplayer/<sub> (tai varalla /tmp)."""
 	for base in ("/media/hdd", "/media/usb", "/media/mmc"):
 		if os.path.isdir(base) and os.access(base, os.W_OK) and (os.path.ismount(base) or os.path.isdir(os.path.join(base, "movie"))):
-			d = os.path.join(base, "e2tvplayer", "kuvakaappaukset")
+			d = os.path.join(base, "e2tvplayer", sub)
 			break
 	else:
-		d = "/tmp/e2tvplayer-kuvakaappaukset"
+		d = "/tmp/e2tvplayer-" + sub
 	if not os.path.isdir(d):
 		os.makedirs(d)
 	return d
+
+
+def shots_dir():
+	return data_dir("kuvakaappaukset")
 
 
 def find_ffmpeg():

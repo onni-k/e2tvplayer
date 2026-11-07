@@ -6,6 +6,8 @@ lisäosavalikosta avatussa ruudussa: sivu tehdään HTML:nä ja ruutua varten se
 tekstiksi. Kieli seuraa Enigma2:n järjestelmäkieltä (suomi tai englanti)."""
 from __future__ import absolute_import
 
+import io
+import os
 import re
 import socket
 
@@ -17,17 +19,88 @@ except ImportError:  # Python 2
 	_unescape = HTMLParser().unescape
 
 
+_PLUGIN_DIR = os.path.dirname(os.path.abspath(__file__))
+_cache = {}
+
+
+def _po_dirs():
+	# asennettuna: <lisäosa>/locale/*.po; kehitysympäristössä repon po/-kansio
+	return [os.path.join(_PLUGIN_DIR, "locale"), os.path.join(_PLUGIN_DIR, "..", "..", "..", "po")]
+
+
+def parse_po(path):
+	"""Pieni .po-lukija: palauttaa ({msgid: msgstr}, otsaketiedot)."""
+	tr, cur, key = {}, {}, None
+
+	def unq(x):
+		x = x.strip()[1:-1]
+		return re.sub(r'\\(.)', lambda m: {"n": "\n", "t": "\t"}.get(m.group(1), m.group(1)), x)
+
+	def done():
+		if "msgid" in cur and cur.get("msgstr") and not cur.get("fuzzy"):
+			tr[cur["msgid"]] = cur["msgstr"]
+
+	with io.open(path, encoding="utf-8") as f:
+		for line in f:
+			line = line.strip()
+			if not line:
+				continue
+			if line.startswith("#,") and "fuzzy" in line:
+				done()
+				cur, key = {"fuzzy": True}, None
+			elif line.startswith("#"):
+				continue
+			elif line.startswith("msgid "):
+				if "msgid" in cur:
+					done()
+					cur = {}
+				key = "msgid"
+				cur[key] = unq(line[6:])
+			elif line.startswith("msgstr "):
+				key = "msgstr"
+				cur[key] = unq(line[7:])
+			elif line.startswith('"') and key:
+				cur[key] += unq(line)
+	done()
+	head = {}
+	for hl in tr.pop("", "").split("\n"):
+		if ":" in hl:
+			k, v = hl.split(":", 1)
+			head[k.strip()] = v.strip()
+	return tr, head
+
+
 def lang():
+	"""Enigma2:n järjestelmäkieli kaksikirjaimisena (fi, en, sv, ...)."""
 	try:
 		from Components.Language import language
-		l = (language.getLanguage() or "").lower()
+		return (language.getLanguage() or "fi")[:2].lower()
 	except Exception:
-		l = "fi"
-	return "fi" if l.startswith("fi") else "en"
+		return "fi"
 
 
-def L(fi, en):
-	return fi if lang() == "fi" else en
+def table(code):
+	"""Käännökset kielelle code; suomi (lähdekieli) = None."""
+	if code == "fi":
+		return None
+	if code not in _cache:
+		_cache[code] = None
+		for d in _po_dirs():
+			p = os.path.join(d, code + ".po")
+			if os.path.exists(p):
+				try:
+					_cache[code] = parse_po(p)[0]
+				except Exception:
+					pass
+				break
+	if _cache[code] is None and code != "en":
+		return table("en")   # kieltä ei ole käännetty: englanti
+	return _cache[code]
+
+
+def T(s):
+	t = table(lang())
+	return t.get(s, s) if t else s
 
 
 def box_ip():
@@ -60,22 +133,25 @@ def _owif(name, default=None):
 def warnings(registered=True):
 	w = []
 	if not registered:
-		w.append(L("Lisäosa ei ole vielä rekisteröity OpenWebifiin. Käynnistä GUI uudelleen "
-			"(OpenWebif lukee lisäosat käynnistyessään).",
-			"The plugin is not registered in OpenWebif yet. Restart the GUI "
-			"(OpenWebif reads its plugins at start-up)."))
+		w.append(T("Lisäosa ei ole vielä rekisteröity OpenWebifiin. Käynnistä GUI uudelleen "
+			"(OpenWebif lukee lisäosat käynnistyessään)."))
 	if _owif("enabled", True) is False:
-		w.append(L("OpenWebif on pois päältä - kytke se päälle.", "OpenWebif is turned off - turn it on."))
+		w.append(T("OpenWebif on pois päältä - kytke se päälle."))
 	port = _owif("port", 80)
 	if port not in (80, None):
-		w.append(L("OpenWebifin portti on %s. Vanhan Samsungin sovellussynkka toimii vain portissa 80.",
-			"The OpenWebif port is %s. The old Samsung app sync only works on port 80.") % port)
+		w.append(T("OpenWebifin portti on %s. Vanhan Samsungin sovellussynkka toimii vain portissa 80.") % port)
 	if _owif("auth", False):
-		w.append(L("OpenWebifin kirjautuminen on päällä. TV-sovellukset eivät osaa kirjautua - "
-			"ota kirjautuminen pois (ainakin lähiverkosta).",
-			"OpenWebif login is turned on. The TV apps cannot log in - "
-			"turn the login off (at least for the local network)."))
+		w.append(T("OpenWebifin kirjautuminen on päällä. TV-sovellukset eivät osaa kirjautua - "
+			"ota kirjautuminen pois (ainakin lähiverkosta)."))
 	return w
+
+
+def _subs_dir():
+	try:
+		from .subs import cache_root
+		return cache_root()
+	except Exception:
+		return "/media/hdd/e2tvplayer/tekstitykset"
 
 
 def page_html(host, version, title, mount, zip_name, has_apk, registered=True):
@@ -83,81 +159,53 @@ def page_html(host, version, title, mount, zip_name, has_apk, registered=True):
 	from . import shots
 	h = {"t": title, "v": version, "h": host, "m": mount, "z": zip_name}
 	out = ["<h1>%(t)s %(v)s</h1>" % h]
-	out.append("<p>%s <b>%s</b></p>" % (L("Boksin osoite:", "Box address:"), host))
+	out.append("<p>%s <b>%s</b></p>" % (T("Boksin osoite:"), host))
 	w = warnings(registered)
 	if w:
-		out.append("<h2>%s</h2><ul>%s</ul>" % (L("Huom", "Note"), "".join("<li>%s</li>" % x for x in w)))
+		out.append("<h2>%s</h2><ul>%s</ul>" % (T("Huom"), "".join("<li>%s</li>" % x for x in w)))
 
 	out.append("<h2>Google TV / Android TV</h2>")
 	if has_apk:
-		out.append(L(
-			"<ol><li>Asenna televisioon Google Playsta sovellus <b>Downloader</b> (AFTVnews).</li>"
+		out.append(T("<ol><li>Asenna televisioon Google Playsta sovellus <b>Downloader</b> (AFTVnews).</li>"
 			"<li>Salli asetuksista Downloaderille <i>tuntemattomien sovellusten asennus</i>.</li>"
-			"<li>Kirjoita Downloaderiin osoite <b>%(h)s/%(m)s</b> ja valitse alta linkki.</li></ol>",
-			"<ol><li>Install the <b>Downloader</b> app (AFTVnews) on the TV from Google Play.</li>"
-			"<li>In the settings, allow Downloader to <i>install unknown apps</i>.</li>"
-			"<li>Enter the address <b>%(h)s/%(m)s</b> in Downloader and choose the link below.</li></ol>") % h)
+			"<li>Kirjoita Downloaderiin osoite <b>%(h)s/%(m)s</b> ja valitse alta linkki.</li></ol>") % h)
 		out.append(("<p style='font-size:1.4em'><a href='/%(m)s/E2TVPlayer.apk'>&#11015; " +
-			L("Lataa", "Download") + " E2TVPlayer.apk</a></p>") % h)
+			T("Lataa") + " E2TVPlayer.apk</a></p>") % h)
 	else:
-		out.append("<p><i>%s</i></p>" % L("Google TV -sovellus ei ole mukana tässä paketissa.",
-			"The Google TV app is not included in this package."))
+		out.append("<p><i>%s</i></p>" % T("Google TV -sovellus ei ole mukana tässä paketissa."))
 
 	out.append("<h2>Samsung Tizen (2015&ndash;)</h2>")
-	out.append(L(
-		"<ol><li>Laita TV developer-tilaan: Apps &rarr; paina 1, 2, 3, 4, 5 &rarr; Developer mode <b>On</b> ja "
+	out.append(T("<ol><li>Laita TV developer-tilaan: Apps &rarr; paina 1, 2, 3, 4, 5 &rarr; Developer mode <b>On</b> ja "
 		"Host PC IP = tietokoneesi tai puhelimesi IP. Käynnistä TV uudelleen.</li>"
 		"<li>Lataa paketti: <a href='/%(m)s/E2TVPlayer.wgt'><b>E2TVPlayer.wgt</b></a></li>"
 		"<li>Asenna se <a href='https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer'>"
 		"Samsung Jellyfin Installerilla</a> (valitse oma .wgt). Ohjelma hoitaa Samsungin varmenteen.</li></ol>"
-		"<p>Päivitykset tulevat boksin lisäosan mukana: käynnistä sovellus uudelleen.</p>",
-		"<ol><li>Put the TV in developer mode: Apps &rarr; press 1, 2, 3, 4, 5 &rarr; Developer mode <b>On</b> and "
-		"Host PC IP = the IP of your computer or phone. Restart the TV.</li>"
-		"<li>Download the package: <a href='/%(m)s/E2TVPlayer.wgt'><b>E2TVPlayer.wgt</b></a></li>"
-		"<li>Install it with the <a href='https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer'>"
-		"Samsung Jellyfin Installer</a> (choose a custom .wgt). It takes care of the Samsung certificate.</li></ol>"
-		"<p>Updates come with the box plugin: just restart the app.</p>") % h)
+		"<p>Päivitykset tulevat boksin lisäosan mukana: käynnistä sovellus uudelleen.</p>") % h)
 
 	out.append("<h2>Samsung Smart TV (2011&ndash;2014)</h2>")
-	out.append(L(
-		"<p>TV hakee sovelluksen osoitteesta <a href='/widgetlist.xml'>http://%(h)s/widgetlist.xml</a>.</p>"
+	out.append(T("<p>TV hakee sovelluksen osoitteesta <a href='/widgetlist.xml'>http://%(h)s/widgetlist.xml</a>.</p>"
 		"<ol><li>TV: Valikko &rarr; Smart Hub &rarr; Samsung-tili &rarr; Kirjaudu. Tunnus <b>develop</b> "
 		"(salasana tyhjä tai 000000).</li>"
 		"<li>Smart Hub &rarr; pidä OK pohjassa jonkin sovelluksen päällä &rarr; <b>IP Setting</b> &rarr; <b>%(h)s</b></li>"
 		"<li>Pidä OK uudelleen pohjassa &rarr; <b>Start User App Sync</b>.</li>"
 		"<li>Sovellus <b>%(t)s</b> ilmestyy Omiin sovelluksiin.</li></ol>"
 		"<p>Päivitys: tee kohta 3 uudelleen ja käynnistä TV sen jälkeen uudelleen. "
-		"<a href='/%(m)s/%(z)s'>Lataa zip</a></p>",
-		"<p>The TV fetches the app from <a href='/widgetlist.xml'>http://%(h)s/widgetlist.xml</a>.</p>"
-		"<ol><li>TV: Menu &rarr; Smart Hub &rarr; Samsung Account &rarr; Log in. User <b>develop</b> "
-		"(password empty or 000000).</li>"
-		"<li>Smart Hub &rarr; hold OK on any app &rarr; <b>IP Setting</b> &rarr; <b>%(h)s</b></li>"
-		"<li>Hold OK again &rarr; <b>Start User App Sync</b>.</li>"
-		"<li>The app <b>%(t)s</b> appears in My Apps.</li></ol>"
-		"<p>Update: repeat step 3 and then restart the TV. "
-		"<a href='/%(m)s/%(z)s'>Download zip</a></p>") % h)
+		"<a href='/%(m)s/%(z)s'>Lataa zip</a></p>") % h)
 
-	out.append("<h2>%s</h2>" % L("Kuvakaappaukset", "Screenshots"))
+	out.append("<h2>%s</h2>" % T("Kuvakaappaukset"))
 	out.append("<p>%s<br><code>%s</code><br><a href='/%s/kuvat'>%s</a></p>" % (
-		L("TV-sovelluksen TOOLS-valikosta otetut kuvat tallentuvat kansioon",
-			"Pictures taken from the TOOLS menu of the TV app are saved in"),
-		shots.shots_dir(), mount, L("Näytä kuvat", "Show the pictures")))
+		T("TV-sovelluksen TOOLS-valikosta otetut kuvat tallentuvat kansioon"),
+		shots.shots_dir(), mount, T("Näytä kuvat")))
 	try:
 		if not shots.find_ffmpeg():
-			out.append("<p><i>%s</i></p>" % L("Videokuva Samsung-kuviin: opkg install ffmpeg",
-				"Video frame in Samsung pictures: opkg install ffmpeg"))
+			out.append("<p><i>%s</i></p>" % T("Videokuva Samsung-kuviin: opkg install ffmpeg"))
 	except Exception:
 		pass
 
-	out.append("<h2>%s</h2>" % L("Tekstitykset", "Subtitles"))
-	out.append("<p>%s</p>" % L(
-		"Boksi purkaa tallenteen DVB-tekstitykset ensimmäisellä toistokerralla kansioon .e2tvplayer "
-		"tallenteen viereen. Live-kanavilla tekstitykset puretaan lähetyksestä.",
-		"The box extracts the DVB subtitles of a recording the first time it is played, into the folder "
-		".e2tvplayer next to the recording. On live channels the subtitles are extracted from the broadcast."))
-	out.append("<p><small>%s</small></p>" % L(
-		"Sovelluksen kieli valitaan TV:llä TOOLS-valikosta (oletuksena TV:n kieli).",
-		"The app language is chosen on the TV in the TOOLS menu (by default the TV's language)."))
+	out.append("<h2>%s</h2>" % T("Tekstitykset"))
+	out.append("<p>%s</p>" % T("Boksi purkaa tallenteen DVB-tekstitykset ensimmäisellä toistokerralla kansioon %s. "
+		"Live-kanavilla tekstitykset puretaan lähetyksestä.") % _subs_dir())
+	out.append("<p><small>%s</small></p>" % T("Sovelluksen kieli valitaan TV:llä TOOLS-valikosta (oletuksena TV:n kieli)."))
 	return "".join(out)
 
 

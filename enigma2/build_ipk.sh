@@ -12,6 +12,8 @@ PLUG=usr/lib/enigma2/python/Plugins/Extensions
 
 mkdir -p "$WORK/data/$PLUG/E2TVPlayer" "$WORK/data/$PLUG/WebInterface/WebChilds/External" "$WORK/control" "$OUT"
 cp -r src/E2TVPlayer/. "$WORK/data/$PLUG/E2TVPlayer/"
+mkdir -p "$WORK/data/$PLUG/E2TVPlayer/locale"
+cp ../po/*.po "$WORK/data/$PLUG/E2TVPlayer/locale/"
 cp src/External/e2tvplayer.py "$WORK/data/$PLUG/WebInterface/WebChilds/External/"
 APK="${E2TVPLAYER_APK:-../android/app/build/outputs/apk/release/E2TVPlayer.apk}"
 if [ -f "$APK" ]; then

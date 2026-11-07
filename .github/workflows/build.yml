@@ -56,6 +56,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Käännökset ajan tasalla (po/*.po)
+        run: python3 tools/i18n.py check
       - name: Samsung (Orsay) ja Tizen -sovellusten testit
         working-directory: tests/web
         run: |

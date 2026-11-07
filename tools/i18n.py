@@ -1,0 +1,264 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 E2TVPlayer contributors
+"""E2TVPlayerin käännökset (po/*.po).
+
+Lähdekieli on suomi: jokainen käännettävä teksti on koodissa muodossa T("...")
+(JavaScript, Kotlin ja Python) tai N('...') (JavaScript, ei käännetä heti).
+
+  python3 tools/i18n.py update   poimii tekstit -> po/e2tvplayer.pot, päivittää po/*.po
+                                 ja tekee sovellusten käännöstiedot
+  python3 tools/i18n.py check    tarkistaa, että kaikki on ajan tasalla (CI)
+  python3 tools/i18n.py new sv Svenska   uusi kieli
+
+Uusi kieli: aja `new`, käännä po/<koodi>.po (esim. Poeditilla) ja aja `update`.
+Boksi lukee .po-tiedostot suoraan; TV-sovelluksille tehdään:
+  enigma2/src/E2TVPlayer/widget/js/util.js   (I18N-DATA-lohko)
+  android/app/src/main/assets/i18n.json
+"""
+import ast
+import glob
+import io
+import json
+import os
+import re
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PO_DIR = os.path.join(ROOT, "po")
+PLUGIN = os.path.join(ROOT, "enigma2", "src", "E2TVPlayer")
+UTIL_JS = os.path.join(PLUGIN, "widget", "js", "util.js")
+ANDROID_SRC = os.path.join(ROOT, "android", "app", "src", "main", "java")
+ANDROID_JSON = os.path.join(ROOT, "android", "app", "src", "main", "assets", "i18n.json")
+BEGIN, END = "/* I18N-DATA-BEGIN (tools/i18n.py tekee tämän, älä muokkaa) */", "/* I18N-DATA-END */"
+
+
+# ------------------------------------------------------------------ poiminta
+
+def _unesc(s, quote):
+	out, i = [], 0
+	while i < len(s):
+		c = s[i]
+		if c == "\\" and i + 1 < len(s):
+			n = s[i + 1]
+			out.append({"n": "\n", "t": "\t"}.get(n, n))
+			i += 2
+		else:
+			out.append(c)
+			i += 1
+	return "".join(out)
+
+
+def extract():
+	"""Palauttaa {msgid: [viittaukset]} esiintymisjärjestyksessä."""
+	found = {}
+
+	def add(s, ref):
+		found.setdefault(s, [])
+		if ref not in found[s]:
+			found[s].append(ref)
+
+	for f in sorted(glob.glob(os.path.join(PLUGIN, "widget", "js", "*.js"))):
+		src = io.open(f, encoding="utf-8").read()
+		src = src.split(BEGIN)[0] + (src.split(END, 1)[1] if END in src else "")
+		for m in re.finditer(r"\b[TN]\('((?:[^'\\]|\\.)*)'\)", src):
+			add(_unesc(m.group(1), "'"), "web/" + os.path.basename(f))
+	for f in sorted(glob.glob(os.path.join(ANDROID_SRC, "**", "*.kt"), recursive=True)):
+		src = io.open(f, encoding="utf-8").read()
+		for m in re.finditer(r'\b[TN]\("((?:[^"\\]|\\.)*)"\)', src):
+			add(_unesc(m.group(1), '"'), "android/" + os.path.basename(f))
+	for f in sorted(glob.glob(os.path.join(PLUGIN, "*.py"))):
+		tree = ast.parse(io.open(f, encoding="utf-8").read())
+		for n in ast.walk(tree):
+			if isinstance(n, ast.Call) and n.args and isinstance(n.args[0], ast.Constant) and isinstance(n.args[0].value, str):
+				fn = n.func
+				if (isinstance(fn, ast.Name) and fn.id == "T") or (isinstance(fn, ast.Attribute) and fn.attr == "T"):
+					add(n.args[0].value, "box/" + os.path.basename(f))
+	return found
+
+
+# ------------------------------------------------------------------ po-tiedostot
+
+def _q(s):
+	s = s.replace("\\", "\\\\").replace('"', '\\"').replace("\t", "\\t")
+	parts = s.split("\n")
+	if len(parts) == 1:
+		return '"%s"' % s
+	return '""\n' + "\n".join('"%s\\n"' % p for p in parts[:-1]) + ('\n"%s"' % parts[-1] if parts[-1] else "")
+
+
+def read_po(path):
+	"""-> (otsake{}, [(msgid, msgstr, fuzzy)])"""
+	entries, cur, key = [], {}, None
+
+	def unq(x):
+		return _unesc(x.strip()[1:-1], '"')
+
+	def done():
+		if "msgid" in cur:
+			entries.append((cur["msgid"], cur.get("msgstr", ""), cur.get("fuzzy", False)))
+
+	for line in io.open(path, encoding="utf-8"):
+		line = line.strip()
+		if not line:
+			continue
+		if line.startswith("#,"):
+			if "msgid" in cur:
+				done()
+				cur = {}
+			cur["fuzzy"] = "fuzzy" in line
+			key = None
+		elif line.startswith("#"):
+			continue
+		elif line.startswith("msgid "):
+			if "msgid" in cur:
+				done()
+				cur = {}
+			key = "msgid"
+			cur[key] = unq(line[6:])
+		elif line.startswith("msgstr "):
+			key = "msgstr"
+			cur[key] = unq(line[7:])
+		elif line.startswith('"') and key:
+			cur[key] += unq(line)
+	done()
+	head = {}
+	rest = []
+	for mid, mstr, fz in entries:
+		if mid == "":
+			for hl in mstr.split("\n"):
+				if ":" in hl:
+					k, v = hl.split(":", 1)
+					head[k.strip()] = v.strip()
+		else:
+			rest.append((mid, mstr, fz))
+	return head, rest
+
+
+def write_po(path, head, msgs, trans, fuzzy):
+	out = ['# E2TVPlayer – käännös / translation', '# SPDX-License-Identifier: GPL-3.0-or-later', 'msgid ""', 'msgstr ""']
+	for k in ("Project-Id-Version", "Language", "X-Language-Name", "MIME-Version", "Content-Type", "Content-Transfer-Encoding"):
+		if k in head:
+			out.append('"%s: %s\\n"' % (k, head[k]))
+	out.append("")
+	for mid, refs in msgs.items():
+		out.append("#: " + " ".join(refs))
+		if fuzzy.get(mid):
+			out.append("#, fuzzy")
+		out.append("msgid " + _q(mid))
+		out.append("msgstr " + _q(trans.get(mid, "")))
+		out.append("")
+	data = "\n".join(out)
+	old = io.open(path, encoding="utf-8").read() if os.path.exists(path) else None
+	if old != data:
+		io.open(path, "w", encoding="utf-8").write(data)
+		return True
+	return False
+
+
+def head_for(code, name):
+	return {"Project-Id-Version": "E2TVPlayer", "Language": code, "X-Language-Name": name, "MIME-Version": "1.0",
+		"Content-Type": "text/plain; charset=UTF-8", "Content-Transfer-Encoding": "8bit"}
+
+
+def languages():
+	res = []
+	for p in sorted(glob.glob(os.path.join(PO_DIR, "*.po"))):
+		head, entries = read_po(p)
+		code = os.path.splitext(os.path.basename(p))[0]
+		res.append((code, head.get("X-Language-Name", code), p, head, entries))
+	return res
+
+
+# ------------------------------------------------------------------ sovellusten tiedot
+
+def app_data(msgs):
+	data = {}
+	for code, name, p, head, entries in languages():
+		t = dict((m, s) for m, s, fz in entries if s and not fz and m in msgs)
+		data[code] = {"name": name, "t": t}
+	return data
+
+
+def outputs(msgs):
+	data = app_data(msgs)
+	web = {}
+	webkeys = set(m for m, refs in msgs.items() if any(r.startswith("web/") for r in refs))
+	for code, d in data.items():
+		web[code] = {"name": d["name"], "t": dict((k, v) for k, v in d["t"].items() if k in webkeys)}
+	js = BEGIN + "\nvar I18N_DATA = " + json.dumps(web, ensure_ascii=False, indent=1, sort_keys=True) + ";\n" + END
+	util = io.open(UTIL_JS, encoding="utf-8").read()
+	a, b = util.index(BEGIN), util.index(END) + len(END)
+	util_new = util[:a] + js + util[b:]
+	akeys = set(m for m, refs in msgs.items() if any(r.startswith("android/") for r in refs))
+	andr = {}
+	for code, d in data.items():
+		andr[code] = {"name": d["name"], "t": dict((k, v) for k, v in d["t"].items() if k in akeys)}
+	ajson = json.dumps(andr, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
+	return [(UTIL_JS, util_new), (ANDROID_JSON, ajson)]
+
+
+def update(check=False):
+	msgs = extract()
+	pot_head = head_for("", "")
+	pot_head.pop("Language")
+	pot_head.pop("X-Language-Name")
+	changed = []
+	pot = os.path.join(PO_DIR, "e2tvplayer.pot")
+	if check:
+		import tempfile
+		tmp = tempfile.mktemp()
+		if os.path.exists(pot):
+			io.open(tmp, "w", encoding="utf-8").write(io.open(pot, encoding="utf-8").read())
+		if write_po(tmp, pot_head, msgs, {}, {}):
+			changed.append(pot)
+	elif write_po(pot, pot_head, msgs, {}, {}):
+		changed.append(pot)
+	missing = {}
+	for code, name, p, head, entries in languages():
+		trans = dict((m, s) for m, s, fz in entries)
+		fuzzy = dict((m, fz) for m, s, fz in entries)
+		missing[code] = [m for m in msgs if not trans.get(m)]
+		if not check and write_po(p, head, msgs, trans, fuzzy):
+			changed.append(p)
+	for path, content in outputs(msgs):
+		old = io.open(path, encoding="utf-8").read() if os.path.exists(path) else None
+		if old != content:
+			changed.append(path)
+			if not check:
+				if not os.path.isdir(os.path.dirname(path)):
+					os.makedirs(os.path.dirname(path))
+				io.open(path, "w", encoding="utf-8").write(content)
+	for code, m in missing.items():
+		print("%s: %d / %d käännetty" % (code, len(msgs) - len(m), len(msgs)))
+		for x in m[:20]:
+			print("   puuttuu: %r" % x)
+	return changed
+
+
+def main():
+	cmd = sys.argv[1] if len(sys.argv) > 1 else "update"
+	if cmd == "new":
+		code, name = sys.argv[2], sys.argv[3]
+		p = os.path.join(PO_DIR, code + ".po")
+		if os.path.exists(p):
+			sys.exit("%s on jo olemassa" % p)
+		write_po(p, head_for(code, name), {}, {}, {})
+		cmd = "update"
+	if cmd == "update":
+		for c in update():
+			print("päivitetty: " + os.path.relpath(c, ROOT))
+	elif cmd == "check":
+		ch = update(check=True)
+		if ch:
+			print("Käännöstiedot eivät ole ajan tasalla, aja: python3 tools/i18n.py update")
+			for c in ch:
+				print("   " + os.path.relpath(c, ROOT))
+			sys.exit(1)
+		print("käännökset ajan tasalla")
+	else:
+		sys.exit(__doc__)
+
+
+if __name__ == "__main__":
+	main()
