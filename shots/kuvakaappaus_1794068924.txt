@@ -1,0 +1,2 @@
+/e2tvplayer/screenshot?platform=googletv&novideo=1&pos=23.38&title=Testitallenne&file=%2Fmedia%2Fhdd%2Fmovie%2F20261103%202000%20-%20Testikanava%20HD%20-%20Testitallenne.ts
+image/png

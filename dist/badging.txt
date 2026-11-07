@@ -1,0 +1,5 @@
+package: name='fi.e2tvplayer' versionCode='1013' versionName='0.1.013' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'
+sdkVersion:'21'
+launchable-activity: name='fi.e2tvplayer.MainActivity'  label='' icon=''
+leanback-launchable-activity: name='fi.e2tvplayer.MainActivity'  label='' icon='' banner=''
+  uses-feature-not-required: name='android.software.leanback'
