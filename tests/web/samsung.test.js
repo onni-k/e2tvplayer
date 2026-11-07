@@ -2,7 +2,7 @@ const fs=require('fs'), {JSDOM}=require('jsdom');
 const W=require('path').resolve(__dirname,'../../enigma2/src/E2TVPlayer/widget')+'/';
 let html=fs.readFileSync(W+'index.html','utf8').replace(/<script[^>]*><\/script>/g,'');
 const dom=new JSDOM(html,{runScripts:'outside-only',url:'http://localhost/'});
-const w=dom.window; const log=[];
+const w=dom.window; Object.defineProperty(w.navigator,'language',{get:()=>process.env.E2LANG||'fi-FI'}); const log=[];
 w.console.log=(...a)=>log.push(a.join(' '));
 // Orsay-API:t
 w.eval(`var Common={API:{Widget:function(){this.sendReadyEvent=function(){};this.blockNavigation=function(){};this.sendReturnEvent=function(){window.__exited='return';};this.sendExitEvent=function(){window.__exited='exit';};},

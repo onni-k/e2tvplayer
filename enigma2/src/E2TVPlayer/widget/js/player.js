@@ -51,7 +51,7 @@ var Player = {
 		if (!Player.ticker) { Player.ticker = setInterval(Player.tick, 250); }
 		document.body.className = 'playing';
 		Player.showOsd(true);
-		Player.setState('Puskuroidaan…');
+		Player.setState(T('Puskuroidaan…'));
 		try { U.$('pluginTVMW').SetMediaSource(); } catch (e0) { }
 		try { pluginAPI.setOffScreenSaver(); } catch (e1) { }
 		var ok = false;
@@ -74,7 +74,7 @@ var Player = {
 			ok = false;
 		}
 		if (!ok) {
-			Player.fail('Toisto ei käynnistynyt');
+			Player.fail(T('Toisto ei käynnistynyt'));
 		}
 	},
 
@@ -91,6 +91,7 @@ var Player = {
 		if (Player.ticker) { clearInterval(Player.ticker); Player.ticker = null; }
 		document.body.className = '';
 		if (Player.onStopped) { Player.onStopped(Player.item); }
+		if (I18n.pending) { setTimeout(function () { I18n.applyIfIdle(); }, 50); }
 	},
 
 	fail: function (msg) {
@@ -99,7 +100,7 @@ var Player = {
 		if (it && it.live && it.liveId && it.directUrl && !it.retried && Player.pos < 1) {
 			Player.active = false;
 			Views.channels.useProxy = false;
-			U.toast('Välitys ei toiminut – toistetaan suoraan (ei tekstityksiä)', 4000);
+			U.toast(T('Välitys ei toiminut – toistetaan suoraan (ei tekstityksiä)'), 4000);
 			it.retried = true;
 			it.url = it.directUrl;
 			it.liveId = null;
@@ -108,23 +109,23 @@ var Player = {
 		}
 		Player.stop();
 		var hint = it && it.live ?
-			'Tarkista, että boksin striimaus (portti 8001) on käytössä ja viritin vapaana.' :
-			'TV ei ehkä tue tallenteen muotoa (esim. tekstitys- tai äänimuoto) tai yhteys katkesi.';
-		Dialog.alert('Toistovirhe', msg + '. ' + hint);
+			T('Tarkista, että boksin striimaus (portti 8001) on käytössä ja viritin vapaana.') :
+			T('TV ei ehkä tue tallenteen muotoa (esim. tekstitys- tai äänimuoto) tai yhteys katkesi.');
+		Dialog.alert(T('Toistovirhe'), msg + '. ' + hint);
 	},
 
 	togglePause: function () {
 		if (!Player.active || Player.item.live) { Player.showOsd(); return; }
 		try {
 			if (Player.paused) { Player.plugin.Resume(); Player.paused = false; Player.setState(''); }
-			else { Player.plugin.Pause(); Player.paused = true; Player.setState('❚❚ Tauko'); Player.savePos(true); }
+			else { Player.plugin.Pause(); Player.paused = true; Player.setState(T('❚❚ Tauko')); Player.savePos(true); }
 		} catch (e) { }
 		Player.showOsd(Player.paused);
 	},
 
 	jump: function (sec) {
 		if (!Player.active || Player.item.live) { return; }
-		if (Player.buffering) { U.toast('Odota hetki - puskuroidaan'); return; }
+		if (Player.buffering) { U.toast(T('Odota hetki - puskuroidaan')); return; }
 		var target = Player.pos + sec;
 		if (Player.dur > 0) { target = Math.min(target, Player.dur - 5); }
 		target = Math.max(0, target);
@@ -175,15 +176,15 @@ var Player = {
 		if (it.live) {
 			var ev = (Views.channels.now || {})[it.sref], b = ev ? Number(ev.begin_timestamp) : 0, d = ev ? Number(ev.duration_sec) : 0;
 			var now = new Date().getTime() / 1000;
-			U.$('osd-time').innerHTML = b && d ? 'LIVE ' + Player.hm(b) + '–' + Player.hm(b + d) : 'LIVE';
+			U.$('osd-time').innerHTML = b && d ? T('LIVE ') + Player.hm(b) + '–' + Player.hm(b + d) : T('LIVE');
 			U.$('osd-fill').style.width = b && d ? Math.max(0, Math.min(100, 100 * (now - b) / d)).toFixed(1) + '%' : '100%';
 			if (ev && ev.title) { U.$('osd-sub').innerHTML = U.esc(ev.title); }
-			U.$('osd-keys').innerHTML = 'CH +/- tai ▲▼ kanava &nbsp; INFO ohjelmatiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta';
+			U.$('osd-keys').innerHTML = T('CH +/- tai ▲▼ kanava &nbsp; INFO ohjelmatiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta');
 		} else {
 			var pct = Player.dur > 0 ? Math.min(100, 100 * Player.pos / Player.dur) : 0;
 			U.$('osd-fill').style.width = pct.toFixed(1) + '%';
 			U.$('osd-time').innerHTML = U.fmtTime(Player.pos) + (Player.dur ? ' / ' + U.fmtTime(Player.dur) : '');
-			U.$('osd-keys').innerHTML = '◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK tauko &nbsp; INFO tiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta';
+			U.$('osd-keys').innerHTML = T('◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK tauko &nbsp; INFO tiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta');
 		}
 	},
 
@@ -228,23 +229,23 @@ var Player = {
 		Player.updateOsd();
 	},
 
-	onBufStart: function () { Player.buffering = true; Player.setState('Puskuroidaan…'); Player.showOsd(true); },
-	onBufProgress: function (pct) { if (Player.buffering) { Player.setState('Puskuroidaan ' + (pct || 0) + ' %'); } },
+	onBufStart: function () { Player.buffering = true; Player.setState(T('Puskuroidaan…')); Player.showOsd(true); },
+	onBufProgress: function (pct) { if (Player.buffering) { Player.setState(T('Puskuroidaan ') + (pct || 0) + ' %'); } },
 	onBufDone: function () { Player.buffering = false; Player.setState(Player.paused ? '❚❚ Tauko' : ''); Player.showOsd(); },
 	onEnd: function () {
 		if (Player.item && !Player.item.live) {
 			Store.setPos(Player.item.key, 0);
 			Player.item.key = null;      /* ettei stop() tallenna loppukohtaa */
 			Player.stop();
-			U.toast('Tallenne katsottu loppuun');
+			U.toast(T('Tallenne katsottu loppuun'));
 		} else {
-			Player.fail('Lähetys katkesi');
+			Player.fail(T('Lähetys katkesi'));
 		}
 	},
-	onConnFailed: function () { Player.fail('Yhteys boksiin epäonnistui'); },
-	onNetLost: function () { Player.fail('Verkkoyhteys katkesi'); },
-	onNotFound: function () { Player.fail('Tiedostoa ei löytynyt'); },
-	onRenderError: function (code) { Player.fail('Toistovirhe (koodi ' + code + ')'); },
+	onConnFailed: function () { Player.fail(T('Yhteys boksiin epäonnistui')); },
+	onNetLost: function () { Player.fail(T('Verkkoyhteys katkesi')); },
+	onNotFound: function () { Player.fail(T('Tiedostoa ei löytynyt')); },
+	onRenderError: function (code) { Player.fail(T('Toistovirhe (koodi ') + code + ')'); },
 
 	/* --- INFO-paneeli: ohjelman tiedot ja eteneminen --- */
 	infoOpen: function () { return U.$('info').style.display === 'block'; },
@@ -274,19 +275,19 @@ var Player = {
 				if (b && d) {
 					var now = new Date().getTime() / 1000;
 					meta += ' · ' + Player.hm(b) + '–' + Player.hm(b + d) +
-						' · jäljellä ' + Math.max(0, Math.round((b + d - now) / 60)) + ' min';
+						T(' · jäljellä ') + Math.max(0, Math.round((b + d - now) / 60)) + ' min';
 					U.$('osd-fill').style.width = Math.max(0, Math.min(100, 100 * (now - b) / d)).toFixed(1) + '%';
 				}
 				desc = ev.longdesc || ev.shortdesc || '';
 				if (ev.shortdesc && ev.longdesc && ev.longdesc.indexOf(ev.shortdesc) < 0) { desc = ev.shortdesc + '\n' + ev.longdesc; }
 			}
 			if (nx && nx.title) {
-				next = 'Seuraavaksi ' + (nx.begin_timestamp ? Player.hm(Number(nx.begin_timestamp)) + ' ' : '') + nx.title;
+				next = T('Seuraavaksi ') + (nx.begin_timestamp ? Player.hm(Number(nx.begin_timestamp)) + ' ' : '') + nx.title;
 			}
 		}
 		U.$('i-title').innerHTML = U.esc(title);
 		U.$('i-meta').innerHTML = U.esc(meta);
-		U.$('i-desc').innerHTML = U.descHtml(desc) || '<span class="cast">Ei ohjelmatietoja</span>';
+		U.$('i-desc').innerHTML = U.descHtml(desc) || T('<span class="cast">Ei ohjelmatietoja</span>');
 		U.$('i-next').innerHTML = U.esc(next);
 	},
 
@@ -325,21 +326,21 @@ var Player = {
 			raw = Player.call('GetTotalNumOfStreamID', types[t]);
 			n = parseInt(raw, 10);
 			if (isNaN(n) || n < 0) { n = 0; }
-			diag.push((types[t] === 1 ? 'ääni' : 'tekstitys') + '=' + (raw === null ? 'ei tukea' : raw));
+			diag.push((types[t] === 1 ? T('ääni') : T('tekstitys')) + '=' + (raw === null ? T('ei tukea') : raw));
 			list = [];
 			for (i = 0; i < n && i < 16; i++) {
 				var lang = U.langName(Player.call('GetStreamLanguageInfo', types[t], i));
 				/* TV ei aina kerro TS-virran ääniraidan kieltä: boksi tietää sen kanavataulusta */
 				var ba = types[t] === Player.AUDIO && Subs.audio && Subs.audio.length === n ? Subs.audio[i] : null;
 				if (ba) {
-					if (!lang || /^raita /.test(lang)) { lang = ba.lang ? U.langName(ba.lang) : ''; }
-					if (ba.codec) { lang = (lang || ('raita ' + (i + 1))) + ' · ' + ba.codec; }
+					if (!lang || lang.indexOf(T('raita ')) === 0) { lang = ba.lang ? U.langName(ba.lang) : ''; }
+					if (ba.codec) { lang = (lang || (T('raita ') + (i + 1))) + ' · ' + ba.codec; }
 				}
-				list.push({ index: i, label: lang || ('raita ' + (i + 1)) });
+				list.push({ index: i, label: lang || (T('raita ') + (i + 1)) });
 			}
 			if (types[t] === Player.AUDIO) { Player.audio = list; } else { Player.subs = list; }
 		}
-		Player.diag = 'TV ilmoittaa: ' + diag.join(', ');
+		Player.diag = T('TV ilmoittaa: ') + diag.join(', ');
 		if (Player.audioSel >= Player.audio.length) { Player.audioSel = 0; }
 		if (Player.subSel >= Player.subs.length) { Player.subSel = -1; }
 		if (U.$('tracks').style.display === 'block') { Player.renderTracks(); }
@@ -348,7 +349,7 @@ var Player = {
 	tracksOpen: function () { return U.$('tracks').style.display === 'block'; },
 
 	showTracks: function () {
-		Player.readStreams();
+		if (Player.active) { Player.readStreams(); }
 		Player.trackRow = 0;
 		Player.renderTracks();
 		U.show('tracks', true);
@@ -356,7 +357,7 @@ var Player = {
 
 	/* Tekstitysvaihtoehdot: pois + boksin purkamat raidat + TV:n omat raidat (jos niitä on) */
 	subOptions: function () {
-		var opts = [{ kind: 'off', label: 'pois' }], i;
+		var opts = [{ kind: 'off', label: T('pois') }], i;
 		for (i = 0; i < Subs.tracks.length; i++) {
 			opts.push({ kind: 'box', key: Subs.tracks[i].key, label: Subs.label(Subs.tracks[i]) });
 		}
@@ -375,65 +376,81 @@ var Player = {
 		return 0;
 	},
 
-	trackRows: function () { return Subs.key ? 4 : 3; },
+	/* Valikon rivit: toistossa ääni, tekstitys, (ajoitus), kieli, kuvakaappaus; listoissa kieli ja kuvakaappaus */
+	rowIds: function () {
+		if (!Player.active) { return ['lang', 'shot']; }
+		return Subs.key ? ['audio', 'sub', 'timing', 'lang', 'shot'] : ['audio', 'sub', 'lang', 'shot'];
+	},
+	trackRows: function () { return Player.rowIds().length; },
+	rowId: function () { return Player.rowIds()[Player.trackRow] || ''; },
 	shotRow: function () { return Player.trackRows() - 1; },
 
 	boxStatus: function () {
 		if (Subs.liveId || (Player.item && Player.item.live)) { return Player.liveStatus(); }
 		switch (Subs.status) {
-			case 'starting': return 'Boksi: luetaan tallennetta…';
-			case 'running': return 'Boksi: tekstityksiä puretaan ' + Math.round(Subs.progress * 100) + ' %';
-			case 'done': return 'Boksi: tekstitykset purettu' + (Subs.key ? ' (' + Subs.cues.length + ' kpl)' : '');
-			case 'none': return 'Boksi: tallenteessa ei DVB-tekstityksiä' + (Subs.teletext ? ' (vain teksti-TV-tekstitys, ei vielä tuettu)' : '');
-			case 'error': return 'Boksi: ' + (Subs.error || 'virhe');
-			case 'stopped': return 'Boksi: purku keskeytyi';
+			case 'starting': return T('Boksi: luetaan tallennetta…');
+			case 'running': return T('Boksi: tekstityksiä puretaan ') + Math.round(Subs.progress * 100) + ' %';
+			case 'done': return T('Boksi: tekstitykset purettu') + (Subs.key ? ' (' + Subs.cues.length + T(' kpl)') : '');
+			case 'none': return T('Boksi: tallenteessa ei DVB-tekstityksiä') + (Subs.teletext ? T(' (vain teksti-TV-tekstitys, ei vielä tuettu)') : '');
+			case 'error': return T('Boksi: ') + (Subs.error || T('virhe'));
+			case 'stopped': return T('Boksi: purku keskeytyi');
 		}
-		return 'Boksi: ei tietoa';
+		return T('Boksi: ei tietoa');
 	},
 
 	liveStatus: function () {
 		if (Subs.liveId) {
 			switch (Subs.status) {
-				case 'connecting': case 'waiting': case 'unknown': case '': return 'Boksi: odotetaan lähetystä…';
-				case 'running': return 'Boksi: tekstitykset puretaan lähetyksestä' + (Subs.key ? ' (' + Subs.cues.length + ' kpl)' : '');
-				case 'none': return 'Boksi: kanavalla ei nyt DVB-tekstityksiä' + (Subs.teletext ? ' (vain teksti-TV, ei vielä tuettu)' : '');
-				case 'closed': return 'Boksi: lähetys päättyi';
-				case 'error': return 'Boksi: ' + (Subs.error || 'virhe');
+				case 'connecting': case 'waiting': case 'unknown': case '': return T('Boksi: odotetaan lähetystä…');
+				case 'running': return T('Boksi: tekstitykset puretaan lähetyksestä') + (Subs.key ? ' (' + Subs.cues.length + T(' kpl)') : '');
+				case 'none': return T('Boksi: kanavalla ei nyt DVB-tekstityksiä') + (Subs.teletext ? T(' (vain teksti-TV, ei vielä tuettu)') : '');
+				case 'closed': return T('Boksi: lähetys päättyi');
+				case 'error': return T('Boksi: ') + (Subs.error || T('virhe'));
 			}
 		}
-		return 'Tekstitykset eivät ole käytössä (suora toisto)';
+		return T('Tekstitykset eivät ole käytössä (suora toisto)');
 	},
 
 	renderTracks: function () {
 		var rows = [], a = Player.audio;
 		var opts = Player.subOptions(), cur = Player.subCurrent(opts);
 		if (Player.trackRow >= Player.trackRows()) { Player.trackRow = 0; }
-		var aval = a.length ? a[Player.audioSel].label + (a.length > 1 ? '  (' + (Player.audioSel + 1) + '/' + a.length + ')' : '') : 'oletus';
-		var sval = opts.length > 1 ? opts[cur].label : 'ei tarjolla';
+		var aval = a.length ? a[Player.audioSel].label + (a.length > 1 ? '  (' + (Player.audioSel + 1) + '/' + a.length + ')' : '') : T('oletus');
+		var sval = opts.length > 1 ? opts[cur].label : T('ei tarjolla');
 		var row = function (i, label, val, arrows) {
 			return '<div class="tr-row' + (Player.trackRow === i ? ' sel' : '') + '"><span class="lbl">' + label + '</span><span class="val">' +
 				(arrows ? '◀ ' : '') + U.esc(val) + (arrows ? ' ▶' : '') + '</span></div>';
 		};
-		rows.push(row(0, 'Ääni', aval, a.length > 1));
-		rows.push(row(1, 'Tekstitys', sval, opts.length > 1));
-		if (Subs.key) {
-			var off = Subs.offset();
-			rows.push(row(2, 'Ajoitus', (off > 0 ? '+' : '') + off.toFixed(1).replace('.', ',') + ' s' +
-				(off === 0 ? '' : (off > 0 ? '  (aiemmin)' : '  (myöhemmin)')), true));
+		var ids = Player.rowIds(), r;
+		for (r = 0; r < ids.length; r++) {
+			if (ids[r] === 'audio') { rows.push(row(r, T('Ääni'), aval, a.length > 1)); }
+			else if (ids[r] === 'sub') { rows.push(row(r, T('Tekstitys'), sval, opts.length > 1)); }
+			else if (ids[r] === 'timing') {
+				var off = Subs.offset();
+				rows.push(row(r, T('Ajoitus'), (off > 0 ? '+' : '') + (I18n.en() ? off.toFixed(1) : off.toFixed(1).replace('.', ',')) + ' s' +
+					(off === 0 ? '' : (off > 0 ? T('  (aiemmin)') : T('  (myöhemmin)'))), true));
+			}
+			else if (ids[r] === 'lang') { rows.push(row(r, T('Kieli'), I18n.label(I18n.pref()) + (I18n.pending ? T('  (käynnistyy uudelleen)') : ''), true)); }
+			else if (ids[r] === 'shot') { rows.push(row(r, T('Kuvakaappaus'), Shot.busy ? T('odota…') : T('OK: ota kuva 10 s päästä'), false)); }
 		}
-		rows.push(row(Player.shotRow(), 'Kuvakaappaus', Shot.busy ? 'odota…' : 'OK: ota kuva 10 s päästä', false));
 		U.$('tr-rows').innerHTML = rows.join('');
-		U.$('tr-diag').innerHTML = U.esc(Player.boxStatus()) + '<br/>' + U.esc(Player.diag);
+		U.$('tr-diag').innerHTML = Player.active ? U.esc(Player.boxStatus()) + '<br/>' + U.esc(Player.diag) : '';
 	},
 
 	changeTrack: function (d) {
-		if (Player.trackRow === Player.shotRow()) { return; }
-		if (Player.trackRow === 0) {
+		var id = Player.rowId();
+		if (id === 'shot') { return; }
+		if (id === 'lang') {
+			I18n.cycle(d);
+			Player.renderTracks();
+			return;
+		}
+		if (id === 'audio') {
 			var n = Player.audio.length;
 			if (n < 2) { return; }
 			Player.audioSel = (Player.audioSel + d + n) % n;
 			Player.call('SetStreamID', Player.AUDIO, Player.audio[Player.audioSel].index);
-		} else if (Player.trackRow === 1) {
+		} else if (id === 'sub') {
 			var opts = Player.subOptions(), m = opts.length;
 			if (m < 2) { return; }
 			var next = opts[(Player.subCurrent(opts) + d + m) % m];
@@ -490,7 +507,8 @@ var Player = {
 				Player.renderTracks();
 			}
 			else if (k === tvKey.KEY_LEFT) { Player.changeTrack(-1); }
-			else if (k === tvKey.KEY_ENTER && Player.trackRow === Player.shotRow()) { U.show('tracks', false); Shot.start(); }
+			else if (k === tvKey.KEY_ENTER && Player.rowId() === 'shot') { U.show('tracks', false); Shot.start(); }
+			else if (k === tvKey.KEY_ENTER && Player.rowId() === 'lang') { U.show('tracks', false); I18n.applyIfIdle(); }
 			else if (k === tvKey.KEY_RIGHT || k === tvKey.KEY_ENTER) { if (k === tvKey.KEY_ENTER) { U.show('tracks', false); } else { Player.changeTrack(1); } }
 			else if (k === tvKey.KEY_RETURN || Player.isMenuKey(k)) { U.show('tracks', false); }
 			else if (k === tvKey.KEY_STOP) { U.show('tracks', false); Player.stop(); }
@@ -576,7 +594,7 @@ var Shot = {
 		if (!window.Promise || !document.createElement('canvas').getContext) {
 			if (!meta.file && !meta.sref) {
 				Shot.busy = false;
-				U.toast('Listanäkymää ei voi kuvata tässä TV:ssä (vain toistossa videokuva)', 4000);
+				U.toast(T('Listanäkymää ei voi kuvata tässä TV:ssä (vain toistossa videokuva)'), 4000);
 				return;
 			}
 			send(null);   /* vanha selain: boksi tallentaa pelkän videokuvan */
@@ -621,10 +639,10 @@ var Shot = {
 			var r = null;
 			try { r = JSON.parse(x.responseText); } catch (e) { r = null; }
 			if (x.status === 200 && r && r.name) {
-				var what = r.ui ? 'näkymä' : 'videokuva';
-				U.toast('Kuva tallennettu boksiin (' + what + (r.ffmpeg && (meta.file || meta.sref) ? ' + videokuva' : '') + '): ' + r.name, 4000);
+				var what = r.ui ? T('näkymä') : T('videokuva');
+				U.toast(T('Kuva tallennettu boksiin (') + what + (r.ffmpeg && (meta.file || meta.sref) ? T(' + videokuva') : '') + '): ' + r.name, 4000);
 			} else {
-				U.toast('Kuvan tallennus epäonnistui', 3000);
+				U.toast(T('Kuvan tallennus epäonnistui'), 3000);
 			}
 		};
 		try {
@@ -633,7 +651,7 @@ var Shot = {
 			x.send(dataUrl || '');
 		} catch (e) {
 			Shot.busy = false;
-			U.toast('Kuvan tallennus epäonnistui', 3000);
+			U.toast(T('Kuvan tallennus epäonnistui'), 3000);
 		}
 	}
 };

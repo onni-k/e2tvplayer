@@ -26,6 +26,7 @@ async function run(web) {
   const vc = new VirtualConsole();
   const dom = new JSDOM(html, { url: 'file://' + path.join(dir, 'index.html'), runScripts: 'dangerously', resources: 'usable', virtualConsole: vc,
     beforeParse(w) {
+      Object.defineProperty(w.navigator, 'language', { get: () => 'fi-FI' });
       w.tizen = { application: { getCurrentApplication: () => ({ exit() {} }) }, tvinputdevice: { registerKey() {} } };
       w.webapis = { avplay: {}, appcommon: { AppCommonScreenSaverState: {}, setScreenSaver() {} } };
     } });

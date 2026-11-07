@@ -89,6 +89,10 @@ class MainActivity : Activity() {
         dMeta = findViewById(R.id.dMeta)
         dDesc = findViewById(R.id.dDesc)
         footer = findViewById(R.id.footer)
+        tabRec.text = T("Tallenteet")
+        tabCh.text = T("Kanavat")
+        tabSet.text = T("Asetukset")
+        langEn = I18n.en()
         findViewById<TextView>(R.id.title).text =
             Html.fromHtml("E2<font color='#4FA3FF'>TV</font>Player")
 
@@ -115,8 +119,11 @@ class MainActivity : Activity() {
         override fun run() { tick(); ui.postDelayed(this, 30000) }
     }
 
+    private var langEn = false
+
     override fun onResume() {
         super.onResume()
+        if (I18n.en() != langEn) { recreate(); return }
         Shots.resumed(this)
         ui.removeCallbacks(ticker)
         ui.postDelayed(ticker, 30000)
@@ -145,26 +152,26 @@ class MainActivity : Activity() {
         Box.get("/api/statusinfo", timeoutMs = 8000, ok = { s ->
             val parts = ArrayList<String>()
             val standby = s.optString("inStandby") == "true" || s.optBoolean("inStandby", false)
-            if (standby) parts.add("valmiustilassa") else {
+            if (standby) parts.add(T("valmiustilassa")) else {
                 s.optString("currservice_station").takeIf { it.isNotEmpty() }?.let { parts.add(it) }
                 s.optString("currservice_name").takeIf { it.isNotEmpty() }?.let { parts.add(it) }
             }
             val rec = s.optString("isRecording") == "true" || s.optBoolean("isRecording", false)
-            val html = (if (rec) "<font color='#FF5A5A'><b>● TALLENTAA</b></font> &nbsp; " else "") +
-                "Boksi ${Html.escapeHtml(Box.host)}" + (if (parts.isEmpty()) "" else " · " + Html.escapeHtml(parts.joinToString(" — ")))
+            val html = (if (rec) T("<font color='#FF5A5A'><b>● TALLENTAA</b></font> &nbsp; ") else "") +
+                T("Boksi ") + Html.escapeHtml(Box.host) + (if (parts.isEmpty()) "" else " · " + Html.escapeHtml(parts.joinToString(" — ")))
             nowbar.text = Html.fromHtml(html)
-        }, fail = { err -> nowbar.text = Html.fromHtml("<font color='#FF5A5A'>Ei yhteyttä boksiin</font> · " + Html.escapeHtml(err)) })
+        }, fail = { err -> nowbar.text = Html.fromHtml(T("<font color='#FF5A5A'>Ei yhteyttä boksiin</font> · ") + Html.escapeHtml(err)) })
     }
 
     private fun updateTabs() {
         tabRec.isSelected = mode == "movies"
         tabCh.isSelected = mode == "channels"
         tabSort.visibility = if (mode == "movies") View.VISIBLE else View.GONE
-        tabSort.text = if (sortByName()) "A–Ö" else "Uusin ensin"
+        tabSort.text = if (sortByName()) T("A–Ö") else T("Uusin ensin")
         footer.text = if (mode == "movies")
-            "OK toista   ·   pitkä OK: valikko (poista, alusta)   ·   ▲ ylös välilehtiin   ·   BACK ylempi kansio"
+            T("OK toista   ·   pitkä OK: valikko (poista, alusta)   ·   ▲ ylös välilehtiin   ·   BACK ylempi kansio")
         else
-            "OK katso   ·   ▲ ylös välilehtiin   ·   BACK takaisin"
+            T("OK katso   ·   ▲ ylös välilehtiin   ·   BACK takaisin")
     }
 
     private fun setBusy(on: Boolean) { busy.visibility = if (on) View.VISIBLE else View.GONE }
@@ -232,7 +239,7 @@ class MainActivity : Activity() {
             setBusy(false)
             movieData = null
             crumb.text = ""
-            setRows(emptyList(), 0, "$err\n\nTarkista boksin osoite: Asetukset")
+            setRows(emptyList(), 0, "$err\n\n" + T("Tarkista boksin osoite: Asetukset"))
         })
     }
 
@@ -247,8 +254,8 @@ class MainActivity : Activity() {
         val meta = StringBuilder()
         if (station.isNotEmpty()) meta.append(Html.escapeHtml(station)).append("<br/>")
         if (rt > 0) meta.append(Fmt.date(rt, true)).append("<br/>")
-        meta.append("Kesto ").append(if (len > 0) Fmt.time(len) else "?").append(" &nbsp; ").append(Html.escapeHtml(size))
-        if (posMs > 0) meta.append("<br/><font color='#4FA3FF'>Katsottu ").append(Fmt.time(posMs / 1000)).append(" asti</font>")
+        meta.append(T("Kesto ")).append(if (len > 0) Fmt.time(len) else "?").append(" &nbsp; ").append(Html.escapeHtml(size))
+        if (posMs > 0) meta.append(T("<br/><font color='#4FA3FF'>Katsottu ")).append(Fmt.time(posMs / 1000)).append(T(" asti</font>"))
         var desc = m.optString("description")
         val ext = m.optString("descriptionExtended")
         if (ext.isNotEmpty() && ext != desc) desc = if (desc.isEmpty()) ext else "$desc\n\n$ext"
@@ -266,14 +273,14 @@ class MainActivity : Activity() {
         val data = movieData ?: return
         val d = dir ?: return
         val rows = ArrayList<Row>()
-        if (d != root) rows.add(Row("up", "..", "Ylempi kansio", icon = "↰"))
+        if (d != root) rows.add(Row("up", "..", T("Ylempi kansio"), icon = "↰"))
         val bms = data.optJSONArray("bookmarks")
         val dirs = ArrayList<String>()
         if (bms != null) for (i in 0 until bms.length()) dirs.add(bms.optString(i).trimEnd('/'))
         dirs.sortBy { it.lowercase() }
         for (name in dirs) {
             if (name.isEmpty() || name.startsWith(".") || name == "trashcan") continue
-            rows.add(Row("dir", name, "Kansio", icon = "▸", path = "$d$name/"))
+            rows.add(Row("dir", name, T("Kansio"), icon = "▸", path = "$d$name/"))
         }
         val ms = ArrayList<JSONObject>()
         val arr = data.optJSONArray("movies")
@@ -284,8 +291,8 @@ class MainActivity : Activity() {
         var idx = index ?: (remember[d] ?: 0)
         if (selectPath != null) rows.indexOfFirst { it.path == selectPath }.takeIf { it >= 0 }?.let { idx = it }
         val rel = if (root != null && d.startsWith(root!!)) d.substring(root!!.length).trimEnd('/') else d
-        crumb.text = "Tallenteet" + (if (rel.isNotEmpty()) " › " + rel.replace("/", " › ") else "") + "  (${ms.size})"
-        setRows(rows, idx, "Kansiossa ei ole tallenteita", focus)
+        crumb.text = T("Tallenteet") + (if (rel.isNotEmpty()) " › " + rel.replace("/", " › ") else "") + "  (${ms.size})"
+        setRows(rows, idx, T("Kansiossa ei ole tallenteita"), focus)
     }
 
     private fun openDir(path: String, selectPath: String? = null) {
@@ -317,7 +324,7 @@ class MainActivity : Activity() {
         if (!fromStart && pos > 30000) {
             AlertDialog.Builder(this, R.style.E2Dialog)
                 .setTitle(r.title)
-                .setItems(arrayOf("Jatka kohdasta " + Fmt.time(pos / 1000), "Alusta")) { _, w ->
+                .setItems(arrayOf(T("Jatka kohdasta ") + Fmt.time(pos / 1000), T("Alusta"))) { _, w ->
                     if (w == 1) playMovie(r, fromStart = true) else start()
                 }.show()
         } else start()
@@ -326,7 +333,7 @@ class MainActivity : Activity() {
     private fun movieMenu(r: Row) {
         AlertDialog.Builder(this, R.style.E2Dialog)
             .setTitle(r.title)
-            .setItems(arrayOf("Toista alusta", "Poista tallenne", if (sortByName()) "Järjestä: uusin ensin" else "Järjestä: A–Ö")) { _, w ->
+            .setItems(arrayOf(T("Toista alusta"), T("Poista tallenne"), if (sortByName()) T("Järjestä: uusin ensin") else T("Järjestä: A–Ö"))) { _, w ->
                 when (w) {
                     0 -> playMovie(r, fromStart = true)
                     1 -> confirmDelete(r)
@@ -337,10 +344,10 @@ class MainActivity : Activity() {
 
     private fun confirmDelete(r: Row) {
         AlertDialog.Builder(this, R.style.E2Dialog)
-            .setTitle("Poistetaanko tallenne?")
+            .setTitle(T("Poistetaanko tallenne?"))
             .setMessage(r.title + "\n" + r.sub)
-            .setNegativeButton("Peruuta", null)
-            .setPositiveButton("Poista") { _, _ ->
+            .setNegativeButton(T("Peruuta"), null)
+            .setPositiveButton(T("Poista")) { _, _ ->
                 setBusy(true)
                 Box.get("/api/moviedelete", mapOf("sRef" to r.ref), ok = { res ->
                     setBusy(false)
@@ -351,9 +358,9 @@ class MainActivity : Activity() {
                             if (arr.optJSONObject(i)?.optString("filename") == r.path) { arr.remove(i); break }
                         }
                         renderMovies(maxOf(0, currentIndex() - 0))
-                        toast("Tallenne poistettu")
-                    } else toast("Poisto epäonnistui: " + res.optString("message"))
-                }, fail = { setBusy(false); toast("Poisto epäonnistui: $it") })
+                        toast(T("Tallenne poistettu"))
+                    } else toast(T("Poisto epäonnistui: ") + res.optString("message"))
+                }, fail = { setBusy(false); toast(T("Poisto epäonnistui: ") + it) })
             }.show()
     }
 
@@ -378,14 +385,14 @@ class MainActivity : Activity() {
             if (arr != null) for (i in 0 until arr.length()) arr.optJSONObject(i)?.let { l.add(it) }
             bouquets = l
             if (l.size == 1) openBouquet(l[0]) else renderBouquets()
-        }, fail = { err -> if (gen == loadGen) { setBusy(false); crumb.text = "Kanavat"; setRows(emptyList(), 0, err) } })
+        }, fail = { err -> if (gen == loadGen) { setBusy(false); crumb.text = T("Kanavat"); setRows(emptyList(), 0, err) } })
     }
 
     private fun renderBouquets() {
         bouquet = null
         val rows = bouquets.map { Row("bouquet", it.optString("servicename"), "Kanavanippu", icon = "▸", ref = it.optString("servicereference")) }
-        crumb.text = "Kanavat"
-        setRows(rows, bouquetIndex, "Ei kanavanippuja")
+        crumb.text = T("Kanavat")
+        setRows(rows, bouquetIndex, T("Ei kanavanippuja"))
     }
 
     private fun openBouquet(b: JSONObject) {
@@ -445,8 +452,8 @@ class MainActivity : Activity() {
             }
             Row("service", s.optString("servicename"), sub, right, icon = "${i + 1}", progress = prog, meta = meta, desc = desc, ref = ref)
         }
-        crumb.text = "Kanavat › " + (bouquet?.optString("servicename") ?: "")
-        setRows(rows, index, "Nipussa ei ole kanavia", focus)
+        crumb.text = T("Kanavat › ") + (bouquet?.optString("servicename") ?: "")
+        setRows(rows, index, T("Nipussa ei ole kanavia"), focus)
     }
 
     private fun playChannel(index: Int) {
@@ -466,7 +473,7 @@ class MainActivity : Activity() {
     private fun settings() {
         val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(48, 24, 48, 0) }
         val info = TextView(this).apply {
-            text = "Enigma2-boksin IP-osoite (esim. 192.168.1.10). OpenWebifin pitää olla käytössä portissa 80."
+            text = T("Enigma2-boksin IP-osoite (esim. 192.168.1.10). OpenWebifin pitää olla käytössä portissa 80.")
             setTextColor(0xFFC9D1D9.toInt())
         }
         val edit = EditText(this).apply {
@@ -477,12 +484,30 @@ class MainActivity : Activity() {
         }
         box.addView(info)
         box.addView(edit)
+        val langAtOpen = I18n.pref()
+        val lang = TextView(this).apply {
+            text = T("Sovelluksen kieli") + ":  ◀ " + I18n.label() + " ▶"
+            setTextColor(0xFFC9D1D9.toInt())
+            setPadding(0, 24, 0, 8)
+            isFocusable = true
+            isClickable = true
+            setBackgroundResource(android.R.drawable.list_selector_background)
+        }
+        val relabel = { lang.text = T("Sovelluksen kieli") + ":  ◀ " + I18n.label() + " ▶" }
+        lang.setOnClickListener { I18n.cycle(1); relabel() }
+        lang.setOnKeyListener { _, k, e ->
+            if (e.action == KeyEvent.ACTION_DOWN && (k == KeyEvent.KEYCODE_DPAD_LEFT || k == KeyEvent.KEYCODE_DPAD_RIGHT)) {
+                I18n.cycle(if (k == KeyEvent.KEYCODE_DPAD_LEFT) -1 else 1); relabel(); true
+            } else false
+        }
+        box.addView(lang)
         AlertDialog.Builder(this, R.style.E2Dialog)
-            .setTitle("Asetukset – E2TVPlayer " + BuildConfigCompat.version(this))
+            .setTitle(T("Asetukset – E2TVPlayer ") + BuildConfigCompat.version(this))
             .setView(box)
-            .setPositiveButton("Tallenna") { _, _ -> setHost(edit.text.toString()) }
-            .setNeutralButton("Etsi boksi") { _, _ -> findBox(first = false) }
-            .setNegativeButton("Peruuta", null)
+            .setPositiveButton(T("Tallenna")) { _, _ -> setHost(edit.text.toString()) }
+            .setNeutralButton(T("Etsi boksi")) { _, _ -> findBox(first = false) }
+            .setNegativeButton(T("Peruuta"), null)
+            .setOnDismissListener { if (I18n.pref() != langAtOpen && I18n.en() != langEn) recreate() }
             .show()
     }
 
@@ -498,22 +523,22 @@ class MainActivity : Activity() {
 
     private fun findBox(first: Boolean) {
         setBusy(true)
-        crumb.text = "Etsitään boksia lähiverkosta…"
+        crumb.text = T("Etsitään boksia lähiverkosta…")
         Box.discover(this) { found ->
             setBusy(false)
             when {
-                found.size == 1 -> { toast("Boksi löytyi: ${found[0]}"); setHost(found[0]) }
+                found.size == 1 -> { toast(T("Boksi löytyi: ") + found[0]); setHost(found[0]) }
                 found.size > 1 -> AlertDialog.Builder(this, R.style.E2Dialog)
-                    .setTitle("Valitse boksi")
+                    .setTitle(T("Valitse boksi"))
                     .setItems(found.toTypedArray()) { _, w -> setHost(found[w]) }
                     .show()
                 else -> {
                     crumb.text = ""
                     AlertDialog.Builder(this, R.style.E2Dialog)
-                        .setTitle("Boksia ei löytynyt")
-                        .setMessage("Lähiverkosta ei löytynyt boksia, jossa on E2TVPlayer-lisäosa. Anna osoite käsin.")
-                        .setPositiveButton("Anna osoite") { _, _ -> settings() }
-                        .setNegativeButton(if (first) "Sulje" else "Peruuta", null)
+                        .setTitle(T("Boksia ei löytynyt"))
+                        .setMessage(T("Lähiverkosta ei löytynyt boksia, jossa on E2TVPlayer-lisäosa. Anna osoite käsin."))
+                        .setPositiveButton(T("Anna osoite")) { _, _ -> settings() }
+                        .setNegativeButton(if (first) T("Sulje") else T("Peruuta"), null)
                         .show()
                 }
             }
@@ -579,9 +604,9 @@ class MainActivity : Activity() {
 
     private fun confirmExit() {
         AlertDialog.Builder(this, R.style.E2Dialog)
-            .setTitle("Lopetetaanko E2TVPlayer?")
-            .setPositiveButton("Kyllä") { _, _ -> finish() }
-            .setNegativeButton("Ei", null)
+            .setTitle(T("Lopetetaanko E2TVPlayer?"))
+            .setPositiveButton(T("Kyllä")) { _, _ -> finish() }
+            .setNegativeButton(T("Ei"), null)
             .show()
     }
 

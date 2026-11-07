@@ -84,9 +84,9 @@ object Shots {
                 val code = c.responseCode
                 val body = (if (code == 200) c.inputStream else c.errorStream)?.bufferedReader()?.use { it.readText() } ?: ""
                 c.disconnect()
-                if (code == 200) "Kuva tallennettu boksiin: " + JSONObject(body).optString("name") else "Kuvan tallennus epäonnistui ($code)"
+                if (code == 200) T("Kuva tallennettu boksiin: ") + JSONObject(body).optString("name") else T("Kuvan tallennus epäonnistui (") + code + ")"
             } catch (e: Exception) {
-                "Kuvan tallennus epäonnistui: ${e.message}"
+                T("Kuvan tallennus epäonnistui: ") + e.message
             }
             android.util.Log.i("E2TVPlayer", "screenshot: $msg")
             ui.post { busy = false; notify(msg) }

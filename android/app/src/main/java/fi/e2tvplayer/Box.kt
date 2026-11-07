@@ -54,9 +54,9 @@ object Box {
                 val js = JSONObject(unent(fetch(u, timeoutMs)))
                 main.post { ok(js) }
             } catch (e: HttpError) {
-                main.post { fail(if (e.code == 401) "OpenWebif vaatii kirjautumisen – ota se pois boksin asetuksista" else "Yhteysvirhe ${e.code}") }
+                main.post { fail(if (e.code == 401) T("OpenWebif vaatii kirjautumisen – ota se pois boksin asetuksista") else T("Yhteysvirhe ") + e.code) }
             } catch (e: Exception) {
-                main.post { fail("Ei yhteyttä boksiin ($host)") }
+                main.post { fail(T("Ei yhteyttä boksiin (") + host + ")") }
             }
         }
     }
@@ -155,12 +155,13 @@ object Box {
 
 object Fmt {
     private val days = arrayOf("su", "ma", "ti", "ke", "to", "pe", "la")
+    private val daysEn = arrayOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
     private fun p2(n: Int) = if (n < 10) "0$n" else "$n"
 
     fun date(ts: Long, withYear: Boolean = false): String {
         if (ts <= 0) return ""
         val c = Calendar.getInstance().apply { timeInMillis = ts * 1000 }
-        var s = days[c.get(Calendar.DAY_OF_WEEK) - 1] + " " + c.get(Calendar.DAY_OF_MONTH) + "." + (c.get(Calendar.MONTH) + 1) + "."
+        var s = (if (I18n.en()) daysEn else days)[c.get(Calendar.DAY_OF_WEEK) - 1] + " " + c.get(Calendar.DAY_OF_MONTH) + "." + (c.get(Calendar.MONTH) + 1) + "."
         if (withYear) s += c.get(Calendar.YEAR)
         return s + " " + p2(c.get(Calendar.HOUR_OF_DAY)) + ":" + p2(c.get(Calendar.MINUTE))
     }
@@ -190,9 +191,10 @@ object Fmt {
     }
 
     fun size(bytes: Long): String = when {
-        bytes >= 1073741824L -> String.format("%.1f Gt", bytes / 1073741824.0).replace('.', ',')
-        bytes >= 1048576L -> "${bytes / 1048576} Mt"
-        else -> "${bytes / 1024} kt"
+        bytes >= 1073741824L -> if (I18n.en()) String.format(java.util.Locale.US, "%.1f GB", bytes / 1073741824.0)
+            else String.format("%.1f Gt", bytes / 1073741824.0).replace('.', ',')
+        bytes >= 1048576L -> "${bytes / 1048576} " + (if (I18n.en()) "MB" else "Mt")
+        else -> "${bytes / 1024} " + (if (I18n.en()) "kB" else "kt")
     }
 
     private val castLabels = mapOf(
@@ -217,7 +219,7 @@ object Fmt {
             val l = cast.getOrPut(label) { ArrayList() }
             if (!l.contains(v)) l.add(v)
         }
-        val extra = cast.entries.joinToString("\n") { it.key + ": " + it.value.joinToString(", ") }
+        val extra = cast.entries.joinToString("\n") { T(it.key) + ": " + it.value.joinToString(", ") }
         return if (main.isEmpty()) extra else if (extra.isEmpty()) main else "$main\n\n$extra"
     }
 
@@ -230,7 +232,7 @@ object Fmt {
     )
 
     fun lang(code: String?): String {
-        if (code.isNullOrBlank()) return "tuntematon"
-        return langs[code.lowercase()] ?: code
+        if (code.isNullOrBlank()) return T("tuntematon")
+        return langs[code.lowercase()]?.let { T(it) } ?: code
     }
 }

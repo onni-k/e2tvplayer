@@ -23,7 +23,7 @@ try:
 except ImportError:  # pragma: no cover - vain testausta varten
 	resource = None
 
-VERSION = "0.1.011"
+VERSION = "0.1.012"
 APP_ID = "E2Tallenteet"   # TV:n sisäinen tunnus pidetään ennallaan: päivitys korvaa vanhan sovelluksen
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"
@@ -283,7 +283,7 @@ if resource is not None:
 			return b""
 
 		def render_shots(self, request, path):
-			from . import shots
+			from . import shots, info
 			if len(path) == 2:
 				p = shots.path_of(path[1])
 				if not p:
@@ -302,10 +302,12 @@ if resource is not None:
 				info = "%s · %s%s" % (m.get("time", ""), m.get("platform", ""),
 					(" · %s @ %s s" % (os.path.basename(m.get("file", "")), m.get("pos"))) if m.get("file") else (" · live" if m.get("sref") else ""))
 				err = ("<br><span style='color:#c60'>%s</span>" % m["error"]) if m.get("error") else ""
-				rows.append("<div style='margin:14px 0'><b>%s</b>%s<br>%s</div>" % (info, err, pics or "<i>ei kuvaa</i>"))
-			html = ("<!DOCTYPE html><html><head><meta charset='utf-8'><title>E2TVPlayer kuvakaappaukset</title></head>"
-				"<body style='font-family:sans-serif;margin:1.5em'><h1>Kuvakaappaukset</h1><p>Kansio: <code>%s</code></p>%s</body></html>"
-				) % (d, "".join(rows) or "<p>Ei vielä kuvia. Ota kuva TV-sovelluksen ääni- ja tekstitysvalikosta.</p>")
+				rows.append("<div style='margin:14px 0'><b>%s</b>%s<br>%s</div>" % (info, err, pics or "<i>%s</i>" % info.L("ei kuvaa", "no picture")))
+			ttl = info.L("Kuvakaappaukset", "Screenshots")
+			html = ("<!DOCTYPE html><html><head><meta charset='utf-8'><title>E2TVPlayer %s</title></head>"
+				"<body style='font-family:sans-serif;margin:1.5em'><h1>%s</h1><p>%s <code>%s</code></p>%s</body></html>"
+				) % (ttl, ttl, info.L("Kansio:", "Folder:"), d, "".join(rows) or "<p>%s</p>" % info.L(
+					"Ei vielä kuvia. Ota kuva TV-sovelluksen TOOLS-valikosta.", "No pictures yet. Take one from the TOOLS menu of the TV app."))
 			request.setHeader(b"Content-Type", b"text/html; charset=utf-8")
 			request.setHeader(b"Cache-Control", b"no-cache")
 			return html.encode("utf-8")
@@ -340,11 +342,12 @@ if resource is not None:
 				request.setHeader(b"Content-Length", str(len(data)).encode("ascii"))
 				return data
 			if path and path[-1].lower().endswith(".apk"):
+				from . import info
 				apk = apk_path()
 				if not apk:
 					request.setResponseCode(404)
 					request.setHeader(b"Content-Type", b"text/plain; charset=utf-8")
-					return u"Google TV -sovellusta ei ole tässä paketissa.".encode("utf-8")
+					return info.L(u"Google TV -sovellusta ei ole tässä paketissa.", u"The Google TV app is not in this package.").encode("utf-8")
 				with open(apk, "rb") as f:
 					data = f.read()
 				log("Google TV app downloaded (%d bytes)" % len(data))
@@ -370,33 +373,8 @@ if resource is not None:
 				return json.dumps({"app": "E2TVPlayer", "version": VERSION, "apk": bool(apk_path()), "web": True, "files": WEB_FILES,
 					"apkVersion": apk_version()}).encode("utf-8")
 			request.setHeader(b"Content-Type", b"text/html; charset=utf-8")
-			apk_html = (
-				"<h2>Google TV / Android TV</h2>"
-				"<ol><li>Asenna televisioon Google Playsta sovellus <b>Downloader</b> (AFTVnews).</li>"
-				"<li>Salli asetuksista Downloaderille <i>tuntemattomien sovellusten asennus</i>.</li>"
-				"<li>Kirjoita Downloaderiin osoite <b>%(h)s/%(m)s</b> ja valitse alta linkki.</li></ol>"
-				"<p style='font-size:1.4em'><a href='/%(m)s/E2TVPlayer.apk'>&#11015; Lataa E2TVPlayer.apk</a></p>"
-			) if apk_path() else "<p><i>Google TV -sovellus ei ole mukana tässä paketissa.</i></p>"
-			html = (
-				"<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width'>"
-				"<title>%(t)s</title></head>"
-				"<body style='font-family:sans-serif;max-width:40em;margin:2em auto;padding:0 1em'>"
-				"<h1>%(t)s %(v)s</h1>" + apk_html +
-				"<h2>Samsung Tizen (2015&ndash;)</h2>"
-				"<ol><li>Laita TV developer-tilaan: Apps &rarr; paina 1, 2, 3, 4, 5 &rarr; Developer mode <b>On</b> ja "
-				"Host PC IP = tietokoneesi IP. Käynnistä TV uudelleen.</li>"
-				"<li>Lataa paketti: <a href='/%(m)s/E2TVPlayer.wgt'><b>E2TVPlayer.wgt</b></a></li>"
-				"<li>Asenna se tietokoneelta <a href='https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer'>"
-				"Samsung Jellyfin Installerilla</a> (valitse oma .wgt). Ohjelma hoitaa Samsungin varmenteen.</li></ol>"
-				"<h2>Samsung Smart TV (2011&ndash;2014)</h2>"
-				"<p>TV hakee sovelluksen osoitteesta "
-				"<a href='/widgetlist.xml'>http://%(h)s/widgetlist.xml</a>.</p>"
-				"<ol><li>Kirjaudu TV:llä Samsung-tilille käyttäjänä <b>develop</b>.</li>"
-				"<li>Smart Hub &rarr; pidä OK pohjassa jonkin sovelluksen päällä &rarr; <b>IP Setting</b> &rarr; <b>%(h)s</b></li>"
-				"<li>Pidä OK uudelleen pohjassa &rarr; <b>Start User App Sync</b>.</li></ol>"
-				"<p><a href='/%(m)s/%(z)s'>Lataa zip</a></p>"
-				"<h2>Kuvakaappaukset</h2><p><a href='/%(m)s/kuvat'>Näytä TV-sovelluksista otetut kuvat</a></p></body></html>"
-			) % {"t": APP_TITLE, "v": VERSION, "h": host, "m": MOUNT, "z": ZIP_NAME}
+			from . import info
+			html = info.page_doc(info.page_html(host, VERSION, APP_TITLE, MOUNT, ZIP_NAME, bool(apk_path())), APP_TITLE)
 			return html.encode("utf-8")
 
 		def render_live(self, request, what):

@@ -11,6 +11,12 @@ Enigma2-boksin (OpenViX ym.) tallenteet ja live-TV tekstityksineen televisioon O
 
 GitHub Actions rakentaa jokaisesta pushista APK:n ja boksin `.ipk`-paketin (APK mukana). Tagi `v*` tekee julkaisun.
 
+## Kieli / Language
+
+TV-sovellukset ovat suomeksi ja englanniksi. Kieli valitaan TOOLS-valikosta (Google TV: pitkä OK tai Asetukset); oletuksena seurataan TV:n kieltä. Boksin sivut ja lisäosan ruutu seuraavat Enigma2:n järjestelmäkieltä.
+
+The TV apps are available in Finnish and English. Choose the language in the TOOLS menu (Google TV: long OK or Settings); by default the TV's language is used. The box pages and the plugin screen follow the Enigma2 system language.
+
 ## Asennus boksiin
 
 ```

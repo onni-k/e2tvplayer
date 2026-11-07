@@ -29,7 +29,7 @@ var Api = {
 			if (done) { return; }
 			done = true;
 			try { xhr.abort(); } catch (e) { }
-			if (fail) { fail('Aikakatkaisu (' + Api.host + ')'); }
+			if (fail) { fail(T('Aikakatkaisu (') + Api.host + ')'); }
 		}, timeoutMs || 15000);
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState !== 4 || done) { return; }
@@ -38,14 +38,14 @@ var Api = {
 			if (xhr.status === 200) {
 				var data = null;
 				try { data = JSON.parse(Api.unent(xhr.responseText)); } catch (e) {
-					if (fail) { fail('Virheellinen vastaus boksilta'); }
+					if (fail) { fail(T('Virheellinen vastaus boksilta')); }
 					return;
 				}
 				if (ok) { ok(data); }
 			} else if (xhr.status === 401) {
-				if (fail) { fail('OpenWebif vaatii kirjautumisen - ota se pois päältä boksin asetuksista'); }
+				if (fail) { fail(T('OpenWebif vaatii kirjautumisen - ota se pois päältä boksin asetuksista')); }
 			} else {
-				if (fail) { fail('Yhteysvirhe ' + (xhr.status || '') + ' (' + Api.host + ')'); }
+				if (fail) { fail(T('Yhteysvirhe ') + (xhr.status || '') + ' (' + Api.host + ')'); }
 			}
 		};
 		try {
@@ -54,7 +54,7 @@ var Api = {
 		} catch (e) {
 			done = true;
 			clearTimeout(timer);
-			if (fail) { fail('Yhteys epäonnistui: ' + e); }
+			if (fail) { fail(T('Yhteys epäonnistui: ') + e); }
 		}
 	},
 

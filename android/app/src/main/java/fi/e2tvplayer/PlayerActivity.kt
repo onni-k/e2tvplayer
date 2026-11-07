@@ -97,6 +97,8 @@ class PlayerActivity : Activity() {
         iNext = findViewById(R.id.iNext)
         tracks = findViewById(R.id.tracks)
         trRows = findViewById(R.id.trRows)
+        findViewById<TextView>(R.id.trHead).text = T("Ääni ja tekstitys")
+        findViewById<TextView>(R.id.trKeys).text = T("▲▼ rivi   ◀▶ vaihda   OK/BACK sulje")
         toastView = findViewById(R.id.toast)
 
         val i = intent
@@ -273,10 +275,10 @@ class PlayerActivity : Activity() {
 
         override fun onPlayerError(error: PlaybackException) {
             buffering.visibility = View.GONE
-            val hint = if (live) "Tarkista, että boksin striimaus (portti 8001) on käytössä ja viritin vapaana."
-            else "Yhteys katkesi tai tallenteen muotoa ei tueta."
+            val hint = if (live) T("Tarkista, että boksin striimaus (portti 8001) on käytössä ja viritin vapaana.")
+            else T("Yhteys katkesi tai tallenteen muotoa ei tueta.")
             AlertDialog.Builder(this@PlayerActivity, R.style.E2Dialog)
-                .setTitle("Toistovirhe")
+                .setTitle(T("Toistovirhe"))
                 .setMessage("${error.errorCodeName}\n\n$hint")
                 .setPositiveButton("OK") { _, _ -> finish() }
                 .setOnCancelListener { finish() }
@@ -363,7 +365,7 @@ class PlayerActivity : Activity() {
                 oTime.text = "LIVE"
                 oBar.progress = 1000
             }
-            oKeys.text = "▲▼ kanava   ·   OK ohjelmatiedot   ·   pitkä OK: ääni ja tekstitys   ·   BACK lopeta"
+            oKeys.text = T("▲▼ kanava   ·   OK ohjelmatiedot   ·   pitkä OK: ääni ja tekstitys   ·   BACK lopeta")
         } else {
             oTitle.text = title
             oSub.text = sub
@@ -371,12 +373,12 @@ class PlayerActivity : Activity() {
             val dur = durationMs()
             oTime.text = Fmt.time(pos / 1000) + if (dur > 0) " / " + Fmt.time(dur / 1000) else ""
             oBar.progress = if (dur > 0) (1000 * pos / dur).toInt().coerceIn(0, 1000) else 0
-            oKeys.text = "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK tauko ja tiedot   ·   pitkä OK: ääni ja tekstitys   ·   BACK lopeta"
+            oKeys.text = T("◀▶ 15 s   ·   ▲▼ 5 min   ·   OK tauko ja tiedot   ·   pitkä OK: ääni ja tekstitys   ·   BACK lopeta")
         }
         if (System.currentTimeMillis() >= stateUntil) {
             oState.text = when {
-                player.playbackState == Player.STATE_BUFFERING -> "Puskuroidaan…"
-                !live && !player.playWhenReady -> "❚❚ Tauko"
+                player.playbackState == Player.STATE_BUFFERING -> T("Puskuroidaan…")
+                !live && !player.playWhenReady -> T("❚❚ Tauko")
                 else -> ""
             }
         }
@@ -391,21 +393,21 @@ class PlayerActivity : Activity() {
             val d = ev?.optLong("duration_sec") ?: 0
             if (b > 0 && d > 0) {
                 val left = maxOf(0L, (b + d - System.currentTimeMillis() / 1000) / 60)
-                meta += " · " + Fmt.hm(b) + "–" + Fmt.hm(b + d) + " · jäljellä $left min"
+                meta += " · " + Fmt.hm(b) + "–" + Fmt.hm(b + d) + T(" · jäljellä ") + left + " min"
             }
             iMeta.text = meta
             val sd = ev?.optString("shortdesc") ?: ""
             val ld = ev?.optString("longdesc") ?: ""
             iDesc.text = Fmt.desc(if (sd.isNotEmpty() && ld.isNotEmpty() && !ld.contains(sd)) "$sd\n$ld" else ld.ifEmpty { sd })
-                .ifEmpty { "Ei ohjelmatietoja" }
+                .ifEmpty { T("Ei ohjelmatietoja") }
             val nx = epgNext
             iNext.text = if (nx != null && nx.optString("title").isNotEmpty())
-                "Seuraavaksi " + Fmt.hm(nx.optLong("begin_timestamp")) + " " + nx.optString("title") else ""
+                T("Seuraavaksi ") + Fmt.hm(nx.optLong("begin_timestamp")) + " " + nx.optString("title") else ""
         } else {
             iTitle.text = title
             val dur = durationMs()
-            iMeta.text = sub + if (dur > 0) " · kesto " + Fmt.time(dur / 1000) else ""
-            iDesc.text = desc.ifEmpty { "Ei ohjelmatietoja" }
+            iMeta.text = sub + if (dur > 0) T(" · kesto ") + Fmt.time(dur / 1000) else ""
+            iDesc.text = desc.ifEmpty { T("Ei ohjelmatietoja") }
             iNext.text = ""
         }
     }
@@ -444,9 +446,9 @@ class PlayerActivity : Activity() {
 
     private fun label(f: Format, type: Int): String {
         var s = f.label?.takeIf { it.isNotEmpty() } ?: Fmt.lang(f.language)
-        if (type == C.TRACK_TYPE_TEXT && (f.roleFlags and C.ROLE_FLAG_DESCRIBES_MUSIC_AND_SOUND) != 0) s += " (kuulovammaiset)"
+        if (type == C.TRACK_TYPE_TEXT && (f.roleFlags and C.ROLE_FLAG_DESCRIBES_MUSIC_AND_SOUND) != 0) s += T(" (kuulovammaiset)")
         if (type == C.TRACK_TYPE_AUDIO) {
-            if ((f.roleFlags and C.ROLE_FLAG_DESCRIBES_VIDEO) != 0) s += " (kuvailutulkkaus)"
+            if ((f.roleFlags and C.ROLE_FLAG_DESCRIBES_VIDEO) != 0) s += T(" (kuvailutulkkaus)")
             val c = codec(f)
             if (c.isNotEmpty()) s += "  ·  $c"
         }
@@ -461,17 +463,17 @@ class PlayerActivity : Activity() {
             for (t in 0 until g.length) {
                 val f = g.getTrackFormat(t)
                 val c = codec(f).ifEmpty { f.sampleMimeType ?: "?" }
-                parts.add(Fmt.lang(f.language) + " " + c + (if (g.isTrackSupported(t)) "" else " (ei tuettu)") +
+                parts.add(Fmt.lang(f.language) + " " + c + (if (g.isTrackSupported(t)) "" else T(" (ei tuettu)")) +
                     (if (g.isTrackSelected(t)) " ✓" else ""))
             }
         }
-        val dec = if (audioDecoder.isEmpty()) "" else "   ·   purkaja: " + audioDecoder
-        return (if (parts.isEmpty()) "Ei ääniraitoja" else parts.joinToString(", ")) + dec
+        val dec = if (audioDecoder.isEmpty()) "" else T("   ·   purkaja: ") + audioDecoder
+        return (if (parts.isEmpty()) T("Ei ääniraitoja") else parts.joinToString(", ")) + dec
     }
 
     private fun options(type: Int): List<Opt> {
         val out = ArrayList<Opt>()
-        if (type == C.TRACK_TYPE_TEXT) out.add(Opt("pois", null, -1, ""))
+        if (type == C.TRACK_TYPE_TEXT) out.add(Opt(T("pois"), null, -1, ""))
         for (g in player.currentTracks.groups) {
             if (g.type != type) continue
             for (t in 0 until g.length) {
@@ -497,13 +499,13 @@ class PlayerActivity : Activity() {
 
     private fun renderTracks() {
         trRows.removeAllViews()
-        val rows = listOf("Ääni" to C.TRACK_TYPE_AUDIO, "Tekstitys" to C.TRACK_TYPE_TEXT)
+        val rows = listOf(T("Ääni") to C.TRACK_TYPE_AUDIO, T("Tekstitys") to C.TRACK_TYPE_TEXT)
         for ((n, pair) in rows.withIndex()) {
             val opts = options(pair.second)
             val cur = current(opts, pair.second)
             val value = when {
-                pair.second == C.TRACK_TYPE_TEXT && opts.size <= 1 -> "ei tarjolla"
-                opts.isEmpty() -> "oletus"
+                pair.second == C.TRACK_TYPE_TEXT && opts.size <= 1 -> T("ei tarjolla")
+                opts.isEmpty() -> T("oletus")
                 else -> opts[cur].label + if (opts.size > 1) "  (${cur + 1}/${opts.size})" else ""
             }
             val arrows = opts.size > 1
@@ -518,18 +520,27 @@ class PlayerActivity : Activity() {
             trRows.addView(tv, lp)
         }
         val mode = TextView(this)
-        mode.text = "Äänen purku".padEnd(14) + "◀ " + (if (audioMode() == "pcm") "sovellus (PCM)" else "TV / Dolby-läpivienti") + " ▶"
+        mode.text = T("Äänen purku").padEnd(14) + "◀ " + (if (audioMode() == "pcm") T("sovellus (PCM)") else T("TV / Dolby-läpivienti")) + " ▶"
         mode.textSize = 17f
         mode.setPadding(24, 14, 24, 14)
         mode.setTextColor(0xFFFFFFFF.toInt())
         mode.setBackgroundColor(if (trackRow == 2) 0xFF2A5C99.toInt() else 0xFF1E2836.toInt())
         trRows.addView(mode, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+        val lng = TextView(this)
+        lng.text = T("Kieli").padEnd(14) + "◀ " + I18n.label() + " ▶"
+        lng.textSize = 17f
+        lng.setPadding(24, 14, 24, 14)
+        lng.setTextColor(0xFFFFFFFF.toInt())
+        lng.setBackgroundColor(if (trackRow == 3) 0xFF2A5C99.toInt() else 0xFF1E2836.toInt())
+        val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        llp.topMargin = 6
+        trRows.addView(lng, llp)
         val shot = TextView(this)
-        shot.text = "Kuvakaappaus".padEnd(14) + if (Shots.busy) "odota…" else "OK: ota kuva 10 s päästä"
+        shot.text = T("Kuvakaappaus").padEnd(14) + if (Shots.busy) T("odota…") else T("OK: ota kuva 10 s päästä")
         shot.textSize = 17f
         shot.setPadding(24, 14, 24, 14)
         shot.setTextColor(0xFFFFFFFF.toInt())
-        shot.setBackgroundColor(if (trackRow == 3) 0xFF2A5C99.toInt() else 0xFF1E2836.toInt())
+        shot.setBackgroundColor(if (trackRow == 4) 0xFF2A5C99.toInt() else 0xFF1E2836.toInt())
         val slp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         slp.topMargin = 6
         trRows.addView(shot, slp)
@@ -594,12 +605,19 @@ class PlayerActivity : Activity() {
     fun showToast(msg: String) = toast(msg)
 
     private fun changeTrack(d: Int) {
-        if (trackRow == 3) return
+        if (trackRow == 4) return
+        if (trackRow == 3) {
+            I18n.cycle(d)
+            findViewById<TextView>(R.id.trHead).text = T("Ääni ja tekstitys")
+            findViewById<TextView>(R.id.trKeys).text = T("▲▼ rivi   ◀▶ vaihda   OK/BACK sulje")
+            renderTracks()
+            return
+        }
         if (trackRow == 2) {
             Box.prefs.edit().putString("audioMode", if (audioMode() == "pcm") "tv" else "pcm").apply()
             rebuildPlayer()
             renderTracks()
-            toast(if (audioMode() == "pcm") "Ääni puretaan sovelluksessa" else "Ääni TV:n / laitteen purettavaksi")
+            toast(if (audioMode() == "pcm") T("Ääni puretaan sovelluksessa") else T("Ääni TV:n / laitteen purettavaksi"))
             return
         }
         val type = if (trackRow == 0) C.TRACK_TYPE_AUDIO else C.TRACK_TYPE_TEXT
@@ -638,14 +656,14 @@ class PlayerActivity : Activity() {
         // valikko auki: vain valikon näppäimet
         if (tracks.visibility == View.VISIBLE) {
             if (first) when (k) {
-                KeyEvent.KEYCODE_DPAD_UP -> { trackRow = (trackRow + 3) % 4; renderTracks() }
-                KeyEvent.KEYCODE_DPAD_DOWN -> { trackRow = (trackRow + 1) % 4; renderTracks() }
+                KeyEvent.KEYCODE_DPAD_UP -> { trackRow = (trackRow + 4) % 5; renderTracks() }
+                KeyEvent.KEYCODE_DPAD_DOWN -> { trackRow = (trackRow + 1) % 5; renderTracks() }
                 KeyEvent.KEYCODE_DPAD_LEFT -> changeTrack(-1)
                 KeyEvent.KEYCODE_DPAD_RIGHT -> changeTrack(1)
                 KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_MENU, KeyEvent.KEYCODE_CAPTIONS ->
                     if (!okDown) {
                         tracks.visibility = View.GONE
-                        if (trackRow == 3 && k != KeyEvent.KEYCODE_MENU && k != KeyEvent.KEYCODE_CAPTIONS) startShot()
+                        if (trackRow == 4 && k != KeyEvent.KEYCODE_MENU && k != KeyEvent.KEYCODE_CAPTIONS) startShot()
                     }
             }
             if (!down && k == KeyEvent.KEYCODE_BACK) tracks.visibility = View.GONE

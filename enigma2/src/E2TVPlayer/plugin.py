@@ -3,94 +3,21 @@
 # Copyright (C) 2026 E2TVPlayer contributors
 from __future__ import absolute_import
 
-import socket
-
 from Components.ActionMap import ActionMap
-from Components.config import config
 from Components.Label import Label
 from Components.ScrollLabel import ScrollLabel
 from Plugins.Plugin import PluginDescriptor
 from Screens.Screen import Screen
 from enigma import getDesktop
 
-from . import web
-
-
-def box_ip():
-	try:
-		from Components.Network import iNetwork
-		for iface in iNetwork.getConfiguredAdapters():
-			ip = iNetwork.getAdapterAttribute(iface, "ip")
-			if ip and ip != [0, 0, 0, 0]:
-				return ".".join(str(x) for x in ip)
-	except Exception:
-		pass
-	try:
-		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		s.connect(("10.255.255.255", 1))  # ei lähetä mitään, valitsee vain reitin
-		ip = s.getsockname()[0]
-		s.close()
-		return ip
-	except Exception:
-		return "?"
-
-
-def _owif(name, default=None):
-	try:
-		return getattr(config.OpenWebif, name).value
-	except Exception:
-		return default
+from . import info, web
 
 
 def info_text():
-	ip = box_ip()
-	lines = []
-	lines.append("Boksin IP-osoite:  %s" % ip)
-	lines.append("")
-	if web.is_registered():
-		lines.append("Tila: valmis - TV voi hakea sovelluksen osoitteesta")
-		lines.append("      http://%s/widgetlist.xml" % ip)
-	else:
-		lines.append("Tila: ei vielä rekisteröity OpenWebifiin.")
-		lines.append("      Käynnistä GUI uudelleen (OpenWebif lukee lisäosat käynnistyessään).")
-	warnings = []
-	if _owif("enabled", True) is False:
-		warnings.append("OpenWebif on pois päältä - kytke se päälle.")
-	port = _owif("port", 80)
-	if port not in (80, None):
-		warnings.append("OpenWebifin portti on %s. TV-synkka toimii vain portissa 80." % port)
-	if _owif("auth", False):
-		warnings.append("OpenWebifin kirjautuminen on päällä. TV ei osaa kirjautua -")
-		warnings.append("ota kirjautuminen pois (ainakin lähiverkosta).")
-	if warnings:
-		lines.append("")
-		lines.append("HUOM:")
-		lines.extend("  " + w for w in warnings)
-	lines.append("")
-	lines.append("Asennus Samsung UE40H6275 (2014 H-sarja):")
-	lines.append(" 1. TV: Valikko > Smart Hub > Samsung-tili > Kirjaudu.")
-	lines.append("    Tunnus: develop   (salasana tyhjä tai 000000)")
-	lines.append(" 2. Paina Smart Hub. Pidä OK pohjassa jonkin sovelluksen päällä.")
-	lines.append(" 3. Valitse IP Setting ja anna: %s" % ip)
-	lines.append(" 4. Pidä OK taas pohjassa > Start User App Sync.")
-	lines.append(" 5. Sovellus '%s' ilmestyy Omiin sovelluksiin." % web.APP_TITLE)
-	lines.append("")
-	lines.append("Päivitys: tee kohta 4 uudelleen ja käynnistä TV sen jälkeen uudelleen.")
-	lines.append("")
-	try:
-		from . import shots
-		lines.append("Kuvakaappaukset (TV-sovelluksen ääni/tekstitys-valikosta):")
-		lines.append("  %s" % shots.shots_dir())
-		lines.append("  selaimella: http://%s/e2tvplayer/kuvat" % ip)
-		if not shots.find_ffmpeg():
-			lines.append("  (videokuva Samsung-kuviin: opkg install ffmpeg)")
-	except Exception:
-		pass
-	lines.append("")
-	lines.append("Tekstitykset: boksi purkaa tallenteen DVB-tekstitykset ensimmäisellä")
-	lines.append("toistokerralla kansioon .e2tvplayer tallenteen viereen.")
-	lines.append("Sovelluksen versio: %s" % web.VERSION)
-	return "\n".join(lines)
+	"""Sama sisältö kuin selaimella osoitteessa http://boksi/e2tvplayer"""
+	ip = info.box_ip()
+	body = info.page_html(ip, web.VERSION, web.APP_TITLE, web.MOUNT, web.ZIP_NAME, bool(web.apk_path()), web.is_registered())
+	return info.html_to_text(body, ip)
 
 
 class E2TVPlayerInfo(Screen):
@@ -111,7 +38,7 @@ class E2TVPlayerInfo(Screen):
 		Screen.__init__(self, session)
 		self.setTitle("E2TVPlayer %s" % web.VERSION)
 		self["text"] = ScrollLabel(info_text())
-		self["hint"] = Label("OK / EXIT = sulje    ylös/alas = vieritä")
+		self["hint"] = Label(info.L("OK / EXIT = sulje    ylös/alas = vieritä", "OK / EXIT = close    up/down = scroll"))
 		self["actions"] = ActionMap(["OkCancelActions", "DirectionActions"], {
 			"ok": self.close,
 			"cancel": self.close,
@@ -137,7 +64,7 @@ def Plugins(**kwargs):
 		PluginDescriptor(where=PluginDescriptor.WHERE_SESSIONSTART, fnc=sessionstart),
 		PluginDescriptor(
 			name="E2TVPlayer",
-			description="Tallenteet ja live-TV Samsung- ja Google TV -televisioille",
+			description=info.L("Tallenteet ja live-TV Samsung- ja Google TV -televisioille", "Recordings and live TV for Samsung and Google TV televisions"),
 			where=PluginDescriptor.WHERE_PLUGINMENU,
 			icon="plugin.png",
 			fnc=main,

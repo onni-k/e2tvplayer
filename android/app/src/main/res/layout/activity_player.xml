@@ -84,6 +84,7 @@
         android:visibility="gone">
 
         <TextView
+            android:id="@+id/trHead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ääni ja tekstitys"
@@ -98,6 +99,7 @@
             android:orientation="vertical" />
 
         <TextView
+            android:id="@+id/trKeys"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"

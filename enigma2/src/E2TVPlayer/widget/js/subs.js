@@ -131,7 +131,7 @@ var Subs = {
 		}, function () {
 			if (gen !== Subs.gen) { return; }
 			Subs.status = 'error';
-			Subs.error = 'boksi ei vastaa';
+			Subs.error = T('boksi ei vastaa');
 			Subs.pollTimer = setTimeout(Subs.poll, 15000);
 		});
 	},
@@ -162,7 +162,7 @@ var Subs = {
 
 	label: function (t) {
 		var s = t.label;
-		if (Subs.running()) { s += ' – haetaan ' + Math.round(Subs.progress * 100) + ' %'; }
+		if (Subs.running()) { s += T(' – haetaan ') + Math.round(Subs.progress * 100) + ' %'; }
 		return s;
 	},
 

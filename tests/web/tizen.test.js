@@ -2,7 +2,7 @@ const fs=require('fs'), {JSDOM}=require('jsdom');
 const W=process.argv[2];
 let html=fs.readFileSync(W+'/index.html','utf8').replace(/<script[^>]*><\/script>/g,'');
 const dom=new JSDOM(html,{runScripts:'outside-only',url:'http://localhost/',pretendToBeVisual:true});
-const w=dom.window; Object.defineProperty(w,'innerWidth',{value:1920}); Object.defineProperty(w,'innerHeight',{value:1080});
+const w=dom.window; Object.defineProperty(w.navigator,'language',{get:()=>process.env.E2LANG||'fi-FI'}); Object.defineProperty(w,'innerWidth',{value:1920}); Object.defineProperty(w,'innerHeight',{value:1080});
 const calls=[]; let L=null; let exited=false; const reg=[];
 // --- Tizen- ja webapis-mockit ---
 w.tizen={application:{getCurrentApplication:()=>({exit:()=>{exited=true;}})},tvinputdevice:{registerKey:k=>{ if(k==='Exit') throw new Error('not supported'); reg.push(k);} }};

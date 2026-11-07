@@ -65,7 +65,7 @@ var Browser = {
 	},
 	setItems: function (items, index, emptyText) {
 		Browser.list.setItems(items, index);
-		U.$('empty').innerHTML = U.esc(emptyText || 'Ei mitään näytettävää');
+		U.$('empty').innerHTML = U.esc(emptyText || T('Ei mitään näytettävää'));
 		U.show('empty', !items.length);
 		Browser.details();
 	},
@@ -101,12 +101,12 @@ Views.movies = {
 	enter: function () {
 		U.show('browser', true);
 		U.show('settings', false);
-		footer('<span class="k k-ok">OK</span>Toista' +
-			'<span class="k k-red"></span>Poista' +
-			'<span class="k k-green"></span>Järjestys' +
-			'<span class="k k-yellow"></span>Kanavat' +
-			'<span class="k k-blue"></span>Asetukset' +
-			'<span class="k k-ret">RETURN</span>Ylös');
+		footer(T('<span class="k k-ok">OK</span>Toista') +
+			T('<span class="k k-red"></span>Poista') +
+			T('<span class="k k-green"></span>Järjestys') +
+			T('<span class="k k-yellow"></span>Kanavat') +
+			T('<span class="k k-blue"></span>Asetukset') +
+			T('<span class="k k-ret">RETURN</span>Ylös'));
 		if (!Views.movies.data && !Views.movies.error) { Views.movies.load(null); }
 		else { Views.movies.render(Browser.list.index); }
 	},
@@ -114,7 +114,7 @@ Views.movies = {
 	reset: function () { Views.movies.root = null; Views.movies.dir = null; Views.movies.data = null; Views.movies.error = null; Views.movies.remember = {}; },
 
 	load: function (dir, selectPath) {
-		U.busy(true, 'Haetaan tallenteita…');
+		U.busy(true, T('Haetaan tallenteita…'));
 		Api.movies(dir, function (data) {
 			U.busy(false);
 			var d = data.directory || dir || '/media/hdd/movie/';
@@ -129,7 +129,7 @@ Views.movies = {
 			Views.movies.error = err;
 			Views.movies.data = null;
 			crumb('');
-			Browser.setItems([], 0, err + ' — OK: yritä uudelleen, sininen: asetukset');
+			Browser.setItems([], 0, err + T(' — OK: yritä uudelleen, sininen: asetukset'));
 		});
 	},
 
@@ -139,14 +139,14 @@ Views.movies = {
 		var M = Views.movies, data = M.data, items = [], i;
 		if (!data) { return items; }
 		if (M.dir !== M.root) {
-			items.push({ type: 'up', icon: '↰', cls: 'dir', title: '..', sub: 'Ylempi kansio' });
+			items.push({ type: 'up', icon: '↰', cls: 'dir', title: '..', sub: T('Ylempi kansio') });
 		}
 		var dirs = (data.bookmarks || []).slice(0);
 		dirs.sort(function (a, b) { return String(a).toLowerCase() < String(b).toLowerCase() ? -1 : 1; });
 		for (i = 0; i < dirs.length; i++) {
 			var name = String(dirs[i]).replace(/\/$/, '');
 			if (!name || name === '.Trash' || name === 'trashcan' || name.charAt(0) === '.') { continue; }
-			items.push({ type: 'dir', icon: '▸', cls: 'dir', title: name, sub: 'Kansio', path: M.dir + name + '/' });
+			items.push({ type: 'dir', icon: '▸', cls: 'dir', title: name, sub: T('Kansio'), path: M.dir + name + '/' });
 		}
 		var movies = (data.movies || []).slice(0);
 		if (M.sortMode() === 'name') {
@@ -169,8 +169,8 @@ Views.movies = {
 		var meta = [];
 		if (m.servicename) { meta.push(U.esc(m.servicename)); }
 		if (m.recordingtime) { meta.push(U.esc(U.fmtDate(m.recordingtime, true))); }
-		meta.push('Kesto ' + (len ? U.esc(U.fmtTime(len)) : '?') + ' &nbsp; ' + U.esc(m.filesize_readable || U.fmtSize(m.filesize)));
-		if (pos > 0) { meta.push('<span style="color:#4fa3ff">Katsottu ' + U.esc(U.fmtTime(pos)) + ' asti</span>'); }
+		meta.push(T('Kesto ') + (len ? U.esc(U.fmtTime(len)) : '?') + ' &nbsp; ' + U.esc(m.filesize_readable || U.fmtSize(m.filesize)));
+		if (pos > 0) { meta.push(T('<span style="color:#4fa3ff">Katsottu ') + U.esc(U.fmtTime(pos)) + T(' asti</span>')); }
 		var desc = m.description || '';
 		if (m.descriptionExtended && m.descriptionExtended !== desc) { desc += (desc ? '\n\n' : '') + m.descriptionExtended; }
 		return {
@@ -197,9 +197,9 @@ Views.movies = {
 			}
 		}
 		var rel = M.dir.indexOf(M.root) === 0 ? M.dir.substring(M.root.length) : M.dir;
-		crumb('Tallenteet' + (rel ? ' › ' + rel.replace(/\/$/, '').split('/').join(' › ') : '') +
-			'  (' + (M.data.movies || []).length + ')' + (M.sortMode() === 'name' ? '  · A–Ö' : '  · uusin ensin'));
-		Browser.setItems(items, index, 'Kansiossa ei ole tallenteita');
+		crumb(T('Tallenteet') + (rel ? ' › ' + rel.replace(/\/$/, '').split('/').join(' › ') : '') +
+			'  (' + (M.data.movies || []).length + ')' + (M.sortMode() === 'name' ? T('  · A–Ö') : T('  · uusin ensin')));
+		Browser.setItems(items, index, T('Kansiossa ei ole tallenteita'));
 	},
 
 	open: function (path, selectPath) {
@@ -225,15 +225,15 @@ Views.movies = {
 				length: it.length,
 				live: false,
 				infoMeta: (it.movie.servicename ? it.movie.servicename + ' · ' : '') + U.fmtDate(it.movie.recordingtime, true) +
-					(it.length ? ' · kesto ' + U.fmtTime(it.length) : ''),
+					(it.length ? T(' · kesto ') + U.fmtTime(it.length) : ''),
 				desc: it.desc
 			}, sec);
 		};
 		var pos = Store.getPos(it.key);
 		if (pos > 30) {
-			Dialog.open('Jatketaanko?', it.title, [
-				{ label: 'Jatka kohdasta ' + U.fmtTime(pos), fn: function () { start(Math.max(0, pos - 5)); } },
-				{ label: 'Alusta', fn: function () { start(0); } }
+			Dialog.open(T('Jatketaanko?'), it.title, [
+				{ label: T('Jatka kohdasta ') + U.fmtTime(pos), fn: function () { start(Math.max(0, pos - 5)); } },
+				{ label: T('Alusta'), fn: function () { start(0); } }
 			], 0);
 		} else {
 			start(0);
@@ -241,11 +241,11 @@ Views.movies = {
 	},
 
 	remove: function (it) {
-		Dialog.open('Poistetaanko tallenne?', it.title + ' (' + U.fmtDate(it.movie.recordingtime, true) + ')', [
-			{ label: 'Peruuta' },
+		Dialog.open(T('Poistetaanko tallenne?'), it.title + ' (' + U.fmtDate(it.movie.recordingtime, true) + ')', [
+			{ label: T('Peruuta') },
 			{
-				label: 'Poista', fn: function () {
-					U.busy(true, 'Poistetaan…');
+				label: T('Poista'), fn: function () {
+					U.busy(true, T('Poistetaan…'));
 					Api.deleteMovie(it.movie.serviceref, function (res) {
 						U.busy(false);
 						if (res && (res.result === true || res.result === 'True' || res.result === 'true')) {
@@ -253,11 +253,11 @@ Views.movies = {
 							for (i = 0; i < list.length; i++) { if (list[i] === it.movie) { list.splice(i, 1); break; } }
 							Store.setPos(it.key, 0);
 							Views.movies.render(Math.min(Browser.list.index, Browser.list.items.length - 2));
-							U.toast('Tallenne poistettu');
+							U.toast(T('Tallenne poistettu'));
 						} else {
-							Dialog.alert('Poisto epäonnistui', (res && res.message) || 'Tuntematon virhe');
+							Dialog.alert(T('Poisto epäonnistui'), (res && res.message) || T('Tuntematon virhe'));
 						}
-					}, function (err) { U.busy(false); Dialog.alert('Poisto epäonnistui', err); });
+					}, function (err) { U.busy(false); Dialog.alert(T('Poisto epäonnistui'), err); });
 				}
 			}
 		], 0);
@@ -281,7 +281,7 @@ Views.movies = {
 			case tvKey.KEY_GREEN:
 				Store.set('sort', M.sortMode() === 'date' ? 'name' : 'date');
 				M.render(0);
-				U.toast(M.sortMode() === 'name' ? 'Järjestys: nimen mukaan' : 'Järjestys: uusin ensin', 1500);
+				U.toast(M.sortMode() === 'name' ? T('Järjestys: nimen mukaan') : T('Järjestys: uusin ensin'), 1500);
 				return true;
 			case tvKey.KEY_YELLOW: App.go('channels'); return true;
 			case tvKey.KEY_BLUE: App.go('settings'); return true;
@@ -305,10 +305,10 @@ Views.channels = {
 	enter: function () {
 		U.show('browser', true);
 		U.show('settings', false);
-		footer('<span class="k k-ok">OK</span>Katso' +
-			'<span class="k k-yellow"></span>Tallenteet' +
-			'<span class="k k-blue"></span>Asetukset' +
-			'<span class="k k-ret">RETURN</span>Takaisin');
+		footer(T('<span class="k k-ok">OK</span>Katso') +
+			T('<span class="k k-yellow"></span>Tallenteet') +
+			T('<span class="k k-blue"></span>Asetukset') +
+			T('<span class="k k-ret">RETURN</span>Takaisin'));
 		var C = Views.channels;
 		if (C.mode === 'services' && C.services) { C.renderServices(Browser.list.index); }
 		else if (C.bouquets) { C.renderBouquets(); }
@@ -319,7 +319,7 @@ Views.channels = {
 
 	loadBouquets: function () {
 		var C = Views.channels;
-		U.busy(true, 'Haetaan kanavanippuja…');
+		U.busy(true, T('Haetaan kanavanippuja…'));
 		Api.bouquets(function (data) {
 			U.busy(false);
 			C.bouquets = data.services || [];
@@ -327,7 +327,7 @@ Views.channels = {
 			else { C.renderBouquets(); }
 		}, function (err) {
 			U.busy(false);
-			crumb('Kanavat');
+			crumb(T('Kanavat'));
 			Browser.setItems([], 0, err);
 		});
 	},
@@ -337,17 +337,17 @@ Views.channels = {
 		C.mode = 'bouquets';
 		C.leave();
 		for (i = 0; i < C.bouquets.length; i++) {
-			items.push({ type: 'bouquet', icon: '▸', cls: 'dir', title: C.bouquets[i].servicename, sub: 'Kanavanippu', b: C.bouquets[i] });
+			items.push({ type: 'bouquet', icon: '▸', cls: 'dir', title: C.bouquets[i].servicename, sub: T('Kanavanippu'), b: C.bouquets[i] });
 		}
-		crumb('Kanavat');
-		Browser.setItems(items, C.bIndex, 'Ei kanavanippuja');
+		crumb(T('Kanavat'));
+		Browser.setItems(items, C.bIndex, T('Ei kanavanippuja'));
 	},
 
 	openBouquet: function (b) {
 		var C = Views.channels;
 		C.bIndex = C.bouquets.length > 1 ? Browser.list.index : 0;
 		C.bouquet = b;
-		U.busy(true, 'Haetaan kanavia…');
+		U.busy(true, T('Haetaan kanavia…'));
 		Api.services(b.servicereference, function (data) {
 			U.busy(false);
 			var list = data.services || [], out = [], i;
@@ -363,7 +363,7 @@ Views.channels = {
 			C.loadEpg();
 			C.leave();
 			C.epgTimer = setInterval(C.loadEpg, 120000);
-		}, function (err) { U.busy(false); Dialog.alert('Virhe', err); });
+		}, function (err) { U.busy(false); Dialog.alert(T('Virhe'), err); });
 	},
 
 	loadEpg: function () {
@@ -403,8 +403,8 @@ Views.channels = {
 	renderServices: function (index) {
 		var C = Views.channels, items = [], i;
 		for (i = 0; i < C.services.length; i++) { items.push(C.serviceItem(C.services[i], i + 1)); }
-		crumb('Kanavat › ' + (C.bouquet ? C.bouquet.servicename : ''));
-		Browser.setItems(items, index, 'Nipussa ei ole kanavia');
+		crumb(T('Kanavat › ') + (C.bouquet ? C.bouquet.servicename : ''));
+		Browser.setItems(items, index, T('Nipussa ei ole kanavia'));
 	},
 
 	useProxy: true,      /* live boksin välityksellä (tekstitykset); pois, jos välitys ei toimi */
@@ -467,7 +467,7 @@ Views.settings = {
 		S.back = from && from !== 'settings' ? from : 'movies';
 		U.show('browser', false);
 		U.show('settings', true);
-		crumb('Asetukset');
+		crumb(T('Asetukset'));
 		footer('');
 		S.parse(Api.host);
 		S.index = 0;
@@ -495,13 +495,13 @@ Views.settings = {
 			html.push('<span class="fld' + (i === S.index ? ' sel' : '') + '">' + U.esc(S.fields[i]) + '</span>');
 			if (i < 3) { html.push('<span class="dot">.</span>'); }
 		}
-		html.push('<span class="fld-label">portti</span>');
+		html.push(T('<span class="fld-label">portti</span>'));
 		U.$('s-fields').innerHTML = html.join('');
 		var def = Api.defaultHost();
-		U.$('s-info').innerHTML = 'Nykyinen: <b>' + U.esc(Api.host || '-') + '</b><br/>' +
-			'Asennettu boksista: ' + U.esc(def || '-') + '<br/>' +
-			'Näytön koko: <b>' + U.esc(Screen.label()) + '</b> (TV ilmoittaa leveydeksi ' + (Screen.detected || '?') + ' px, skaala ' + Screen.scale.toFixed(2) + ')<br/>' +
-			'Sovellus ' + U.esc(typeof BOX_PLUGIN_VERSION !== 'undefined' ? BOX_PLUGIN_VERSION : '?');
+		U.$('s-info').innerHTML = T('Nykyinen: <b>') + U.esc(Api.host || '-') + '</b><br/>' +
+			T('Asennettu boksista: ') + U.esc(def || '-') + '<br/>' +
+			T('Näytön koko: <b>') + U.esc(Screen.label()) + T('</b> (TV ilmoittaa leveydeksi ') + (Screen.detected || '?') + T(' px, skaala ') + Screen.scale.toFixed(2) + ')<br/>' +
+			T('Sovellus ') + U.esc(typeof BOX_PLUGIN_VERSION !== 'undefined' ? BOX_PLUGIN_VERSION : '?');
 	},
 
 	digit: function (d) {
@@ -529,22 +529,22 @@ Views.settings = {
 
 	save: function () {
 		var S = Views.settings, host = S.value();
-		U.busy(true, 'Testataan ' + host + '…');
+		U.busy(true, T('Testataan ') + host + '…');
 		var old = Api.host;
 		Api.host = host;
 		Api.status(function () {
 			U.busy(false);
 			Store.set('host', host === Api.defaultHost() ? '' : host);
-			U.toast('Yhteys toimii: ' + host);
+			U.toast(T('Yhteys toimii: ') + host);
 			Views.movies.reset();
 			Views.channels.bouquets = null; Views.channels.services = null; Views.channels.mode = 'bouquets';
 			App.refreshStatus();
 			App.go('movies');
 		}, function (err) {
 			U.busy(false);
-			Dialog.open('Ei yhteyttä', err + '. Tallennetaanko silti?', [
-				{ label: 'Tallenna', fn: function () { Store.set('host', host); Views.movies.reset(); App.go('movies'); } },
-				{ label: 'Korjaa', fn: function () { Api.host = old; } }
+			Dialog.open(T('Ei yhteyttä'), err + T('. Tallennetaanko silti?'), [
+				{ label: T('Tallenna'), fn: function () { Store.set('host', host); Views.movies.reset(); App.go('movies'); } },
+				{ label: T('Korjaa'), fn: function () { Api.host = old; } }
 			], 1, function () { Api.host = old; });
 		});
 	},
@@ -561,7 +561,7 @@ Views.settings = {
 			case tvKey.KEY_DOWN: S.step(-1); return true;
 			case tvKey.KEY_ENTER: S.save(); return true;
 			case tvKey.KEY_RED: S.parse(Api.defaultHost()); S.fresh = true; S.render(); return true;
-			case tvKey.KEY_GREEN: Screen.cycle(); S.render(); U.toast('Näytön koko: ' + Screen.label(), 2000); return true;
+			case tvKey.KEY_GREEN: Screen.cycle(); S.render(); U.toast(T('Näytön koko: ') + Screen.label(), 2000); return true;
 			case tvKey.KEY_RETURN: App.go(S.back); return true;
 		}
 		return false;
