@@ -8,7 +8,7 @@ import java.util.Locale
 
 /**
  * Sovelluksen kieli: "auto" (laitteen kieli) tai kielikoodi. Lähdekieli on suomi;
- * käännökset tulevat repon po/*.po-tiedostoista (tools/i18n.py -> assets/i18n.json).
+ * käännökset tulevat repon po-kansion .po-tiedostoista (tools/i18n.py -> assets/i18n.json).
  */
 object I18n {
     private val names = linkedMapOf("fi" to "suomi")
