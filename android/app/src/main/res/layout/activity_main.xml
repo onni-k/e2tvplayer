@@ -28,10 +28,10 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <TextView android:id="@+id/tabRec" style="@style/E2Tab" android:text="Tallenteet" />
-            <TextView android:id="@+id/tabCh" style="@style/E2Tab" android:text="Kanavat" />
-            <TextView android:id="@+id/tabSort" style="@style/E2Tab" android:text="Uusin ensin" />
-            <TextView android:id="@+id/tabSet" style="@style/E2Tab" android:text="Asetukset" />
+            <TextView android:id="@+id/tabRec" style="@style/E2Tab" android:text="Recordings" />
+            <TextView android:id="@+id/tabCh" style="@style/E2Tab" android:text="Channels" />
+            <TextView android:id="@+id/tabSort" style="@style/E2Tab" android:text="Newest first" />
+            <TextView android:id="@+id/tabSet" style="@style/E2Tab" android:text="Settings" />
 
             <View
                 android:layout_width="0dp"

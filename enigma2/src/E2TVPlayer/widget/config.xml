@@ -2,7 +2,7 @@
 <widget>
 	<cpname>E2TVPlayer</cpname>
 	<cpauthjs></cpauthjs>
-	<ver>0.1.014</ver>
+	<ver>0.1.015</ver>
 	<mgrver></mgrver>
 	<emp></emp>
 	<type>user</type>
@@ -23,7 +23,7 @@
 	<ListIcon>icon/list_85x70.png</ListIcon>
 	<BigListIcon>icon/list_95x78.png</BigListIcon>
 	<widgetname>E2TVPlayer</widgetname>
-	<description>Enigma2-boksin tallenteet ja kanavat OpenWebifin kautta</description>
+	<description>Enigma2 recordings and channels through OpenWebif</description>
 	<width>1280</width>
 	<height>720</height>
 	<author>

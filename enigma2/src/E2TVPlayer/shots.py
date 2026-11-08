@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 E2TVPlayer contributors
 #
-# Kuvakaappaukset TV-sovelluksista. Sovellus lähettää oman näkymänsä kuvana (Google TV:llä
-# myös videokuvan); web-TV:issä (Tizen/Orsay) videokuva on laitteistotasolla, jota sovellus ei
-# näe, joten boksi lisää videokuvan saman kohdan tallenteesta ffmpegillä, jos se on asennettu.
+# Screenshots from the TV apps. The app sends its own view as an image (on Google TV also the
+# video frame); on the web TVs (Tizen/Orsay) the video is on a hardware plane the app cannot
+# see, so the box adds the video frame from the same position of the recording with ffmpeg,
+# if it is installed.
 
 from __future__ import absolute_import, print_function
 
@@ -23,8 +24,12 @@ def log(msg):
 	print("[E2TVPlayer] shots: %s" % msg)
 
 
+# folder names of older versions
+OLD_NAMES = {"screenshots": "kuvakaappaukset", "subtitles": "tekstitykset"}
+
+
 def data_dir(sub):
-	"""Lisäosan datakansio: /media/hdd/e2tvplayer/<sub> (tai varalla /tmp)."""
+	"""Data folder of the plugin: /media/hdd/e2tvplayer/<sub> (or /tmp as a fallback)."""
 	for base in ("/media/hdd", "/media/usb", "/media/mmc"):
 		if os.path.isdir(base) and os.access(base, os.W_OK) and (os.path.ismount(base) or os.path.isdir(os.path.join(base, "movie"))):
 			d = os.path.join(base, "e2tvplayer", sub)
@@ -32,12 +37,20 @@ def data_dir(sub):
 	else:
 		d = "/tmp/e2tvplayer-" + sub
 	if not os.path.isdir(d):
-		os.makedirs(d)
+		old = os.path.join(os.path.dirname(d), OLD_NAMES.get(sub, "-")) if not d.startswith("/tmp/") \
+			else "/tmp/e2tvplayer-" + OLD_NAMES.get(sub, "-")
+		try:
+			if os.path.isdir(old):
+				os.rename(old, d)   # keep the data of older versions
+		except OSError:
+			pass
+		if not os.path.isdir(d):
+			os.makedirs(d)
 	return d
 
 
 def shots_dir():
-	return data_dir("kuvakaappaukset")
+	return data_dir("screenshots")
 
 
 def find_ffmpeg():
@@ -48,7 +61,7 @@ def find_ffmpeg():
 
 
 def decode_body(data, content_type):
-	"""Kuva joko sellaisenaan (image/png, image/jpeg) tai data-URL:na (vanhat TV-selaimet)."""
+	"""The image either as such (image/png, image/jpeg) or as a data URL (old TV browsers)."""
 	if not data:
 		return None, None
 	if content_type.startswith("image/"):
@@ -61,7 +74,7 @@ def decode_body(data, content_type):
 
 
 def save(platform, image, ext, file_path=None, pos=0.0, sref=None, live_port=8001, with_video=True, title=""):
-	"""Tallentaa kuvan ja käynnistää videokuvan yhdistämisen taustalla. Palauttaa tiedot."""
+	"""Saves the image and starts adding the video frame in the background. Returns the details."""
 	d = shots_dir()
 	platform = re.sub(r"[^a-z0-9]", "", (platform or "tv").lower())[:12] or "tv"
 	stamp = time.strftime("%Y%m%d-%H%M%S")
@@ -79,14 +92,14 @@ def save(platform, image, ext, file_path=None, pos=0.0, sref=None, live_port=800
 	ff = find_ffmpeg()
 	src = None
 	if not with_video:
-		pass   # sovellus kaappasi videokuvan itse (Google TV)
+		pass   # the app captured the video frame itself (Google TV)
 	elif file_path and os.path.isfile(file_path):
 		src = file_path
 	elif sref and re.match(r"^[0-9A-Fa-f:]+$", sref):
 		src = "http://127.0.0.1:%d/%s" % (live_port, sref)
 	meta["ffmpeg"] = bool(ff)
 	if not ff and with_video:
-		meta["error"] = "ffmpeg puuttuu boksista (opkg install ffmpeg), videokuvaa ei lisätty" if src else ""
+		meta["error"] = "ffmpeg is not installed on the box (opkg install ffmpeg), no video frame added" if src else ""
 	_write_meta(d, meta)
 	if ff and src:
 		t = threading.Thread(target=_compose, args=(ff, d, meta, src))
@@ -120,7 +133,7 @@ def _compose(ff, d, meta, src):
 			time.sleep(0.2)
 		if p.poll() is None:
 			p.kill()
-			meta["error"] = "ffmpeg ei valmistunut ajassa"
+			meta["error"] = "ffmpeg did not finish in time"
 		elif p.returncode != 0:
 			meta["error"] = "ffmpeg: " + p.stderr.read().decode("utf-8", "ignore").strip()[-300:]
 		elif os.path.isfile(os.path.join(d, out)):

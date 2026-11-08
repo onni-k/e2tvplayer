@@ -11,8 +11,8 @@ import android.widget.Toast
 import org.json.JSONObject
 
 /**
- * Kuvakaappaus 10 s viiveellä boksiin. Laskuri on sovelluksen yhteinen, joten se jatkuu, vaikka
- * käyttäjä palaisi toistosta listaan: kuva otetaan siitä näkymästä, joka on laskurin lopussa auki.
+ * Screenshot to the box after 10 s. The countdown is app-wide, so it continues even if the user
+ * returns from playback to the list: the picture is taken of the view open when the countdown ends.
  */
 object Shots {
     private val ui = Handler(Looper.getMainLooper())
@@ -59,12 +59,12 @@ object Shots {
         if (a is PlayerActivity) {
             a.captureShot { bmp, params -> upload(bmp, params) }
         } else {
-            // listanäkymä: ei videota, piirretään ikkunan sisältö
+            // list view: no video, draw the window content
             val root = a.window.decorView
             if (root.width <= 0 || root.height <= 0) { busy = false; return }
             val bmp = Bitmap.createBitmap(root.width, root.height, Bitmap.Config.ARGB_8888)
             root.draw(Canvas(bmp))
-            upload(bmp, linkedMapOf("platform" to "googletv", "novideo" to "1", "title" to "lista"))
+            upload(bmp, linkedMapOf("platform" to "googletv", "novideo" to "1", "title" to "list"))
         }
     }
 
@@ -84,9 +84,9 @@ object Shots {
                 val code = c.responseCode
                 val body = (if (code == 200) c.inputStream else c.errorStream)?.bufferedReader()?.use { it.readText() } ?: ""
                 c.disconnect()
-                if (code == 200) T("Kuva tallennettu boksiin: ") + JSONObject(body).optString("name") else T("Kuvan tallennus epäonnistui (") + code + ")"
+                if (code == 200) T("Picture saved on the box: ") + JSONObject(body).optString("name") else T("Saving the picture failed (") + code + ")"
             } catch (e: Exception) {
-                T("Kuvan tallennus epäonnistui: ") + e.message
+                T("Saving the picture failed: ") + e.message
             }
             android.util.Log.i("E2TVPlayer", "screenshot: $msg")
             ui.post { busy = false; notify(msg) }

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
-/* Tizen-sovitin: tarjoaa vanhan Samsung (Orsay) -alustan rajapinnat Tizenin päälle, jotta sama
-   sovelluskoodi toimii molemmissa. Soitin = webapis.avplay, näppäimet = tizen.tvinputdevice.
-   ES5, koska vanhimmat Tizen-TV:t (2015) käyttävät vanhaa WebKitiä. */
+/* Tizen adapter: provides the APIs of the old Samsung (Orsay) platform on top of Tizen, so that
+   the same app code works on both. Player = webapis.avplay, keys = tizen.tvinputdevice.
+   ES5, because the oldest Tizen TVs (2015) use an old WebKit. */
 (function () {
 	var IS_TIZEN = typeof tizen !== 'undefined';
 
@@ -28,7 +28,7 @@
 		if (!IS_TIZEN) { return; }
 		var k;
 		for (k = 0; k < REGISTER.length; k++) {
-			try { tizen.tvinputdevice.registerKey(REGISTER[k]); } catch (e) { /* osa näppäimistä ei ole kaikissa malleissa */ }
+			try { tizen.tvinputdevice.registerKey(REGISTER[k]); } catch (e) { /* some keys do not exist on every model */ }
 		}
 	}
 
@@ -54,7 +54,7 @@
 		}
 	} };
 
-	/* ---- Orsay-soitinlisäosan rajapinta AVPlayn päälle ---- */
+	/* ---- the Orsay player plugin API on top of AVPlay ---- */
 	function AV() { return webapis.avplay; }
 
 	function fire(el, name) {
@@ -112,7 +112,7 @@
 		}
 
 		el.SetDisplayArea = function (x, y, w, h) {
-			/* Orsayn koordinaatisto on 960x540, AVPlayn 1920x1080 */
+			/* Orsay coordinates are 960x540, AVPlay ones 1920x1080 */
 			state.rect = [x * 2, y * 2, w * 2, h * 2];
 			try { AV().setDisplayRect(state.rect[0], state.rect[1], state.rect[2], state.rect[3]); } catch (e) { }
 			return true;
@@ -164,7 +164,7 @@
 		el.JumpBackward = function (sec) { try { AV().jumpBackward(Math.floor(sec * 1000)); } catch (e) { } return true; };
 		el.GetDuration = function () { try { return AV().getDuration(); } catch (e) { return 0; } };
 
-		/* ääni- ja tekstitysraidat: tyyppi 1 = ääni, 5 = tekstitys (Orsayn numerointi) */
+		/* audio and subtitle tracks: type 1 = audio, 5 = subtitles (Orsay numbering) */
 		el.GetTotalNumOfStreamID = function (type) { return tracksOf(type).length; };
 		el.GetStreamLanguageInfo = function (type, idx) { var t = tracksOf(type)[idx]; return t ? trackLang(t) : ''; };
 		el.SetStreamID = function (type, idx) {
@@ -192,7 +192,7 @@
 		if (tv) { tv.SetMediaSource = function () { }; }
 	}
 
-	/* Tizen: sovellus piiloon/takaisin -> toisto tauolle */
+	/* Tizen: app hidden/shown -> pause playback */
 	if (IS_TIZEN) {
 		document.addEventListener('visibilitychange', function () {
 			try {

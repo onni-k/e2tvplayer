@@ -14,7 +14,7 @@ from . import info, web
 
 
 def info_text():
-	"""Sama sisältö kuin selaimella osoitteessa http://boksi/e2tvplayer"""
+	"""The same content as in the browser at http://box/e2tvplayer"""
 	ip = info.box_ip()
 	body = info.page_html(ip, web.VERSION, web.APP_TITLE, web.MOUNT, web.ZIP_NAME, bool(web.apk_path()), web.is_registered())
 	return info.html_to_text(body, ip)
@@ -38,7 +38,7 @@ class E2TVPlayerInfo(Screen):
 		Screen.__init__(self, session)
 		self.setTitle("E2TVPlayer %s" % web.VERSION)
 		self["text"] = ScrollLabel(info_text())
-		self["hint"] = Label(info.T("OK / EXIT = sulje    ylös/alas = vieritä"))
+		self["hint"] = Label(info.T("OK / EXIT = close    up/down = scroll"))
 		self["actions"] = ActionMap(["OkCancelActions", "DirectionActions"], {
 			"ok": self.close,
 			"cancel": self.close,
@@ -64,7 +64,7 @@ def Plugins(**kwargs):
 		PluginDescriptor(where=PluginDescriptor.WHERE_SESSIONSTART, fnc=sessionstart),
 		PluginDescriptor(
 			name="E2TVPlayer",
-			description=info.T("Tallenteet ja live-TV Samsung- ja Google TV -televisioille"),
+			description=info.T("Recordings and live TV for Samsung and Google TV televisions"),
 			where=PluginDescriptor.WHERE_PLUGINMENU,
 			icon="plugin.png",
 			fnc=main,

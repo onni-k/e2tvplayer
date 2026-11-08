@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
-/* Yksinkertainen virtuaalilista: piirretään vain näkyvät rivit. */
+/* A simple virtual list: only the visible rows are drawn. */
 function ListView(listId, thumbId, rows, renderRow) {
 	this.el = U.$(listId);
 	this.thumb = U.$(thumbId);
@@ -32,9 +32,9 @@ ListView.prototype.move = function (delta) {
 	var old = this.index;
 	var next = this.index + delta;
 	if (Math.abs(delta) === 1) {
-		next = (next + n) % n;                     /* yksi askel kiertää ympäri */
+		next = (next + n) % n;                     /* a single step wraps around */
 	} else {
-		next = Math.max(0, Math.min(n - 1, next)); /* sivu kerrallaan pysähtyy päähän */
+		next = Math.max(0, Math.min(n - 1, next)); /* a page at a time stops at the end */
 	}
 	this.index = next;
 	this.clampTop();

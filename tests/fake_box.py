@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 E2TVPlayer contributors
-# Simuloitu Enigma2-boksi CI-testiä varten: OpenWebif-rajapinta (portti 80),
-# tallenne Range-tuella (/file) ja live-striimi (portti 8001). Vain standardikirjasto.
+# A simulated Enigma2 box for the CI test: the OpenWebif API (port 80), a recording with
+# Range support (/file) and a live stream (port 8001). Standard library only.
 import json
 import os
 import sys
@@ -13,7 +13,7 @@ from urllib.parse import parse_qs, urlparse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TS = os.path.join(HERE, "test.ts")
-REC = "/media/hdd/movie/20261103 2000 - Testikanava HD - Testitallenne.ts"
+REC = "/media/hdd/movie/20261103 2000 - Test Channel HD - Test recording.ts"
 SREF1 = "1:0:19:1:4:2D:FFFF0000:0:0:0:"
 SREF2 = "1:0:19:2:4:2D:FFFF0000:0:0:0:"
 NOW = int(time.time())
@@ -21,22 +21,22 @@ LOG = []
 
 API = {
     "/e2tvplayer/info": {"app": "E2TVPlayer", "version": "ci", "apk": True},
-    "/api/statusinfo": {"currservice_station": "Testikanava HD", "currservice_name": "Iltauutiset", "isRecording": "true", "inStandby": "false"},
-    "/api/movielist": {"directory": "/media/hdd/movie/", "bookmarks": ["Sarjat"], "movies": [
-        {"filename": REC, "eventname": "Testitallenne", "servicename": "Testikanava HD", "recordingtime": NOW - 3600,
+    "/api/statusinfo": {"currservice_station": "Test Channel HD", "currservice_name": "Evening News", "isRecording": "true", "inStandby": "false"},
+    "/api/movielist": {"directory": "/media/hdd/movie/", "bookmarks": ["Series"], "movies": [
+        {"filename": REC, "eventname": "Test recording", "servicename": "Test Channel HD", "recordingtime": NOW - 3600,
          "length": "0:30", "filesize": os.path.getsize(TS), "filesize_readable": "2,3 MB",
-         "description": "Lyhyt kuvaus.", "descriptionExtended": "Pidempi kuvaus testitallenteesta.actor: Rose Nieminenactor: Mikko Heino",
+         "description": "Short description.", "descriptionExtended": "A longer description of the test recording.actor: Rose Nieminenactor: Mikko Heino",
          "serviceref": "1:0:0:0:0:0:0:0:0:0:" + REC},
-        {"filename": "/media/hdd/movie/vanha.ts", "eventname": "Vanha tallenne", "servicename": "Kanava 2", "recordingtime": NOW - 90000,
-         "length": "1:05:00", "filesize": 2000000000, "serviceref": "1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/vanha.ts"}]},
-    "/api/getservices": {"services": [{"servicereference": '1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.fav.tv" ORDER BY bouquet', "servicename": "Suosikit"}]},
-    "/api/epgnow": {"events": [{"sref": SREF1, "title": "Iltauutiset", "begin_timestamp": NOW - 600, "duration_sec": 1800, "shortdesc": "Päivän uutiset."}]},
-    "/api/epgservicenow": {"events": [{"sref": SREF1, "title": "Iltauutiset", "begin_timestamp": NOW - 600, "duration_sec": 1800, "shortdesc": "Päivän uutiset.", "longdesc": "Uutiset ja sää."}]},
-    "/api/epgservicenext": {"events": [{"sref": SREF1, "title": "Sää", "begin_timestamp": NOW + 1200, "duration_sec": 300}]},
+        {"filename": "/media/hdd/movie/old.ts", "eventname": "Old recording", "servicename": "Channel 2", "recordingtime": NOW - 90000,
+         "length": "1:05:00", "filesize": 2000000000, "serviceref": "1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/old.ts"}]},
+    "/api/getservices": {"services": [{"servicereference": '1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.fav.tv" ORDER BY bouquet', "servicename": "Favourites"}]},
+    "/api/epgnow": {"events": [{"sref": SREF1, "title": "Evening News", "begin_timestamp": NOW - 600, "duration_sec": 1800, "shortdesc": "Daily news."}]},
+    "/api/epgservicenow": {"events": [{"sref": SREF1, "title": "Evening News", "begin_timestamp": NOW - 600, "duration_sec": 1800, "shortdesc": "Daily news.", "longdesc": "News and weather."}]},
+    "/api/epgservicenext": {"events": [{"sref": SREF1, "title": "Weather", "begin_timestamp": NOW + 1200, "duration_sec": 300}]},
 }
-SERVICES = {"services": [{"servicereference": SREF1, "servicename": "Testikanava HD"},
-                         {"servicereference": "1:64:1:0:0:0:0:0:0:0:", "servicename": "--- välimerkki ---"},
-                         {"servicereference": SREF2, "servicename": "Toinen kanava"}]}
+SERVICES = {"services": [{"servicereference": SREF1, "servicename": "Test Channel HD"},
+                         {"servicereference": "1:64:1:0:0:0:0:0:0:0:", "servicename": "--- marker ---"},
+                         {"servicereference": SREF2, "servicename": "Second channel"}]}
 
 
 class Api(BaseHTTPRequestHandler):
@@ -61,8 +61,8 @@ class Api(BaseHTTPRequestHandler):
             return self.send_file()
         if u.path == "/api/getservices" and q.get("sRef"):
             return self.send_json(SERVICES)
-        if u.path == "/api/movielist" and q.get("dirname", "").rstrip("/").endswith("Sarjat"):
-            return self.send_json({"directory": "/media/hdd/movie/Sarjat/", "bookmarks": [], "movies": []})
+        if u.path == "/api/movielist" and q.get("dirname", "").rstrip("/").endswith("Series"):
+            return self.send_json({"directory": "/media/hdd/movie/Series/", "bookmarks": [], "movies": []})
         if u.path in API:
             return self.send_json(API[u.path])
         self.send_response(404)
@@ -77,7 +77,7 @@ class Api(BaseHTTPRequestHandler):
             self.send_response(404); self.send_header("Content-Length", "0"); self.end_headers(); return
         out = os.environ.get("SHOTS", os.path.join(HERE, "..", "shots"))
         os.makedirs(out, exist_ok=True)
-        name = "kuvakaappaus_%d" % int(time.time())
+        name = "screenshot_%d" % int(time.time())
         with open(os.path.join(out, name + ".png"), "wb") as f:
             f.write(body)
         with open(os.path.join(out, name + ".txt"), "w") as f:
@@ -115,7 +115,7 @@ class Api(BaseHTTPRequestHandler):
 
 
 class Stream(BaseHTTPRequestHandler):
-    """Kuten Enigma2:n striimipalvelin: HTTP/1.0, ei pituutta, tavuja reaaliajassa."""
+    """Like the Enigma2 stream server: HTTP/1.0, no length, bytes in real time."""
     protocol_version = "HTTP/1.0"
 
     def log_message(self, fmt, *args):
@@ -128,7 +128,7 @@ class Stream(BaseHTTPRequestHandler):
         data = open(TS, "rb").read()
         rate = len(data) / 30.0
         try:
-            while True:     # silmukka, jotta "live" ei lopu
+            while True:     # loop so that "live" never ends
                 for i in range(0, len(data), 18800):
                     self.wfile.write(data[i:i + 18800])
                     time.sleep(18800 / rate)

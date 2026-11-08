@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
-/* OpenWebif JSON-rajapinta. Orsay-sovellus saa tehdä XHR-kutsuja mihin tahansa osoitteeseen. */
+/* The OpenWebif JSON API. The Orsay app may make XHR calls to any address. */
 var Api = {
 	host: '',
 
@@ -29,7 +29,7 @@ var Api = {
 			if (done) { return; }
 			done = true;
 			try { xhr.abort(); } catch (e) { }
-			if (fail) { fail(T('Aikakatkaisu (') + Api.host + ')'); }
+			if (fail) { fail(T('Timeout (') + Api.host + ')'); }
 		}, timeoutMs || 15000);
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState !== 4 || done) { return; }
@@ -38,14 +38,14 @@ var Api = {
 			if (xhr.status === 200) {
 				var data = null;
 				try { data = JSON.parse(Api.unent(xhr.responseText)); } catch (e) {
-					if (fail) { fail(T('Virheellinen vastaus boksilta')); }
+					if (fail) { fail(T('Invalid response from the box')); }
 					return;
 				}
 				if (ok) { ok(data); }
 			} else if (xhr.status === 401) {
-				if (fail) { fail(T('OpenWebif vaatii kirjautumisen - ota se pois päältä boksin asetuksista')); }
+				if (fail) { fail(T('OpenWebif requires a login - turn it off in the box settings')); }
 			} else {
-				if (fail) { fail(T('Yhteysvirhe ') + (xhr.status || '') + ' (' + Api.host + ')'); }
+				if (fail) { fail(T('Connection error ') + (xhr.status || '') + ' (' + Api.host + ')'); }
 			}
 		};
 		try {
@@ -54,12 +54,12 @@ var Api = {
 		} catch (e) {
 			done = true;
 			clearTimeout(timer);
-			if (fail) { fail(T('Yhteys epäonnistui: ') + e); }
+			if (fail) { fail(T('Connection failed: ') + e); }
 		}
 	},
 
-	/* OpenWebif lähettää osan EPG-teksteistä HTML-merkintöinä (Shorty&#x27;s): puretaan ne
-	   ennen JSON-jäsennystä niin, että tulos on yhä kelvollista JSONia. */
+	/* OpenWebif sends some EPG texts with HTML entities (Shorty&#x27;s): decode them before
+	   JSON parsing so that the result is still valid JSON. */
 	unent: function (t) {
 		return String(t || '').replace(/&(#[xX][0-9a-fA-F]+|#[0-9]+|amp|quot|lt|gt|apos);/g, function (m, e) {
 			var c;
@@ -77,7 +77,7 @@ var Api = {
 		try { return typeof webapis !== 'undefined' && !!webapis.network && !!webapis.network.getIp(); } catch (e) { return false; }
 	},
 
-	/* Kysyy /e2tvplayer/info jokaiselta lähiverkon osoitteelta (x.y.z.1-254) */
+	/* asks /e2tvplayer/info from every address of the local network (x.y.z.1-254) */
 	discover: function (done) {
 		var ip = '';
 		try { ip = webapis.network.getIp(); } catch (e) { ip = ''; }
@@ -121,7 +121,7 @@ var Api = {
 
 	epgNext: function (bref, ok, fail) { Api.get('/api/epgnext', { bRef: bref }, ok, fail, 20000); },
 
-	/* Boksin purkamat DVB-tekstitykset (E2TVPlayer) */
+	/* DVB subtitles extracted by the box (E2TVPlayer) */
 	subs: function (file, key, from, ok, fail) {
 		Api.get('/e2tvplayer/subs', { file: file, track: key || null, from: key ? (from || 0) : null }, ok, fail, 20000);
 	},
@@ -130,7 +130,7 @@ var Api = {
 		return Api.base() + '/e2tvplayer/subimg?file=' + encodeURIComponent(file) + '&track=' + encodeURIComponent(key) + '&n=' + n;
 	},
 
-	/* Live-kanava boksin välityksellä: boksi purkaa tekstitykset samasta virrasta */
+	/* live channel through the box relay: the box extracts the subtitles from the same stream */
 	liveUrl: function (id, sref) {
 		return Api.base() + '/e2tvplayer/live?id=' + encodeURIComponent(id) + '&sref=' + encodeURIComponent(sref);
 	},
@@ -143,9 +143,9 @@ var Api = {
 		return Api.base() + '/e2tvplayer/liveimg?id=' + encodeURIComponent(id) + '&track=' + encodeURIComponent(key) + '&n=' + n;
 	},
 
-	/* Tallenteen URL - OpenWebifin /file tukee Range-pyyntöjä, joten kelaus toimii */
+	/* URL of a recording - the OpenWebif /file supports Range requests, so seeking works */
 	fileUrl: function (path) { return Api.base() + '/file?file=' + encodeURIComponent(path); },
 
-	/* Live-kanava Enigma2:n striimipalvelimelta (portti 8001) */
+	/* live channel from the Enigma2 stream server (port 8001) */
 	streamUrl: function (sref) { return 'http://' + Api.hostname() + ':8001/' + sref; }
 };

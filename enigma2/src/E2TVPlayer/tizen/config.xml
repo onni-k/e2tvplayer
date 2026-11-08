@@ -5,7 +5,7 @@
     <feature name="http://tizen.org/feature/screen.size.normal.1080.1920"/>
     <icon src="icon.png"/>
     <name>E2TVPlayer</name>
-    <description>Enigma2-boksin tallenteet ja live-TV tekstityksineen</description>
+    <description>Recordings and live TV of an Enigma2 box, with subtitles</description>
     <author>E2TVPlayer</author>
     <access origin="*" subdomains="true"/>
     <tizen:privilege name="http://tizen.org/privilege/internet"/>

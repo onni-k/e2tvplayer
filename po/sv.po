@@ -1,0 +1,1014 @@
+# E2TVPlayer translation
+# SPDX-License-Identifier: GPL-3.0-or-later
+msgid ""
+msgstr ""
+"Project-Id-Version: E2TVPlayer\n"
+"Language: sv\n"
+"X-Language-Name: svenska\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: web/api.js
+msgid "Timeout ("
+msgstr "Tidsgräns ("
+
+#: web/api.js
+msgid "Invalid response from the box"
+msgstr "Ogiltigt svar från boxen"
+
+#: web/api.js
+msgid "OpenWebif requires a login - turn it off in the box settings"
+msgstr "OpenWebif kräver inloggning - stäng av den i boxens inställningar"
+
+#: web/api.js android/Box.kt
+msgid "Connection error "
+msgstr "Anslutningsfel "
+
+#: web/api.js
+msgid "Connection failed: "
+msgstr "Anslutningen misslyckades: "
+
+#: web/main.js
+msgid "Box address missing"
+msgstr "Boxens adress saknas"
+
+#: web/main.js
+msgid "Enter the IP address of the Enigma2 box."
+msgstr "Ange Enigma2-boxens IP-adress."
+
+#: web/main.js
+msgid "Searching for the box…"
+msgstr "Söker efter boxen…"
+
+#: web/main.js android/MainActivity.kt
+msgid "Box found: "
+msgstr "Boxen hittades: "
+
+#: web/main.js android/MainActivity.kt
+msgid "Choose a box"
+msgstr "Välj en box"
+
+#: web/main.js
+msgid "More than one box was found on the network."
+msgstr "Flera boxar hittades i nätverket."
+
+#: web/main.js android/MainActivity.kt
+msgid "Box not found"
+msgstr "Boxen hittades inte"
+
+#: web/main.js android/MainActivity.kt
+msgid "Quit E2TVPlayer?"
+msgstr "Avsluta E2TVPlayer?"
+
+#: web/main.js android/MainActivity.kt
+msgid "Yes"
+msgstr "Ja"
+
+#: web/main.js android/MainActivity.kt
+msgid "No"
+msgstr "Nej"
+
+#: web/main.js
+msgid "Box in standby"
+msgstr "Boxen i viloläge"
+
+#: web/main.js
+msgid "<span class=\"rec\">● RECORDING</span> &nbsp; "
+msgstr "<span class=\"rec\">● SPELAR IN</span> &nbsp; "
+
+#: web/main.js android/MainActivity.kt
+msgid "Box "
+msgstr "Box "
+
+#: web/main.js
+msgid "<span class=\"rec\">No connection to the box</span> &nbsp; "
+msgstr "<span class=\"rec\">Ingen anslutning till boxen</span> &nbsp; "
+
+#: web/player.js android/PlayerActivity.kt
+msgid "Buffering…"
+msgstr "Buffrar…"
+
+#: web/player.js
+msgid "Playback did not start"
+msgstr "Uppspelningen startade inte"
+
+#: web/player.js
+msgid "Relay failed – playing directly (no subtitles)"
+msgstr "Vidarebefordran misslyckades – spelar direkt (ingen textning)"
+
+#: web/player.js android/PlayerActivity.kt
+msgid "Check that streaming (port 8001) is enabled on the box and a tuner is free."
+msgstr "Kontrollera att strömning (port 8001) är aktiverad på boxen och att en mottagare är ledig."
+
+#: web/player.js
+msgid "The TV may not support the recording's format (e.g. subtitle or audio format), or the connection was lost."
+msgstr "TV:n stöder kanske inte inspelningens format (t.ex. textnings- eller ljudformat), eller så bröts anslutningen."
+
+#: web/player.js android/PlayerActivity.kt
+msgid "Playback error"
+msgstr "Uppspelningsfel"
+
+#: web/player.js android/PlayerActivity.kt
+msgid "❚❚ Paused"
+msgstr "❚❚ Paus"
+
+#: web/player.js
+msgid "Please wait - buffering"
+msgstr "Vänta - buffrar"
+
+#: web/player.js
+msgid "LIVE "
+msgstr "LIVE "
+
+#: web/player.js
+msgid "LIVE"
+msgstr "LIVE"
+
+#: web/player.js
+msgid "CH +/- or ▲▼ channel &nbsp; INFO programme info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop"
+msgstr "CH +/- eller ▲▼ kanal &nbsp; INFO programinfo &nbsp; TOOLS ljud/textning &nbsp; RETURN stopp"
+
+#: web/player.js
+msgid "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK pause &nbsp; INFO info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop"
+msgstr "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK paus &nbsp; INFO info &nbsp; TOOLS ljud/textning &nbsp; RETURN stopp"
+
+#: web/player.js
+msgid "Buffering "
+msgstr "Buffrar "
+
+#: web/player.js
+msgid "Recording watched to the end"
+msgstr "Inspelningen har setts till slutet"
+
+#: web/player.js
+msgid "Broadcast interrupted"
+msgstr "Sändningen avbröts"
+
+#: web/player.js
+msgid "Connection to the box failed"
+msgstr "Anslutningen till boxen misslyckades"
+
+#: web/player.js
+msgid "Network connection lost"
+msgstr "Nätverksanslutningen bröts"
+
+#: web/player.js
+msgid "File not found"
+msgstr "Filen hittades inte"
+
+#: web/player.js
+msgid "Playback error (code "
+msgstr "Uppspelningsfel (kod "
+
+#: web/player.js android/PlayerActivity.kt
+msgid " · remaining "
+msgstr " · kvar "
+
+#: web/player.js android/PlayerActivity.kt
+msgid "Next "
+msgstr "Nästa "
+
+#: web/player.js
+msgid "<span class=\"cast\">No programme information</span>"
+msgstr "<span class=\"cast\">Ingen programinformation</span>"
+
+#: web/player.js
+msgid "audio"
+msgstr "ljud"
+
+#: web/player.js
+msgid "subtitles"
+msgstr "textning"
+
+#: web/player.js
+msgid "not supported"
+msgstr "stöds inte"
+
+#: web/player.js web/util.js
+msgid "track "
+msgstr "spår "
+
+#: web/player.js
+msgid "TV reports: "
+msgstr "TV:n rapporterar: "
+
+#: web/player.js android/PlayerActivity.kt
+msgid "off"
+msgstr "av"
+
+#: web/player.js
+msgid "Box: reading the recording…"
+msgstr "Box: läser inspelningen…"
+
+#: web/player.js
+msgid "Box: extracting subtitles "
+msgstr "Box: extraherar textning "
+
+#: web/player.js
+msgid "Box: subtitles extracted"
+msgstr "Box: textningen extraherad"
+
+#: web/player.js
+msgid ")"
+msgstr ")"
+
+#: web/player.js
+msgid "Box: no DVB subtitles in the recording"
+msgstr "Box: ingen DVB-textning i inspelningen"
+
+#: web/player.js
+msgid " (teletext subtitles only, not supported yet)"
+msgstr " (endast text-TV-textning, stöds inte ännu)"
+
+#: web/player.js
+msgid "Box: "
+msgstr "Box: "
+
+#: web/player.js
+msgid "error"
+msgstr "fel"
+
+#: web/player.js
+msgid "Box: extraction interrupted"
+msgstr "Box: extraheringen avbröts"
+
+#: web/player.js
+msgid "Box: no information"
+msgstr "Box: ingen information"
+
+#: web/player.js
+msgid "Box: waiting for the broadcast…"
+msgstr "Box: väntar på sändningen…"
+
+#: web/player.js
+msgid "Box: subtitles extracted from the broadcast"
+msgstr "Box: textningen extraheras från sändningen"
+
+#: web/player.js
+msgid "Box: no DVB subtitles on this channel now"
+msgstr "Box: ingen DVB-textning på kanalen just nu"
+
+#: web/player.js
+msgid " (teletext only, not supported yet)"
+msgstr " (endast text-TV, stöds inte ännu)"
+
+#: web/player.js
+msgid "Box: broadcast ended"
+msgstr "Box: sändningen slutade"
+
+#: web/player.js
+msgid "Subtitles not available (direct playback)"
+msgstr "Textning inte tillgänglig (direkt uppspelning)"
+
+#: web/player.js android/PlayerActivity.kt
+msgid "default"
+msgstr "standard"
+
+#: web/player.js android/PlayerActivity.kt
+msgid "not available"
+msgstr "inte tillgänglig"
+
+#: web/player.js android/PlayerActivity.kt
+msgid "Audio"
+msgstr "Ljud"
+
+#: web/player.js android/PlayerActivity.kt
+msgid "Subtitles"
+msgstr "Textning"
+
+#: web/player.js
+msgid "Timing"
+msgstr "Tidsjustering"
+
+#: web/player.js
+msgid "  (earlier)"
+msgstr "  (tidigare)"
+
+#: web/player.js
+msgid "  (later)"
+msgstr "  (senare)"
+
+#: web/player.js android/PlayerActivity.kt
+msgid "Language"
+msgstr "Språk"
+
+#: web/player.js
+msgid "  (restarts)"
+msgstr "  (startar om)"
+
+#: web/player.js android/PlayerActivity.kt
+msgid "Screenshot"
+msgstr "Skärmbild"
+
+#: web/player.js android/PlayerActivity.kt
+msgid "wait…"
+msgstr "vänta…"
+
+#: web/player.js android/PlayerActivity.kt
+msgid "OK: take a picture in 10 s"
+msgstr "OK: ta en bild om 10 s"
+
+#: web/player.js
+msgid "The list view cannot be captured on this TV (video frame only during playback)"
+msgstr "Listvyn kan inte fångas på den här TV:n (videobild endast under uppspelning)"
+
+#: web/player.js
+msgid "view"
+msgstr "vy"
+
+#: web/player.js
+msgid "video frame"
+msgstr "videobild"
+
+#: web/player.js
+msgid "Picture saved on the box ("
+msgstr "Bilden sparades på boxen ("
+
+#: web/player.js
+msgid " + video frame"
+msgstr " + videobild"
+
+#: web/player.js
+msgid "Saving the picture failed"
+msgstr "Det gick inte att spara bilden"
+
+#: web/subs.js
+msgid "box does not respond"
+msgstr "boxen svarar inte"
+
+#: web/subs.js
+msgid " – loading "
+msgstr " – laddar "
+
+#: web/util.js android/Box.kt
+msgid "in use"
+msgstr "används"
+
+#: web/util.js
+msgid "chosen"
+msgstr "valt"
+
+#: web/util.js android/I18n.kt
+msgid "automatic"
+msgstr "automatiskt"
+
+#: web/util.js
+msgid "Box address"
+msgstr "Boxens adress"
+
+#: web/util.js
+msgid "Number keys enter digits, left/right moves between fields, up/down changes the value."
+msgstr "Sifferknapparna matar in siffror, vänster/höger byter fält, upp/ned ändrar värdet."
+
+#: web/util.js
+msgid "<span class=\"k k-ok\">OK</span> Save &nbsp; <span class=\"k k-red\"></span> Reset &nbsp; <span class=\"k k-green\"></span> Screen size &nbsp; <span class=\"k k-ret\">RETURN</span> Cancel"
+msgstr "<span class=\"k k-ok\">OK</span> Spara &nbsp; <span class=\"k k-red\"></span> Återställ &nbsp; <span class=\"k k-green\"></span> Skärmstorlek &nbsp; <span class=\"k k-ret\">RETURN</span> Avbryt"
+
+#: web/util.js android/PlayerActivity.kt
+msgid "Audio and subtitles"
+msgstr "Ljud och textning"
+
+#: web/util.js
+msgid "▲▼ row &nbsp; ◀▶ change &nbsp; OK/RETURN close"
+msgstr "▲▼ rad &nbsp; ◀▶ ändra &nbsp; OK/RETURN stäng"
+
+#: web/util.js
+msgid "Loading&hellip;"
+msgstr "Laddar&hellip;"
+
+#: web/util.js android/PlayerActivity.kt
+msgid " (hard of hearing)"
+msgstr " (hörselskadade)"
+
+#: web/util.js android/Box.kt
+msgid "Sun Mon Tue Wed Thu Fri Sat"
+msgstr "sön mån tis ons tor fre lör"
+
+#: web/util.js
+msgid "Loading…"
+msgstr "Laddar…"
+
+#: web/util.js android/Box.kt
+msgid "Cast"
+msgstr "Medverkande"
+
+#: web/util.js android/Box.kt
+msgid "Director"
+msgstr "Regi"
+
+#: web/util.js android/Box.kt
+msgid "Producer"
+msgstr "Producent"
+
+#: web/util.js android/Box.kt
+msgid "Writer"
+msgstr "Manus"
+
+#: web/util.js android/Box.kt
+msgid "Presenter"
+msgstr "Programledare"
+
+#: web/util.js android/Box.kt
+msgid "Guests"
+msgstr "Gäster"
+
+#: web/util.js android/Box.kt
+msgid "Commentator"
+msgstr "Kommentator"
+
+#: web/util.js android/Box.kt
+msgid "Narrator"
+msgstr "Berättare"
+
+#: web/util.js android/Box.kt
+msgid "Music"
+msgstr "Musik"
+
+#: web/util.js
+msgid "Country"
+msgstr "Land"
+
+#: web/util.js
+msgid "Year"
+msgstr "År"
+
+#: web/util.js android/Box.kt
+msgid "Finnish"
+msgstr "finska"
+
+#: web/util.js android/Box.kt
+msgid "Swedish"
+msgstr "svenska"
+
+#: web/util.js android/Box.kt
+msgid "English"
+msgstr "engelska"
+
+#: web/util.js android/Box.kt
+msgid "Dutch"
+msgstr "nederländska"
+
+#: web/util.js android/Box.kt
+msgid "German"
+msgstr "tyska"
+
+#: web/util.js android/Box.kt
+msgid "French"
+msgstr "franska"
+
+#: web/util.js android/Box.kt
+msgid "Spanish"
+msgstr "spanska"
+
+#: web/util.js android/Box.kt
+msgid "Italian"
+msgstr "italienska"
+
+#: web/util.js android/Box.kt
+msgid "Russian"
+msgstr "ryska"
+
+#: web/util.js android/Box.kt
+msgid "Danish"
+msgstr "danska"
+
+#: web/util.js android/Box.kt
+msgid "Norwegian"
+msgstr "norska"
+
+#: web/util.js android/Box.kt
+msgid "Estonian"
+msgstr "estniska"
+
+#: web/util.js android/Box.kt
+msgid "Sami"
+msgstr "samiska"
+
+#: web/util.js android/Box.kt
+msgid "original"
+msgstr "original"
+
+#: web/util.js android/Box.kt
+msgid "other"
+msgstr "annat"
+
+#: web/util.js android/Box.kt
+msgid "unknown"
+msgstr "okänt"
+
+#: web/util.js android/Box.kt
+msgid "audio description"
+msgstr "syntolkning"
+
+#: web/util.js
+msgid "960×540 (reduced)"
+msgstr "960×540 (förminskad)"
+
+#: web/views.js
+msgid "Nothing to show"
+msgstr "Inget att visa"
+
+#: web/views.js
+msgid "<span class=\"k k-ok\">OK</span>Play"
+msgstr "<span class=\"k k-ok\">OK</span>Spela"
+
+#: web/views.js
+msgid "<span class=\"k k-red\"></span>Delete"
+msgstr "<span class=\"k k-red\"></span>Radera"
+
+#: web/views.js
+msgid "<span class=\"k k-green\"></span>Sort"
+msgstr "<span class=\"k k-green\"></span>Sortera"
+
+#: web/views.js
+msgid "<span class=\"k k-yellow\"></span>Channels"
+msgstr "<span class=\"k k-yellow\"></span>Kanaler"
+
+#: web/views.js
+msgid "<span class=\"k k-blue\"></span>Settings"
+msgstr "<span class=\"k k-blue\"></span>Inställningar"
+
+#: web/views.js
+msgid "<span class=\"k k-ret\">RETURN</span>Up"
+msgstr "<span class=\"k k-ret\">RETURN</span>Upp"
+
+#: web/views.js
+msgid "Loading recordings…"
+msgstr "Laddar inspelningar…"
+
+#: web/views.js
+msgid " — OK: retry, blue: settings"
+msgstr " — OK: försök igen, blå: inställningar"
+
+#: web/views.js android/MainActivity.kt
+msgid "Parent folder"
+msgstr "Överordnad mapp"
+
+#: web/views.js android/MainActivity.kt
+msgid "Folder"
+msgstr "Mapp"
+
+#: web/views.js android/MainActivity.kt
+msgid "Duration "
+msgstr "Längd "
+
+#: web/views.js
+msgid "<span style=\"color:#4fa3ff\">Watched up to "
+msgstr "<span style=\"color:#4fa3ff\">Sedd till "
+
+#: web/views.js
+msgid "</span>"
+msgstr "</span>"
+
+#: web/views.js android/MainActivity.kt
+msgid "Recordings"
+msgstr "Inspelningar"
+
+#: web/views.js
+msgid "  · A–Z"
+msgstr "  · A–Ö"
+
+#: web/views.js
+msgid "  · newest first"
+msgstr "  · nyaste först"
+
+#: web/views.js android/MainActivity.kt
+msgid "No recordings in this folder"
+msgstr "Inga inspelningar i den här mappen"
+
+#: web/views.js android/PlayerActivity.kt
+msgid " · duration "
+msgstr " · längd "
+
+#: web/views.js
+msgid "Resume?"
+msgstr "Fortsätta?"
+
+#: web/views.js android/MainActivity.kt
+msgid "Resume from "
+msgstr "Fortsätt från "
+
+#: web/views.js android/MainActivity.kt
+msgid "From the start"
+msgstr "Från början"
+
+#: web/views.js android/MainActivity.kt
+msgid "Delete the recording?"
+msgstr "Radera inspelningen?"
+
+#: web/views.js android/MainActivity.kt
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: web/views.js android/MainActivity.kt
+msgid "Delete"
+msgstr "Radera"
+
+#: web/views.js
+msgid "Deleting…"
+msgstr "Raderar…"
+
+#: web/views.js android/MainActivity.kt
+msgid "Recording deleted"
+msgstr "Inspelningen raderad"
+
+#: web/views.js
+msgid "Delete failed"
+msgstr "Det gick inte att radera"
+
+#: web/views.js
+msgid "Unknown error"
+msgstr "Okänt fel"
+
+#: web/views.js
+msgid "Sort: by name"
+msgstr "Sortering: efter namn"
+
+#: web/views.js android/MainActivity.kt
+msgid "Sort: newest first"
+msgstr "Sortering: nyaste först"
+
+#: web/views.js
+msgid "<span class=\"k k-ok\">OK</span>Watch"
+msgstr "<span class=\"k k-ok\">OK</span>Titta"
+
+#: web/views.js
+msgid "<span class=\"k k-yellow\"></span>Recordings"
+msgstr "<span class=\"k k-yellow\"></span>Inspelningar"
+
+#: web/views.js
+msgid "<span class=\"k k-ret\">RETURN</span>Back"
+msgstr "<span class=\"k k-ret\">RETURN</span>Tillbaka"
+
+#: web/views.js
+msgid "Loading bouquets…"
+msgstr "Laddar kanalgrupper…"
+
+#: web/views.js android/MainActivity.kt
+msgid "Channels"
+msgstr "Kanaler"
+
+#: web/views.js android/MainActivity.kt
+msgid "Bouquet"
+msgstr "Kanalgrupp"
+
+#: web/views.js android/MainActivity.kt
+msgid "No bouquets"
+msgstr "Inga kanalgrupper"
+
+#: web/views.js
+msgid "Loading channels…"
+msgstr "Laddar kanaler…"
+
+#: web/views.js
+msgid "Error"
+msgstr "Fel"
+
+#: web/views.js android/MainActivity.kt
+msgid "Channels › "
+msgstr "Kanaler › "
+
+#: web/views.js android/MainActivity.kt
+msgid "No channels in this bouquet"
+msgstr "Inga kanaler i den här kanalgruppen"
+
+#: web/views.js android/MainActivity.kt
+msgid "Settings"
+msgstr "Inställningar"
+
+#: web/views.js
+msgid "<span class=\"fld-label\">port</span>"
+msgstr "<span class=\"fld-label\">port</span>"
+
+#: web/views.js
+msgid "Current: <b>"
+msgstr "Nuvarande: <b>"
+
+#: web/views.js
+msgid "Installed from the box: "
+msgstr "Installerad från boxen: "
+
+#: web/views.js
+msgid "Screen size: <b>"
+msgstr "Skärmstorlek: <b>"
+
+#: web/views.js
+msgid "</b> (TV reports a width of "
+msgstr "</b> (TV:n rapporterar bredden "
+
+#: web/views.js
+msgid " px, scale "
+msgstr " px, skala "
+
+#: web/views.js
+msgid "App "
+msgstr "App "
+
+#: web/views.js
+msgid "Testing "
+msgstr "Testar "
+
+#: web/views.js
+msgid "Connection works: "
+msgstr "Anslutningen fungerar: "
+
+#: web/views.js
+msgid "No connection"
+msgstr "Ingen anslutning"
+
+#: web/views.js
+msgid ". Save anyway?"
+msgstr ". Spara ändå?"
+
+#: web/views.js android/MainActivity.kt
+msgid "Save"
+msgstr "Spara"
+
+#: web/views.js
+msgid "Fix"
+msgstr "Rätta"
+
+#: web/views.js
+msgid "Screen size: "
+msgstr "Skärmstorlek: "
+
+#: android/Box.kt
+msgid "OpenWebif requires a login – turn it off in the box settings"
+msgstr "OpenWebif kräver inloggning – stäng av den i boxens inställningar"
+
+#: android/Box.kt
+msgid "No connection to the box ("
+msgstr "Ingen anslutning till boxen ("
+
+#: android/Box.kt
+msgid "GB"
+msgstr "GB"
+
+#: android/Box.kt
+msgid "MB"
+msgstr "MB"
+
+#: android/Box.kt
+msgid "kB"
+msgstr "kB"
+
+#: android/MainActivity.kt
+msgid "in standby"
+msgstr "i viloläge"
+
+#: android/MainActivity.kt
+msgid "<font color='#FF5A5A'><b>● RECORDING</b></font> &nbsp; "
+msgstr "<font color='#FF5A5A'><b>● SPELAR IN</b></font> &nbsp; "
+
+#: android/MainActivity.kt
+msgid "<font color='#FF5A5A'>No connection to the box</font> · "
+msgstr "<font color='#FF5A5A'>Ingen anslutning till boxen</font> · "
+
+#: android/MainActivity.kt
+msgid "A–Z"
+msgstr "A–Ö"
+
+#: android/MainActivity.kt
+msgid "Newest first"
+msgstr "Nyaste först"
+
+#: android/MainActivity.kt
+msgid "OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs   ·   BACK parent folder"
+msgstr "OK spela   ·   långt OK: meny (radera, från början)   ·   ▲ upp till flikarna   ·   BACK överordnad mapp"
+
+#: android/MainActivity.kt
+msgid "OK watch   ·   ▲ up to tabs   ·   BACK back"
+msgstr "OK titta   ·   ▲ upp till flikarna   ·   BACK tillbaka"
+
+#: android/MainActivity.kt
+msgid "Check the box address: Settings"
+msgstr "Kontrollera boxens adress: Inställningar"
+
+#: android/MainActivity.kt
+msgid "<br/><font color='#4FA3FF'>Watched up to "
+msgstr "<br/><font color='#4FA3FF'>Sedd till "
+
+#: android/MainActivity.kt
+msgid "</font>"
+msgstr "</font>"
+
+#: android/MainActivity.kt
+msgid "Play from the start"
+msgstr "Spela från början"
+
+#: android/MainActivity.kt
+msgid "Delete recording"
+msgstr "Radera inspelning"
+
+#: android/MainActivity.kt
+msgid "Sort: A–Z"
+msgstr "Sortering: A–Ö"
+
+#: android/MainActivity.kt
+msgid "Delete failed: "
+msgstr "Det gick inte att radera: "
+
+#: android/MainActivity.kt
+msgid "IP address of the Enigma2 box (e.g. 192.168.1.10). OpenWebif must be enabled on port 80."
+msgstr "Enigma2-boxens IP-adress (t.ex. 192.168.1.10). OpenWebif måste vara aktiverat på port 80."
+
+#: android/MainActivity.kt
+msgid "App language"
+msgstr "Appens språk"
+
+#: android/MainActivity.kt
+msgid "Settings – E2TVPlayer "
+msgstr "Inställningar – E2TVPlayer "
+
+#: android/MainActivity.kt
+msgid "Find box"
+msgstr "Sök box"
+
+#: android/MainActivity.kt
+msgid "Searching for the box on the network…"
+msgstr "Söker efter boxen i nätverket…"
+
+#: android/MainActivity.kt
+msgid "No box with the E2TVPlayer plugin was found on the network. Enter the address manually."
+msgstr "Ingen box med E2TVPlayer-tillägget hittades i nätverket. Ange adressen manuellt."
+
+#: android/MainActivity.kt
+msgid "Enter address"
+msgstr "Ange adress"
+
+#: android/MainActivity.kt
+msgid "Close"
+msgstr "Stäng"
+
+#: android/PlayerActivity.kt
+msgid "▲▼ row   ◀▶ change   OK/BACK close"
+msgstr "▲▼ rad   ◀▶ ändra   OK/BACK stäng"
+
+#: android/PlayerActivity.kt
+msgid "The connection was lost or the recording's format is not supported."
+msgstr "Anslutningen bröts eller så stöds inte inspelningens format."
+
+#: android/PlayerActivity.kt
+msgid "▲▼ channel   ·   OK programme info   ·   long OK: audio and subtitles   ·   BACK stop"
+msgstr "▲▼ kanal   ·   OK programinfo   ·   långt OK: ljud och textning   ·   BACK stopp"
+
+#: android/PlayerActivity.kt
+msgid "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK pause and info   ·   long OK: audio and subtitles   ·   BACK stop"
+msgstr "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK paus och info   ·   långt OK: ljud och textning   ·   BACK stopp"
+
+#: android/PlayerActivity.kt
+msgid "No programme information"
+msgstr "Ingen programinformation"
+
+#: android/PlayerActivity.kt
+msgid " (audio description)"
+msgstr " (syntolkning)"
+
+#: android/PlayerActivity.kt
+msgid " (not supported)"
+msgstr " (stöds inte)"
+
+#: android/PlayerActivity.kt
+msgid "   ·   decoder: "
+msgstr "   ·   avkodare: "
+
+#: android/PlayerActivity.kt
+msgid "No audio tracks"
+msgstr "Inga ljudspår"
+
+#: android/PlayerActivity.kt
+msgid "Audio decoding"
+msgstr "Ljudavkodning"
+
+#: android/PlayerActivity.kt
+msgid "app (PCM)"
+msgstr "appen (PCM)"
+
+#: android/PlayerActivity.kt
+msgid "TV / Dolby passthrough"
+msgstr "TV / Dolby-genomkoppling"
+
+#: android/PlayerActivity.kt
+msgid "Audio is decoded in the app"
+msgstr "Ljudet avkodas i appen"
+
+#: android/PlayerActivity.kt
+msgid "Audio is decoded by the TV / device"
+msgstr "Ljudet avkodas av TV:n / enheten"
+
+#: android/Shots.kt
+msgid "Picture saved on the box: "
+msgstr "Bilden sparades på boxen: "
+
+#: android/Shots.kt
+msgid "Saving the picture failed ("
+msgstr "Det gick inte att spara bilden ("
+
+#: android/Shots.kt
+msgid "Saving the picture failed: "
+msgstr "Det gick inte att spara bilden: "
+
+#: box/info.py
+msgid "The plugin is not registered in OpenWebif yet. Restart the GUI (OpenWebif reads its plugins at start-up)."
+msgstr "Tillägget är inte registrerat i OpenWebif ännu. Starta om GUI:t (OpenWebif läser in sina tillägg vid start)."
+
+#: box/info.py
+msgid "OpenWebif is turned off - turn it on."
+msgstr "OpenWebif är avstängt - slå på det."
+
+#: box/info.py
+msgid "OpenWebif login is turned on. The TV apps cannot log in - turn the login off (at least for the local network)."
+msgstr "Inloggning i OpenWebif är påslagen. TV-apparna kan inte logga in - stäng av inloggningen (åtminstone för det lokala nätverket)."
+
+#: box/info.py
+msgid "<ol><li>Put the TV in developer mode: Apps &rarr; press 1, 2, 3, 4, 5 &rarr; Developer mode <b>On</b> and Host PC IP = the IP of your computer or phone. Restart the TV.</li><li>Download the package: <a href='/%(m)s/E2TVPlayer.wgt'><b>E2TVPlayer.wgt</b></a></li><li>Install it with the <a href='https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer'>Samsung Jellyfin Installer</a> (choose a custom .wgt). It takes care of the Samsung certificate.</li></ol><p>Updates come with the box plugin: just restart the app.</p>"
+msgstr "<ol><li>Sätt TV:n i utvecklarläge: Apps &rarr; tryck 1, 2, 3, 4, 5 &rarr; Developer mode <b>On</b> och Host PC IP = IP-adressen till din dator eller telefon. Starta om TV:n.</li><li>Ladda ner paketet: <a href='/%(m)s/E2TVPlayer.wgt'><b>E2TVPlayer.wgt</b></a></li><li>Installera det med <a href='https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer'>Samsung Jellyfin Installer</a> (välj en egen .wgt). Programmet tar hand om Samsungs certifikat.</li></ol><p>Uppdateringar kommer med boxens tillägg: starta bara om appen.</p>"
+
+#: box/info.py
+msgid "<p>The TV fetches the app from <a href='/widgetlist.xml'>http://%(h)s/widgetlist.xml</a>.</p><ol><li>TV: Menu &rarr; Smart Hub &rarr; Samsung Account &rarr; Log in. User <b>develop</b> (password empty or 000000).</li><li>Smart Hub &rarr; hold OK on any app &rarr; <b>IP Setting</b> &rarr; <b>%(h)s</b></li><li>Hold OK again &rarr; <b>Start User App Sync</b>.</li><li>The app <b>%(t)s</b> appears in My Apps.</li></ol><p>Update: repeat step 3 and then restart the TV. <a href='/%(m)s/%(z)s'>Download zip</a></p>"
+msgstr "<p>TV:n hämtar appen från <a href='/widgetlist.xml'>http://%(h)s/widgetlist.xml</a>.</p><ol><li>TV: Meny &rarr; Smart Hub &rarr; Samsung-konto &rarr; Logga in. Användare <b>develop</b> (lösenord tomt eller 000000).</li><li>Smart Hub &rarr; håll OK intryckt på valfri app &rarr; <b>IP Setting</b> &rarr; <b>%(h)s</b></li><li>Håll OK intryckt igen &rarr; <b>Start User App Sync</b>.</li><li>Appen <b>%(t)s</b> visas under Mina appar.</li></ol><p>Uppdatering: upprepa steg 3 och starta sedan om TV:n. <a href='/%(m)s/%(z)s'>Ladda ner zip</a></p>"
+
+#: box/info.py box/web.py
+msgid "Screenshots"
+msgstr "Skärmbilder"
+
+#: box/info.py
+msgid "Subtitle extraction"
+msgstr "Extrahering av textning"
+
+#: box/info.py
+msgid "The app language is chosen on the TV in the TOOLS menu (by default the TV's language)."
+msgstr "Appens språk väljs på TV:n i TOOLS-menyn (som standard TV:ns språk)."
+
+#: box/info.py
+msgid "The OpenWebif port is %s. The old Samsung app sync only works on port 80."
+msgstr "OpenWebif-porten är %s. Den gamla Samsungs appsynkronisering fungerar bara på port 80."
+
+#: box/info.py
+msgid "Box address:"
+msgstr "Boxens adress:"
+
+#: box/info.py
+msgid "<ol><li>Install the <b>Downloader</b> app (AFTVnews) on the TV from Google Play.</li><li>In the settings, allow Downloader to <i>install unknown apps</i>.</li><li>Enter the address <b>%(h)s/%(m)s</b> in Downloader and choose the link below.</li></ol>"
+msgstr "<ol><li>Installera appen <b>Downloader</b> (AFTVnews) på TV:n från Google Play.</li><li>Tillåt i inställningarna att Downloader <i>installerar okända appar</i>.</li><li>Skriv adressen <b>%(h)s/%(m)s</b> i Downloader och välj länken nedan.</li></ol>"
+
+#: box/info.py
+msgid "The Google TV app is not included in this package."
+msgstr "Google TV-appen ingår inte i det här paketet."
+
+#: box/info.py
+msgid "Pictures taken from the TOOLS menu of the TV app are saved in"
+msgstr "Bilder som tas från TV-appens TOOLS-meny sparas i"
+
+#: box/info.py
+msgid "Show the pictures"
+msgstr "Visa bilderna"
+
+#: box/info.py
+msgid "Start-up log of the TV apps (device, language, version):"
+msgstr "TV-apparnas startlogg (enhet, språk, version):"
+
+#: box/info.py
+msgid "Show the log"
+msgstr "Visa loggen"
+
+#: box/info.py
+msgid "The box extracts the DVB subtitles of a recording the first time it is played, into the folder %s. On live channels the subtitles are extracted from the broadcast."
+msgstr "Boxen extraherar en inspelnings DVB-textning första gången den spelas, till mappen %s. På livekanaler extraheras textningen från sändningen."
+
+#: box/info.py
+msgid "Note"
+msgstr "Obs"
+
+#: box/info.py
+msgid "Video frame in Samsung pictures: opkg install ffmpeg"
+msgstr "Videobild i Samsung-bilder: opkg install ffmpeg"
+
+#: box/info.py
+msgid "Download"
+msgstr "Ladda ner"
+
+#: box/plugin.py
+msgid "OK / EXIT = close    up/down = scroll"
+msgstr "OK / EXIT = stäng    upp/ned = rulla"
+
+#: box/plugin.py
+msgid "Recordings and live TV for Samsung and Google TV televisions"
+msgstr "Inspelningar och live-TV för Samsung- och Google TV-televisioner"
+
+#: box/web.py
+msgid "Folder:"
+msgstr "Mapp:"
+
+#: box/web.py
+msgid "No pictures yet. Take one from the TOOLS menu of the TV app."
+msgstr "Inga bilder ännu. Ta en från TV-appens TOOLS-meny."
+
+#: box/web.py
+msgid "The Google TV app is not in this package."
+msgstr "Google TV-appen finns inte i det här paketet."
+
+#: box/web.py
+msgid "no picture"
+msgstr "ingen bild"

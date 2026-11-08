@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 E2TVPlayer contributors
-# Rakentaa allekirjoittamattoman Tizen-paketin (E2TVPlayer.wgt) ilman boksia.
-# Käyttö: build_wgt.py <hakemisto tai .wgt-tiedosto> [boksin osoite]
+# Builds the unsigned Tizen package (E2TVPlayer.wgt) without a box.
+# Usage: build_wgt.py <directory or .wgt file> [box address]
 import importlib.util
 import io
 import os

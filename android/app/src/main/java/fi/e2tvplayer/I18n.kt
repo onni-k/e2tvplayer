@@ -7,11 +7,12 @@ import org.json.JSONObject
 import java.util.Locale
 
 /**
- * Sovelluksen kieli: "auto" (laitteen kieli) tai kielikoodi. Lähdekieli on suomi;
- * käännökset tulevat repon po-kansion .po-tiedostoista (tools/i18n.py -> assets/i18n.json).
+ * App language: "auto" (the device language) or a language code. The source language is English;
+ * translations come from the .po files in the repository po folder (tools/i18n.py -> assets/i18n.json).
  */
 object I18n {
-    private val names = linkedMapOf("fi" to "suomi")
+    const val SOURCE = "en"
+    private val names = linkedMapOf(SOURCE to "English")
     private val tables = HashMap<String, Map<String, String>>()
 
     fun init(ctx: Context) {
@@ -38,22 +39,19 @@ object I18n {
         return if (v != "auto" && names.containsKey(v)) v else "auto"
     }
 
+    /** the device language; one without a translation falls back to English */
     fun sys(): String {
-        val l = Locale.getDefault().language.lowercase().let { if (it == "sv" || it == "swe") "sv" else it.take(2) }
-        return when {
-            names.containsKey(l) -> l
-            names.containsKey("en") -> "en"
-            else -> "fi"
-        }
+        val l = Locale.getDefault().language.lowercase().let { if (it == "swe") "sv" else it.take(2) }
+        return if (names.containsKey(l)) l else SOURCE
     }
 
     fun cur(): String = pref().let { if (it == "auto") sys() else it }
 
-    /** muu kuin suomi: desimaalipiste */
-    fun en(): Boolean = cur() != "fi"
+    /** decimal comma (Finnish, Swedish) or point */
+    fun decimalComma(): Boolean = cur() == "fi" || cur() == "sv"
 
     fun label(v: String = pref()): String =
-        if (v == "auto") T("automaattinen") + " (" + name(sys()) + ")" else name(v)
+        if (v == "auto") T("automatic") + " (" + name(sys()) + ")" else name(v)
 
     fun cycle(d: Int) {
         val o = listOf("auto") + langs()
@@ -63,11 +61,11 @@ object I18n {
 
     fun tr(s: String): String {
         val c = cur()
-        return if (c == "fi") s else tables[c]?.get(s) ?: s
+        return if (c == SOURCE) s else tables[c]?.get(s) ?: s
     }
 }
 
 fun T(s: String): String = I18n.tr(s)
 
-/** Merkitsee tekstin käännettäväksi kääntämättä sitä vielä. */
+/** Marks a text for translation without translating it yet. */
 fun N(s: String): String = s

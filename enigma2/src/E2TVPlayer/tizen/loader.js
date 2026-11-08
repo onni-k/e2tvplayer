@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
-/* Lataa sovelluksen koodin boksista, jotta Tizen-sovellus tarvitsee asentaa vain kerran:
-   boksin lisäosan päivitys päivittää myös TV-sovelluksen. Jos boksi ei vastaa (tai sen
-   koodi ei lataudu), käytetään paketin omaa kopiota. */
+/* Loads the app code from the box, so the Tizen app needs to be installed only once:
+   updating the box plugin also updates the TV app. If the box does not answer (or its
+   code does not load), the copy in the package is used. */
 var E2Loader = {
 	FILES: ['js/util.js', 'js/api.js', 'js/listview.js', 'js/player.js', 'js/subs.js', 'js/views.js', 'js/main.js'],
-	source: 'paketti',
+	source: 'package',
 
 	host: function () {
 		var h = '';
@@ -26,7 +26,7 @@ var E2Loader = {
 			try { info = JSON.parse(x.responseText); } catch (e) { info = null; }
 			if (x.status === 200 && info && info.app === 'E2TVPlayer' && info.web) {
 				done = true;
-				if (info.files && info.files.length) { E2Loader.FILES = info.files; }   /* uudet tiedostot boksin mukaan */
+				if (info.files && info.files.length) { E2Loader.FILES = info.files; }   /* new file list from the box */
 				E2Loader.load('http://' + h + '/e2tvplayer/web/', info.version || '');
 			} else {
 				local();
@@ -39,7 +39,7 @@ var E2Loader = {
 		var q = ver ? '?v=' + encodeURIComponent(ver) : '';
 		var head = document.getElementsByTagName('head')[0];
 		if (base) {
-			E2Loader.source = 'boksi';
+			E2Loader.source = 'box';
 			if (ver) { window.BOX_PLUGIN_VERSION = ver; }
 			var css = document.createElement('link');
 			css.rel = 'stylesheet';
@@ -58,7 +58,7 @@ var E2Loader = {
 			s.src = base + E2Loader.FILES[i] + q;
 			s.onload = function () { i++; next(); };
 			s.onerror = function () {
-				/* boksin koodi ei latautunut: käynnistetään paketin omalla kopiolla */
+				/* the box code did not load: start with the copy in the package */
 				if (base) { location.replace('index.html?local=1'); }
 			};
 			head.appendChild(s);

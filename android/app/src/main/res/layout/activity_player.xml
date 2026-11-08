@@ -23,7 +23,7 @@
         android:layout_gravity="center"
         android:visibility="gone" />
 
-    <!-- INFO: ohjelmatiedot -->
+    <!-- INFO: programme info -->
     <LinearLayout
         android:id="@+id/info"
         android:layout_width="match_parent"
@@ -72,7 +72,7 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- Ääni ja tekstitys -->
+    <!-- Audio and subtitles -->
     <LinearLayout
         android:id="@+id/tracks"
         android:layout_width="560dp"
@@ -87,7 +87,7 @@
             android:id="@+id/trHead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ääni ja tekstitys"
+            android:text="Audio and subtitles"
             android:textColor="@color/text_hi"
             android:textSize="20sp" />
 
@@ -103,12 +103,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="▲▼ rivi   ◀▶ vaihda   OK/BACK sulje"
+            android:text="▲▼ row   ◀▶ change   OK/BACK close"
             android:textColor="@color/text_dim"
             android:textSize="13sp" />
     </LinearLayout>
 
-    <!-- Alapalkki -->
+    <!-- Bottom bar -->
     <RelativeLayout
         android:id="@+id/osd"
         android:layout_width="match_parent"

@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-// Versio luetaan boksin lisäosasta, jotta molemmat pysyvät samassa numerossa
+// the version is read from the box plugin so that both have the same number
 val e2Version: String = run {
     val f = rootProject.file("../enigma2/src/E2TVPlayer/web.py")
     val m = if (f.exists()) Regex("^VERSION = \"([0-9.]+)\"", RegexOption.MULTILINE).find(f.readText()) else null
@@ -25,7 +25,7 @@ android {
     }
 
     signingConfigs {
-        // Sama avain joka rakennuksessa, jotta päivitys asentuu vanhan päälle
+        // the same key in every build so that an update installs over the old version
         create("e2") {
             storeFile = rootProject.file("e2tvplayer.keystore")
             storePassword = "e2tvplayer"
@@ -62,14 +62,14 @@ dependencies {
     val media3 = "1.3.1"
     implementation("androidx.media3:media3-exoplayer:$media3")
     implementation("androidx.media3:media3-ui:$media3")
-    // FFmpeg-äänidekooderi (AC-3, E-AC-3, AAC, MP2 ...) PCM:ksi: ääni kuuluu, vaikka TV ei osaisi Dolbya
+    // FFmpeg audio decoder (AC-3, E-AC-3, AAC, MP2 ...) to PCM: audio plays even if the TV has no Dolby
     implementation("org.jellyfin.media3:media3-ffmpeg-decoder:$media3+")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
     implementation("androidx.annotation:annotation:1.8.0")
 }
 
-// APK:n nimeksi E2TVPlayer.apk
+// name the APK E2TVPlayer.apk
 android.applicationVariants.all {
     outputs.all {
         (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = "E2TVPlayer.apk"

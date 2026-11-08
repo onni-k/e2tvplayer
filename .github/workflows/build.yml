@@ -23,11 +23,11 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v3
 
-      - name: Google TV -sovellus (APK)
+      - name: Google TV app (APK)
         working-directory: android
         run: ./gradlew --no-daemon assembleRelease
 
-      - name: Boksin lisäosa (ipk, APK mukana)
+      - name: Box plugin (ipk with the APK)
         run: |
           E2TVPLAYER_APK=$PWD/android/app/build/outputs/apk/release/E2TVPlayer.apk OUT=$PWD/dist sh enigma2/build_ipk.sh
           cp android/app/build/outputs/apk/release/E2TVPlayer.apk dist/
@@ -40,7 +40,7 @@ jobs:
           name: e2tvplayer
           path: dist/*
 
-      - name: Julkaisu (tagi v*)
+      - name: Release (tag v*)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
@@ -56,9 +56,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Käännökset ajan tasalla (po/*.po)
+      - name: Translations up to date (po/*.po)
         run: python3 tools/i18n.py check
-      - name: Samsung (Orsay) ja Tizen -sovellusten testit
+      - name: Samsung (Orsay) and Tizen app tests
         working-directory: tests/web
         run: |
           npm install --no-audit --no-fund
@@ -82,13 +82,13 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Simuloitu boksi
+      - name: Simulated box
         run: |
           mkdir -p apk && cp dist/E2TVPlayer.apk apk/
           sudo nohup python3 tests/fake_box.py 80 > box.log 2>&1 &
           sleep 2 && curl -s http://127.0.0.1/e2tvplayer/info
 
-      - name: Emulaattoritesti
+      - name: Emulator test
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
@@ -100,7 +100,7 @@ jobs:
           disable-animations: true
           script: OUT=shots sh tests/tv_test.sh
 
-      - name: Tulokset builds-haaraan
+      - name: Results to the builds branch
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

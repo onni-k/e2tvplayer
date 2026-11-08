@@ -1,23 +1,23 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
-/* Tallenteen DVB-tekstitykset. Boksi purkaa ne kuviksi (E2TVPlayer subs.py),
-   ja tämä moduuli näyttää oikean kuvan videon päällä toistokohdan mukaan. */
+/* DVB subtitles. The box renders them into images (E2TVPlayer subs.py / live.py),
+   and this module shows the right image over the video according to the playback position. */
 var Subs = {
 	file: null,
-	tracks: [],          /* [{key, lang, label}] boksilta */
+	tracks: [],          /* [{key, lang, label}] from the box */
 	status: '',
 	progress: 0,
 	error: '',
 	teletext: 0,
 	dw: 720,
 	dh: 576,
-	key: null,           /* valittu raita */
+	key: null,           /* the chosen track */
 	cues: [],
 	pollTimer: null,
 	shown: -1,
-	gen: 0,              /* estää vanhojen vastausten sotkemasta uutta toistoa */
-	liveId: null,        /* live-lähetyksen istunto boksilla */
+	gen: 0,              /* keeps old responses from mixing into a new playback */
+	liveId: null,        /* live session on the box */
 	liveGen: 0,
-	audio: [],          /* boksin tieto ääniraidoista: [{lang, codec}] PMT-järjestyksessä */
+	audio: [],          /* the box's audio track info: [{lang, codec}] in PMT order */
 
 	start: function (item) {
 		Subs.stop();
@@ -62,7 +62,7 @@ var Subs = {
 		return Subs.liveId ? Api.liveImgUrl(Subs.liveId, Subs.key, n) : Api.subImgUrl(Subs.file, Subs.key, n);
 	},
 
-	/* Live: boksi lähettää myös viimeisimmän vihjeen uudelleen, koska sen loppuaika tarkentuu vasta myöhemmin */
+	/* live: the box also resends the latest cue, because its end time becomes known only later */
 	pollLive: function () {
 		var gen = Subs.gen, id = Subs.liveId, key = Subs.key;
 		if (Subs.pollTimer) { clearTimeout(Subs.pollTimer); Subs.pollTimer = null; }
@@ -124,19 +124,19 @@ var Subs = {
 			}
 			if (!hadTracks && Subs.tracks.length && !Subs.key) { Subs.autoSelect(); }
 			if (Player.tracksOpen && Player.tracksOpen()) { Player.renderTracks(); }
-			/* jatketaan kyselyä niin kauan kuin purku on kesken */
+			/* keep polling while the extraction is in progress */
 			if (Subs.running() || (Subs.key && Subs.key !== key)) {
 				Subs.pollTimer = setTimeout(Subs.poll, Subs.status === 'starting' ? 1500 : (Subs.key ? 4000 : 6000));
 			}
 		}, function () {
 			if (gen !== Subs.gen) { return; }
 			Subs.status = 'error';
-			Subs.error = T('boksi ei vastaa');
+			Subs.error = T('box does not respond');
 			Subs.pollTimer = setTimeout(Subs.poll, 15000);
 		});
 	},
 
-	/* Valitsee automaattisesti saman tekstityksen kuin viimeksi */
+	/* chooses the same subtitles as last time automatically */
 	autoSelect: function () {
 		var pref = Store.get('subPref', ''), i;
 		if (!pref) { return; }
@@ -162,11 +162,11 @@ var Subs = {
 
 	label: function (t) {
 		var s = TL(t.label);
-		if (Subs.running()) { s += T(' – haetaan ') + Math.round(Subs.progress * 100) + ' %'; }
+		if (Subs.running()) { s += T(' – loading ') + Math.round(Subs.progress * 100) + ' %'; }
 		return s;
 	},
 
-	/* Etsii kohdassa t näkyvän vihjeen (lista on aikajärjestyksessä) */
+	/* finds the cue shown at time t (the list is in time order) */
 	find: function (t) {
 		var c = Subs.cues, lo = 0, hi = c.length - 1, mid, found = -1;
 		while (lo <= hi) {
@@ -192,7 +192,7 @@ var Subs = {
 		img.style.height = Math.round(c.h * sy) + 'px';
 		U.show('sublayer', true);
 		Subs.shown = idx;
-		/* ladataan seuraava kuva valmiiksi */
+		/* preload the next image */
 		if (idx + 1 < Subs.cues.length) {
 			try { (new Image()).src = Subs.imgUrl(Subs.cues[idx + 1].n); } catch (e) { }
 		}

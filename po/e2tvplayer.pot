@@ -1,4 +1,4 @@
-# E2TVPlayer – käännös / translation
+# E2TVPlayer translation
 # SPDX-License-Identifier: GPL-3.0-or-later
 msgid ""
 msgstr ""
@@ -8,111 +8,111 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: web/api.js
-msgid "Aikakatkaisu ("
+msgid "Timeout ("
 msgstr ""
 
 #: web/api.js
-msgid "Virheellinen vastaus boksilta"
+msgid "Invalid response from the box"
 msgstr ""
 
 #: web/api.js
-msgid "OpenWebif vaatii kirjautumisen - ota se pois päältä boksin asetuksista"
+msgid "OpenWebif requires a login - turn it off in the box settings"
 msgstr ""
 
 #: web/api.js android/Box.kt
-msgid "Yhteysvirhe "
+msgid "Connection error "
 msgstr ""
 
 #: web/api.js
-msgid "Yhteys epäonnistui: "
+msgid "Connection failed: "
 msgstr ""
 
 #: web/main.js
-msgid "Boksin osoite puuttuu"
+msgid "Box address missing"
 msgstr ""
 
 #: web/main.js
-msgid "Syötä Enigma2-boksin IP-osoite."
+msgid "Enter the IP address of the Enigma2 box."
 msgstr ""
 
 #: web/main.js
-msgid "Etsitään boksia…"
+msgid "Searching for the box…"
 msgstr ""
 
 #: web/main.js android/MainActivity.kt
-msgid "Boksi löytyi: "
+msgid "Box found: "
 msgstr ""
 
 #: web/main.js android/MainActivity.kt
-msgid "Valitse boksi"
+msgid "Choose a box"
 msgstr ""
 
 #: web/main.js
-msgid "Lähiverkosta löytyi useampi boksi."
+msgid "More than one box was found on the network."
 msgstr ""
 
 #: web/main.js android/MainActivity.kt
-msgid "Boksia ei löytynyt"
+msgid "Box not found"
 msgstr ""
 
 #: web/main.js android/MainActivity.kt
-msgid "Lopetetaanko E2TVPlayer?"
+msgid "Quit E2TVPlayer?"
 msgstr ""
 
 #: web/main.js android/MainActivity.kt
-msgid "Kyllä"
+msgid "Yes"
 msgstr ""
 
 #: web/main.js android/MainActivity.kt
-msgid "Ei"
+msgid "No"
 msgstr ""
 
 #: web/main.js
-msgid "Boksi valmiustilassa"
+msgid "Box in standby"
 msgstr ""
 
 #: web/main.js
-msgid "<span class=\"rec\">● TALLENTAA</span> &nbsp; "
+msgid "<span class=\"rec\">● RECORDING</span> &nbsp; "
 msgstr ""
 
 #: web/main.js android/MainActivity.kt
-msgid "Boksi "
+msgid "Box "
 msgstr ""
 
 #: web/main.js
-msgid "<span class=\"rec\">Ei yhteyttä boksiin</span> &nbsp; "
+msgid "<span class=\"rec\">No connection to the box</span> &nbsp; "
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "Puskuroidaan…"
+msgid "Buffering…"
 msgstr ""
 
 #: web/player.js
-msgid "Toisto ei käynnistynyt"
+msgid "Playback did not start"
 msgstr ""
 
 #: web/player.js
-msgid "Välitys ei toiminut – toistetaan suoraan (ei tekstityksiä)"
+msgid "Relay failed – playing directly (no subtitles)"
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "Tarkista, että boksin striimaus (portti 8001) on käytössä ja viritin vapaana."
+msgid "Check that streaming (port 8001) is enabled on the box and a tuner is free."
 msgstr ""
 
 #: web/player.js
-msgid "TV ei ehkä tue tallenteen muotoa (esim. tekstitys- tai äänimuoto) tai yhteys katkesi."
+msgid "The TV may not support the recording's format (e.g. subtitle or audio format), or the connection was lost."
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "Toistovirhe"
+msgid "Playback error"
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "❚❚ Tauko"
+msgid "❚❚ Paused"
 msgstr ""
 
 #: web/player.js
-msgid "Odota hetki - puskuroidaan"
+msgid "Please wait - buffering"
 msgstr ""
 
 #: web/player.js
@@ -124,893 +124,889 @@ msgid "LIVE"
 msgstr ""
 
 #: web/player.js
-msgid "CH +/- tai ▲▼ kanava &nbsp; INFO ohjelmatiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta"
+msgid "CH +/- or ▲▼ channel &nbsp; INFO programme info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop"
 msgstr ""
 
 #: web/player.js
-msgid "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK tauko &nbsp; INFO tiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta"
+msgid "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK pause &nbsp; INFO info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop"
 msgstr ""
 
 #: web/player.js
-msgid "Puskuroidaan "
+msgid "Buffering "
 msgstr ""
 
 #: web/player.js
-msgid "Tallenne katsottu loppuun"
+msgid "Recording watched to the end"
 msgstr ""
 
 #: web/player.js
-msgid "Lähetys katkesi"
+msgid "Broadcast interrupted"
 msgstr ""
 
 #: web/player.js
-msgid "Yhteys boksiin epäonnistui"
+msgid "Connection to the box failed"
 msgstr ""
 
 #: web/player.js
-msgid "Verkkoyhteys katkesi"
+msgid "Network connection lost"
 msgstr ""
 
 #: web/player.js
-msgid "Tiedostoa ei löytynyt"
+msgid "File not found"
 msgstr ""
 
 #: web/player.js
-msgid "Toistovirhe (koodi "
+msgid "Playback error (code "
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid " · jäljellä "
+msgid " · remaining "
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "Seuraavaksi "
+msgid "Next "
 msgstr ""
 
 #: web/player.js
-msgid "<span class=\"cast\">Ei ohjelmatietoja</span>"
+msgid "<span class=\"cast\">No programme information</span>"
 msgstr ""
 
 #: web/player.js
-msgid "ääni"
+msgid "audio"
 msgstr ""
 
 #: web/player.js
-msgid "tekstitys"
+msgid "subtitles"
 msgstr ""
 
 #: web/player.js
-msgid "ei tukea"
+msgid "not supported"
 msgstr ""
 
 #: web/player.js web/util.js
-msgid "raita "
+msgid "track "
 msgstr ""
 
 #: web/player.js
-msgid "TV ilmoittaa: "
+msgid "TV reports: "
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "pois"
+msgid "off"
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: luetaan tallennetta…"
+msgid "Box: reading the recording…"
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: tekstityksiä puretaan "
+msgid "Box: extracting subtitles "
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: tekstitykset purettu"
+msgid "Box: subtitles extracted"
 msgstr ""
 
 #: web/player.js
-msgid " kpl)"
+msgid ")"
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: tallenteessa ei DVB-tekstityksiä"
+msgid "Box: no DVB subtitles in the recording"
 msgstr ""
 
 #: web/player.js
-msgid " (vain teksti-TV-tekstitys, ei vielä tuettu)"
+msgid " (teletext subtitles only, not supported yet)"
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: "
+msgid "Box: "
 msgstr ""
 
 #: web/player.js
-msgid "virhe"
+msgid "error"
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: purku keskeytyi"
+msgid "Box: extraction interrupted"
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: ei tietoa"
+msgid "Box: no information"
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: odotetaan lähetystä…"
+msgid "Box: waiting for the broadcast…"
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: tekstitykset puretaan lähetyksestä"
+msgid "Box: subtitles extracted from the broadcast"
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: kanavalla ei nyt DVB-tekstityksiä"
+msgid "Box: no DVB subtitles on this channel now"
 msgstr ""
 
 #: web/player.js
-msgid " (vain teksti-TV, ei vielä tuettu)"
+msgid " (teletext only, not supported yet)"
 msgstr ""
 
 #: web/player.js
-msgid "Boksi: lähetys päättyi"
+msgid "Box: broadcast ended"
 msgstr ""
 
 #: web/player.js
-msgid "Tekstitykset eivät ole käytössä (suora toisto)"
+msgid "Subtitles not available (direct playback)"
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "oletus"
+msgid "default"
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "ei tarjolla"
+msgid "not available"
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "Ääni"
+msgid "Audio"
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "Tekstitys"
+msgid "Subtitles"
 msgstr ""
 
 #: web/player.js
-msgid "Ajoitus"
+msgid "Timing"
 msgstr ""
 
 #: web/player.js
-msgid "  (aiemmin)"
+msgid "  (earlier)"
 msgstr ""
 
 #: web/player.js
-msgid "  (myöhemmin)"
+msgid "  (later)"
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "Kieli"
+msgid "Language"
 msgstr ""
 
 #: web/player.js
-msgid "  (käynnistyy uudelleen)"
+msgid "  (restarts)"
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "Kuvakaappaus"
+msgid "Screenshot"
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "odota…"
+msgid "wait…"
 msgstr ""
 
 #: web/player.js android/PlayerActivity.kt
-msgid "OK: ota kuva 10 s päästä"
+msgid "OK: take a picture in 10 s"
 msgstr ""
 
 #: web/player.js
-msgid "Listanäkymää ei voi kuvata tässä TV:ssä (vain toistossa videokuva)"
+msgid "The list view cannot be captured on this TV (video frame only during playback)"
 msgstr ""
 
 #: web/player.js
-msgid "näkymä"
+msgid "view"
 msgstr ""
 
 #: web/player.js
-msgid "videokuva"
+msgid "video frame"
 msgstr ""
 
 #: web/player.js
-msgid "Kuva tallennettu boksiin ("
+msgid "Picture saved on the box ("
 msgstr ""
 
 #: web/player.js
-msgid " + videokuva"
+msgid " + video frame"
 msgstr ""
 
 #: web/player.js
-msgid "Kuvan tallennus epäonnistui"
+msgid "Saving the picture failed"
 msgstr ""
 
 #: web/subs.js
-msgid "boksi ei vastaa"
+msgid "box does not respond"
 msgstr ""
 
 #: web/subs.js
-msgid " – haetaan "
+msgid " – loading "
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "käytössä"
+msgid "in use"
 msgstr ""
 
 #: web/util.js
-msgid "valittu"
+msgid "chosen"
 msgstr ""
 
 #: web/util.js android/I18n.kt
-msgid "automaattinen"
+msgid "automatic"
 msgstr ""
 
 #: web/util.js
-msgid "Boksin osoite"
+msgid "Box address"
 msgstr ""
 
 #: web/util.js
-msgid "Numeronäppäimet syöttävät, vasen/oikea vaihtaa kenttää, ylös/alas muuttaa arvoa."
+msgid "Number keys enter digits, left/right moves between fields, up/down changes the value."
 msgstr ""
 
 #: web/util.js
-msgid "<span class=\"k k-ok\">OK</span> Tallenna &nbsp; <span class=\"k k-red\"></span> Palauta oletus &nbsp; <span class=\"k k-green\"></span> Näytön koko &nbsp; <span class=\"k k-ret\">RETURN</span> Peruuta"
+msgid "<span class=\"k k-ok\">OK</span> Save &nbsp; <span class=\"k k-red\"></span> Reset &nbsp; <span class=\"k k-green\"></span> Screen size &nbsp; <span class=\"k k-ret\">RETURN</span> Cancel"
 msgstr ""
 
 #: web/util.js android/PlayerActivity.kt
-msgid "Ääni ja tekstitys"
+msgid "Audio and subtitles"
 msgstr ""
 
 #: web/util.js
-msgid "▲▼ rivi &nbsp; ◀▶ vaihda &nbsp; OK/RETURN sulje"
+msgid "▲▼ row &nbsp; ◀▶ change &nbsp; OK/RETURN close"
 msgstr ""
 
 #: web/util.js
-msgid "Ladataan&hellip;"
+msgid "Loading&hellip;"
 msgstr ""
 
 #: web/util.js android/PlayerActivity.kt
-msgid " (kuulovammaiset)"
+msgid " (hard of hearing)"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "su ma ti ke to pe la"
+msgid "Sun Mon Tue Wed Thu Fri Sat"
 msgstr ""
 
 #: web/util.js
-msgid "Ladataan…"
+msgid "Loading…"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "Näyttelijät"
+msgid "Cast"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "Ohjaaja"
+msgid "Director"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "Tuottaja"
+msgid "Producer"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "Käsikirjoitus"
+msgid "Writer"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "Juontaja"
+msgid "Presenter"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "Vieraat"
+msgid "Guests"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "Selostaja"
+msgid "Commentator"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "Kertoja"
+msgid "Narrator"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "Musiikki"
+msgid "Music"
 msgstr ""
 
 #: web/util.js
-msgid "Maa"
+msgid "Country"
 msgstr ""
 
 #: web/util.js
-msgid "Vuosi"
+msgid "Year"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "suomi"
+msgid "Finnish"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "ruotsi"
+msgid "Swedish"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "englanti"
+msgid "English"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "hollanti"
+msgid "Dutch"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "saksa"
+msgid "German"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "ranska"
+msgid "French"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "espanja"
+msgid "Spanish"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "italia"
+msgid "Italian"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "venäjä"
+msgid "Russian"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "tanska"
+msgid "Danish"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "norja"
+msgid "Norwegian"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "viro"
+msgid "Estonian"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "saame"
+msgid "Sami"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "alkuperäinen"
+msgid "original"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "muu"
+msgid "other"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "tuntematon"
+msgid "unknown"
 msgstr ""
 
 #: web/util.js android/Box.kt
-msgid "kuvailutulkkaus"
+msgid "audio description"
 msgstr ""
 
 #: web/util.js
-msgid "960×540 (pienennetty)"
+msgid "960×540 (reduced)"
 msgstr ""
 
 #: web/views.js
-msgid "Ei mitään näytettävää"
+msgid "Nothing to show"
 msgstr ""
 
 #: web/views.js
-msgid "<span class=\"k k-ok\">OK</span>Toista"
+msgid "<span class=\"k k-ok\">OK</span>Play"
 msgstr ""
 
 #: web/views.js
-msgid "<span class=\"k k-red\"></span>Poista"
+msgid "<span class=\"k k-red\"></span>Delete"
 msgstr ""
 
 #: web/views.js
-msgid "<span class=\"k k-green\"></span>Järjestys"
+msgid "<span class=\"k k-green\"></span>Sort"
 msgstr ""
 
 #: web/views.js
-msgid "<span class=\"k k-yellow\"></span>Kanavat"
+msgid "<span class=\"k k-yellow\"></span>Channels"
 msgstr ""
 
 #: web/views.js
-msgid "<span class=\"k k-blue\"></span>Asetukset"
+msgid "<span class=\"k k-blue\"></span>Settings"
 msgstr ""
 
 #: web/views.js
-msgid "<span class=\"k k-ret\">RETURN</span>Ylös"
+msgid "<span class=\"k k-ret\">RETURN</span>Up"
 msgstr ""
 
 #: web/views.js
-msgid "Haetaan tallenteita…"
+msgid "Loading recordings…"
 msgstr ""
 
 #: web/views.js
-msgid " — OK: yritä uudelleen, sininen: asetukset"
+msgid " — OK: retry, blue: settings"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Ylempi kansio"
+msgid "Parent folder"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Kansio"
+msgid "Folder"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Kesto "
+msgid "Duration "
 msgstr ""
 
 #: web/views.js
-msgid "<span style=\"color:#4fa3ff\">Katsottu "
+msgid "<span style=\"color:#4fa3ff\">Watched up to "
 msgstr ""
 
 #: web/views.js
-msgid " asti</span>"
+msgid "</span>"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Tallenteet"
+msgid "Recordings"
 msgstr ""
 
 #: web/views.js
-msgid "  · A–Ö"
+msgid "  · A–Z"
 msgstr ""
 
 #: web/views.js
-msgid "  · uusin ensin"
+msgid "  · newest first"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Kansiossa ei ole tallenteita"
+msgid "No recordings in this folder"
 msgstr ""
 
 #: web/views.js android/PlayerActivity.kt
-msgid " · kesto "
+msgid " · duration "
 msgstr ""
 
 #: web/views.js
-msgid "Jatketaanko?"
+msgid "Resume?"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Jatka kohdasta "
+msgid "Resume from "
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Alusta"
+msgid "From the start"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Poistetaanko tallenne?"
+msgid "Delete the recording?"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Peruuta"
+msgid "Cancel"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Poista"
+msgid "Delete"
 msgstr ""
 
 #: web/views.js
-msgid "Poistetaan…"
+msgid "Deleting…"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Tallenne poistettu"
+msgid "Recording deleted"
 msgstr ""
 
 #: web/views.js
-msgid "Poisto epäonnistui"
+msgid "Delete failed"
 msgstr ""
 
 #: web/views.js
-msgid "Tuntematon virhe"
+msgid "Unknown error"
 msgstr ""
 
 #: web/views.js
-msgid "Järjestys: nimen mukaan"
-msgstr ""
-
-#: web/views.js
-msgid "Järjestys: uusin ensin"
-msgstr ""
-
-#: web/views.js
-msgid "<span class=\"k k-ok\">OK</span>Katso"
-msgstr ""
-
-#: web/views.js
-msgid "<span class=\"k k-yellow\"></span>Tallenteet"
-msgstr ""
-
-#: web/views.js
-msgid "<span class=\"k k-ret\">RETURN</span>Takaisin"
-msgstr ""
-
-#: web/views.js
-msgid "Haetaan kanavanippuja…"
+msgid "Sort: by name"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Kanavat"
+msgid "Sort: newest first"
 msgstr ""
 
 #: web/views.js
-msgid "Kanavanippu"
+msgid "<span class=\"k k-ok\">OK</span>Watch"
+msgstr ""
+
+#: web/views.js
+msgid "<span class=\"k k-yellow\"></span>Recordings"
+msgstr ""
+
+#: web/views.js
+msgid "<span class=\"k k-ret\">RETURN</span>Back"
+msgstr ""
+
+#: web/views.js
+msgid "Loading bouquets…"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Ei kanavanippuja"
-msgstr ""
-
-#: web/views.js
-msgid "Haetaan kanavia…"
-msgstr ""
-
-#: web/views.js
-msgid "Virhe"
+msgid "Channels"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Kanavat › "
+msgid "Bouquet"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Nipussa ei ole kanavia"
+msgid "No bouquets"
+msgstr ""
+
+#: web/views.js
+msgid "Loading channels…"
+msgstr ""
+
+#: web/views.js
+msgid "Error"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Asetukset"
-msgstr ""
-
-#: web/views.js
-msgid "<span class=\"fld-label\">portti</span>"
-msgstr ""
-
-#: web/views.js
-msgid "Nykyinen: <b>"
-msgstr ""
-
-#: web/views.js
-msgid "Asennettu boksista: "
-msgstr ""
-
-#: web/views.js
-msgid "Näytön koko: <b>"
-msgstr ""
-
-#: web/views.js
-msgid "</b> (TV ilmoittaa leveydeksi "
-msgstr ""
-
-#: web/views.js
-msgid " px, skaala "
-msgstr ""
-
-#: web/views.js
-msgid "Sovellus "
-msgstr ""
-
-#: web/views.js
-msgid "Testataan "
-msgstr ""
-
-#: web/views.js
-msgid "Yhteys toimii: "
-msgstr ""
-
-#: web/views.js
-msgid "Ei yhteyttä"
-msgstr ""
-
-#: web/views.js
-msgid ". Tallennetaanko silti?"
+msgid "Channels › "
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
-msgid "Tallenna"
+msgid "No channels in this bouquet"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
+msgid "Settings"
 msgstr ""
 
 #: web/views.js
-msgid "Korjaa"
+msgid "<span class=\"fld-label\">port</span>"
 msgstr ""
 
 #: web/views.js
-msgid "Näytön koko: "
+msgid "Current: <b>"
+msgstr ""
+
+#: web/views.js
+msgid "Installed from the box: "
+msgstr ""
+
+#: web/views.js
+msgid "Screen size: <b>"
+msgstr ""
+
+#: web/views.js
+msgid "</b> (TV reports a width of "
+msgstr ""
+
+#: web/views.js
+msgid " px, scale "
+msgstr ""
+
+#: web/views.js
+msgid "App "
+msgstr ""
+
+#: web/views.js
+msgid "Testing "
+msgstr ""
+
+#: web/views.js
+msgid "Connection works: "
+msgstr ""
+
+#: web/views.js
+msgid "No connection"
+msgstr ""
+
+#: web/views.js
+msgid ". Save anyway?"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
+msgid "Save"
+msgstr ""
+
+#: web/views.js
+msgid "Fix"
+msgstr ""
+
+#: web/views.js
+msgid "Screen size: "
 msgstr ""
 
 #: android/Box.kt
-msgid "OpenWebif vaatii kirjautumisen – ota se pois boksin asetuksista"
+msgid "OpenWebif requires a login – turn it off in the box settings"
 msgstr ""
 
 #: android/Box.kt
-msgid "Ei yhteyttä boksiin ("
+msgid "No connection to the box ("
 msgstr ""
 
 #: android/Box.kt
-msgid "Gt"
+msgid "GB"
 msgstr ""
 
 #: android/Box.kt
-msgid "Mt"
+msgid "MB"
 msgstr ""
 
 #: android/Box.kt
-msgid "kt"
+msgid "kB"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "valmiustilassa"
+msgid "in standby"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "<font color='#FF5A5A'><b>● TALLENTAA</b></font> &nbsp; "
+msgid "<font color='#FF5A5A'><b>● RECORDING</b></font> &nbsp; "
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "<font color='#FF5A5A'>Ei yhteyttä boksiin</font> · "
+msgid "<font color='#FF5A5A'>No connection to the box</font> · "
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "A–Ö"
+msgid "A–Z"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Uusin ensin"
+msgid "Newest first"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "OK toista   ·   pitkä OK: valikko (poista, alusta)   ·   ▲ ylös välilehtiin   ·   BACK ylempi kansio"
+msgid "OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs   ·   BACK parent folder"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "OK katso   ·   ▲ ylös välilehtiin   ·   BACK takaisin"
+msgid "OK watch   ·   ▲ up to tabs   ·   BACK back"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Tarkista boksin osoite: Asetukset"
+msgid "Check the box address: Settings"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "<br/><font color='#4FA3FF'>Katsottu "
+msgid "<br/><font color='#4FA3FF'>Watched up to "
 msgstr ""
 
 #: android/MainActivity.kt
-msgid " asti</font>"
+msgid "</font>"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Toista alusta"
+msgid "Play from the start"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Poista tallenne"
+msgid "Delete recording"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Järjestä: uusin ensin"
+msgid "Sort: A–Z"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Järjestä: A–Ö"
+msgid "Delete failed: "
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Poisto epäonnistui: "
+msgid "IP address of the Enigma2 box (e.g. 192.168.1.10). OpenWebif must be enabled on port 80."
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Enigma2-boksin IP-osoite (esim. 192.168.1.10). OpenWebifin pitää olla käytössä portissa 80."
+msgid "App language"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Sovelluksen kieli"
+msgid "Settings – E2TVPlayer "
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Asetukset – E2TVPlayer "
+msgid "Find box"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Etsi boksi"
+msgid "Searching for the box on the network…"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Etsitään boksia lähiverkosta…"
+msgid "No box with the E2TVPlayer plugin was found on the network. Enter the address manually."
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Lähiverkosta ei löytynyt boksia, jossa on E2TVPlayer-lisäosa. Anna osoite käsin."
+msgid "Enter address"
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "Anna osoite"
-msgstr ""
-
-#: android/MainActivity.kt
-msgid "Sulje"
+msgid "Close"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "▲▼ rivi   ◀▶ vaihda   OK/BACK sulje"
+msgid "▲▼ row   ◀▶ change   OK/BACK close"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "Yhteys katkesi tai tallenteen muotoa ei tueta."
+msgid "The connection was lost or the recording's format is not supported."
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "▲▼ kanava   ·   OK ohjelmatiedot   ·   pitkä OK: ääni ja tekstitys   ·   BACK lopeta"
+msgid "▲▼ channel   ·   OK programme info   ·   long OK: audio and subtitles   ·   BACK stop"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK tauko ja tiedot   ·   pitkä OK: ääni ja tekstitys   ·   BACK lopeta"
+msgid "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK pause and info   ·   long OK: audio and subtitles   ·   BACK stop"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "Ei ohjelmatietoja"
+msgid "No programme information"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid " (kuvailutulkkaus)"
+msgid " (audio description)"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid " (ei tuettu)"
+msgid " (not supported)"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "   ·   purkaja: "
+msgid "   ·   decoder: "
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "Ei ääniraitoja"
+msgid "No audio tracks"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "Äänen purku"
+msgid "Audio decoding"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "sovellus (PCM)"
+msgid "app (PCM)"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "TV / Dolby-läpivienti"
+msgid "TV / Dolby passthrough"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "Ääni puretaan sovelluksessa"
+msgid "Audio is decoded in the app"
 msgstr ""
 
 #: android/PlayerActivity.kt
-msgid "Ääni TV:n / laitteen purettavaksi"
+msgid "Audio is decoded by the TV / device"
 msgstr ""
 
 #: android/Shots.kt
-msgid "Kuva tallennettu boksiin: "
+msgid "Picture saved on the box: "
 msgstr ""
 
 #: android/Shots.kt
-msgid "Kuvan tallennus epäonnistui ("
+msgid "Saving the picture failed ("
 msgstr ""
 
 #: android/Shots.kt
-msgid "Kuvan tallennus epäonnistui: "
+msgid "Saving the picture failed: "
 msgstr ""
 
 #: box/info.py
-msgid "Lisäosa ei ole vielä rekisteröity OpenWebifiin. Käynnistä GUI uudelleen (OpenWebif lukee lisäosat käynnistyessään)."
+msgid "The plugin is not registered in OpenWebif yet. Restart the GUI (OpenWebif reads its plugins at start-up)."
 msgstr ""
 
 #: box/info.py
-msgid "OpenWebif on pois päältä - kytke se päälle."
+msgid "OpenWebif is turned off - turn it on."
 msgstr ""
 
 #: box/info.py
-msgid "OpenWebifin kirjautuminen on päällä. TV-sovellukset eivät osaa kirjautua - ota kirjautuminen pois (ainakin lähiverkosta)."
+msgid "OpenWebif login is turned on. The TV apps cannot log in - turn the login off (at least for the local network)."
 msgstr ""
 
 #: box/info.py
-msgid "<ol><li>Laita TV developer-tilaan: Apps &rarr; paina 1, 2, 3, 4, 5 &rarr; Developer mode <b>On</b> ja Host PC IP = tietokoneesi tai puhelimesi IP. Käynnistä TV uudelleen.</li><li>Lataa paketti: <a href='/%(m)s/E2TVPlayer.wgt'><b>E2TVPlayer.wgt</b></a></li><li>Asenna se <a href='https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer'>Samsung Jellyfin Installerilla</a> (valitse oma .wgt). Ohjelma hoitaa Samsungin varmenteen.</li></ol><p>Päivitykset tulevat boksin lisäosan mukana: käynnistä sovellus uudelleen.</p>"
+msgid "<ol><li>Put the TV in developer mode: Apps &rarr; press 1, 2, 3, 4, 5 &rarr; Developer mode <b>On</b> and Host PC IP = the IP of your computer or phone. Restart the TV.</li><li>Download the package: <a href='/%(m)s/E2TVPlayer.wgt'><b>E2TVPlayer.wgt</b></a></li><li>Install it with the <a href='https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer'>Samsung Jellyfin Installer</a> (choose a custom .wgt). It takes care of the Samsung certificate.</li></ol><p>Updates come with the box plugin: just restart the app.</p>"
 msgstr ""
 
 #: box/info.py
-msgid "<p>TV hakee sovelluksen osoitteesta <a href='/widgetlist.xml'>http://%(h)s/widgetlist.xml</a>.</p><ol><li>TV: Valikko &rarr; Smart Hub &rarr; Samsung-tili &rarr; Kirjaudu. Tunnus <b>develop</b> (salasana tyhjä tai 000000).</li><li>Smart Hub &rarr; pidä OK pohjassa jonkin sovelluksen päällä &rarr; <b>IP Setting</b> &rarr; <b>%(h)s</b></li><li>Pidä OK uudelleen pohjassa &rarr; <b>Start User App Sync</b>.</li><li>Sovellus <b>%(t)s</b> ilmestyy Omiin sovelluksiin.</li></ol><p>Päivitys: tee kohta 3 uudelleen ja käynnistä TV sen jälkeen uudelleen. <a href='/%(m)s/%(z)s'>Lataa zip</a></p>"
+msgid "<p>The TV fetches the app from <a href='/widgetlist.xml'>http://%(h)s/widgetlist.xml</a>.</p><ol><li>TV: Menu &rarr; Smart Hub &rarr; Samsung Account &rarr; Log in. User <b>develop</b> (password empty or 000000).</li><li>Smart Hub &rarr; hold OK on any app &rarr; <b>IP Setting</b> &rarr; <b>%(h)s</b></li><li>Hold OK again &rarr; <b>Start User App Sync</b>.</li><li>The app <b>%(t)s</b> appears in My Apps.</li></ol><p>Update: repeat step 3 and then restart the TV. <a href='/%(m)s/%(z)s'>Download zip</a></p>"
 msgstr ""
 
 #: box/info.py box/web.py
-msgid "Kuvakaappaukset"
+msgid "Screenshots"
 msgstr ""
 
 #: box/info.py
-msgid "Tekstitykset"
+msgid "Subtitle extraction"
 msgstr ""
 
 #: box/info.py
-msgid "Sovelluksen kieli valitaan TV:llä TOOLS-valikosta (oletuksena TV:n kieli)."
+msgid "The app language is chosen on the TV in the TOOLS menu (by default the TV's language)."
 msgstr ""
 
 #: box/info.py
-msgid "OpenWebifin portti on %s. Vanhan Samsungin sovellussynkka toimii vain portissa 80."
+msgid "The OpenWebif port is %s. The old Samsung app sync only works on port 80."
 msgstr ""
 
 #: box/info.py
-msgid "Boksin osoite:"
+msgid "Box address:"
 msgstr ""
 
 #: box/info.py
-msgid "<ol><li>Asenna televisioon Google Playsta sovellus <b>Downloader</b> (AFTVnews).</li><li>Salli asetuksista Downloaderille <i>tuntemattomien sovellusten asennus</i>.</li><li>Kirjoita Downloaderiin osoite <b>%(h)s/%(m)s</b> ja valitse alta linkki.</li></ol>"
+msgid "<ol><li>Install the <b>Downloader</b> app (AFTVnews) on the TV from Google Play.</li><li>In the settings, allow Downloader to <i>install unknown apps</i>.</li><li>Enter the address <b>%(h)s/%(m)s</b> in Downloader and choose the link below.</li></ol>"
 msgstr ""
 
 #: box/info.py
-msgid "Google TV -sovellus ei ole mukana tässä paketissa."
+msgid "The Google TV app is not included in this package."
 msgstr ""
 
 #: box/info.py
-msgid "TV-sovelluksen TOOLS-valikosta otetut kuvat tallentuvat kansioon"
+msgid "Pictures taken from the TOOLS menu of the TV app are saved in"
 msgstr ""
 
 #: box/info.py
-msgid "Näytä kuvat"
+msgid "Show the pictures"
 msgstr ""
 
 #: box/info.py
-msgid "TV-sovellusten käynnistysloki (laite, kieli, versio):"
+msgid "Start-up log of the TV apps (device, language, version):"
 msgstr ""
 
 #: box/info.py
-msgid "Näytä loki"
+msgid "Show the log"
 msgstr ""
 
 #: box/info.py
-msgid "Boksi purkaa tallenteen DVB-tekstitykset ensimmäisellä toistokerralla kansioon %s. Live-kanavilla tekstitykset puretaan lähetyksestä."
+msgid "The box extracts the DVB subtitles of a recording the first time it is played, into the folder %s. On live channels the subtitles are extracted from the broadcast."
 msgstr ""
 
 #: box/info.py
-msgid "Huom"
+msgid "Note"
 msgstr ""
 
 #: box/info.py
-msgid "Videokuva Samsung-kuviin: opkg install ffmpeg"
+msgid "Video frame in Samsung pictures: opkg install ffmpeg"
 msgstr ""
 
 #: box/info.py
-msgid "Lataa"
+msgid "Download"
 msgstr ""
 
 #: box/plugin.py
-msgid "OK / EXIT = sulje    ylös/alas = vieritä"
+msgid "OK / EXIT = close    up/down = scroll"
 msgstr ""
 
 #: box/plugin.py
-msgid "Tallenteet ja live-TV Samsung- ja Google TV -televisioille"
+msgid "Recordings and live TV for Samsung and Google TV televisions"
 msgstr ""
 
 #: box/web.py
-msgid "Kansio:"
+msgid "Folder:"
 msgstr ""
 
 #: box/web.py
-msgid "Ei vielä kuvia. Ota kuva TV-sovelluksen TOOLS-valikosta."
+msgid "No pictures yet. Take one from the TOOLS menu of the TV app."
 msgstr ""
 
 #: box/web.py
-msgid "Google TV -sovellusta ei ole tässä paketissa."
+msgid "The Google TV app is not in this package."
 msgstr ""
 
 #: box/web.py
-msgid "ei kuvaa"
+msgid "no picture"
 msgstr ""

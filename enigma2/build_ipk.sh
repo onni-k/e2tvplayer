@@ -1,7 +1,7 @@
 #!/bin/sh
-# Rakentaa enigma2-plugin-extensions-e2tvplayer_<versio>_all.ipk
-# Jos ../android/app/build/outputs/apk/release/E2TVPlayer.apk (tai E2TVPLAYER_APK) on olemassa,
-# se liitetään pakettiin, jolloin boksi jakaa Google TV -sovelluksen osoitteessa /e2tvplayer/E2TVPlayer.apk
+# Builds enigma2-plugin-extensions-e2tvplayer_<version>_all.ipk
+# If ../android/app/build/outputs/apk/release/E2TVPlayer.apk (or E2TVPLAYER_APK) exists,
+# it is included, and the box serves the Google TV app at /e2tvplayer/E2TVPlayer.apk
 set -e
 cd "$(dirname "$0")"
 VERSION=$(sed -n 's/^VERSION = "\(.*\)"/\1/p' src/E2TVPlayer/web.py)
@@ -20,7 +20,7 @@ if [ -f "$APK" ]; then
 	mkdir -p "$WORK/data/$PLUG/E2TVPlayer/android"
 	cp "$APK" "$WORK/data/$PLUG/E2TVPlayer/android/E2TVPlayer.apk"
 	echo "$VERSION" > "$WORK/data/$PLUG/E2TVPlayer/android/version.txt"
-	echo "APK mukana: $APK"
+	echo "APK included: $APK"
 fi
 find "$WORK/data" -name '__pycache__' -prune -exec rm -rf {} + -o -name '*.py[co]' -exec rm -f {} +
 
@@ -35,20 +35,20 @@ Depends: enigma2-plugin-extensions-openwebif
 License: GPL-3.0-or-later
 Replaces: enigma2-plugin-extensions-e2samsungtv
 Conflicts: enigma2-plugin-extensions-e2samsungtv
-Description: E2TVPlayer - recordings and live TV with subtitles on Samsung Smart TV (Orsay) and Google TV via OpenWebif.
+Description: E2TVPlayer - recordings and live TV with subtitles on Samsung Smart TV (Orsay, Tizen) and Google TV via OpenWebif.
  Serves /widgetlist.xml for the Samsung developer-mode app sync and the Android TV APK.
 EOC
 
 cat > "$WORK/control/preinst" <<'EOC'
 #!/bin/sh
-# vanha nimi (E2SamsungTV) pois, jos se on asennettu ilman paketinhallintaa
+# remove the old name (E2SamsungTV) if it was installed without the package manager
 rm -rf /usr/lib/enigma2/python/Plugins/Extensions/E2SamsungTV
 rm -f /usr/lib/enigma2/python/Plugins/Extensions/WebInterface/WebChilds/External/e2samsungtv.py*
 exit 0
 EOC
 cat > "$WORK/control/postinst" <<'EOC'
 #!/bin/sh
-echo "E2TVPlayer asennettu. Käynnistä GUI uudelleen, jotta OpenWebif ottaa sen käyttöön."
+echo "E2TVPlayer installed. Restart the GUI so that OpenWebif picks it up."
 exit 0
 EOC
 cat > "$WORK/control/postrm" <<'EOC'

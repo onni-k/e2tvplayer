@@ -17,7 +17,7 @@ import java.util.Calendar
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
-/** OpenWebif-rajapinta ja sovelluksen asetukset. */
+/** The OpenWebif API and the app settings. */
 object Box {
     private val pool = Executors.newFixedThreadPool(4)
     private val main = Handler(Looper.getMainLooper())
@@ -35,13 +35,13 @@ object Box {
 
     fun base(): String = "http://$host"
 
-    /** Käynnistysmerkintä boksin lokiin (http://boksi/e2tvplayer/loki). */
+    /** Start-up entry in the box log (http://box/e2tvplayer/logs). */
     fun hello(version: String) {
         if (host.isBlank()) return
         val loc = java.util.Locale.getDefault()
         val msg = "start platform=android app=$version model=${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}" +
             " | device=${android.os.Build.DEVICE} | android=${android.os.Build.VERSION.RELEASE} (sdk ${android.os.Build.VERSION.SDK_INT})" +
-            " | lang=locale=${loc.toLanguageTag()} → ${I18n.sys()}, " + T("käytössä") + " " + I18n.name(I18n.cur()) +
+            " | lang=locale=${loc.toLanguageTag()} → ${I18n.sys()}, " + T("in use") + " " + I18n.name(I18n.cur()) +
             " | pref=${I18n.pref()}"
         pool.execute {
             try {
@@ -65,7 +65,7 @@ object Box {
     fun fileUrl(path: String) = url("/file", mapOf("file" to path))
     fun streamUrl(sref: String) = "http://${hostname()}:8001/$sref"
 
-    /** GET + JSON taustasäikeessä, vastaus pääsäikeeseen. */
+    /** GET + JSON in a background thread, the answer on the main thread. */
     fun get(path: String, params: Map<String, String?> = emptyMap(), timeoutMs: Int = 15000,
             ok: (JSONObject) -> Unit, fail: (String) -> Unit) {
         val u = url(path, params)
@@ -74,15 +74,15 @@ object Box {
                 val js = JSONObject(unent(fetch(u, timeoutMs)))
                 main.post { ok(js) }
             } catch (e: HttpError) {
-                main.post { fail(if (e.code == 401) T("OpenWebif vaatii kirjautumisen – ota se pois boksin asetuksista") else T("Yhteysvirhe ") + e.code) }
+                main.post { fail(if (e.code == 401) T("OpenWebif requires a login – turn it off in the box settings") else T("Connection error ") + e.code) }
             } catch (e: Exception) {
-                main.post { fail(T("Ei yhteyttä boksiin (") + host + ")") }
+                main.post { fail(T("No connection to the box (") + host + ")") }
             }
         }
     }
 
-    /** OpenWebif lähettää osan EPG-teksteistä HTML-merkintöinä (Shorty&#x27;s): puretaan ne ennen
-     *  JSON-jäsennystä niin, että tulos on yhä kelvollista JSONia. */
+    /** OpenWebif sends some EPG texts with HTML entities (Shorty&#x27;s): decode them before
+     *  JSON parsing so that the result is still valid JSON. */
     fun unent(t: String): String = Regex("&(#[xX][0-9a-fA-F]+|#[0-9]+|amp|quot|lt|gt|apos);").replace(t) { m ->
         val e = m.groupValues[1]
         val c = when (e) {
@@ -118,7 +118,7 @@ object Box {
         }
     }
 
-    /** Etsii lähiverkosta boksin, jossa E2TVPlayer-lisäosa on asennettu. */
+    /** Searches the local network for a box with the E2TVPlayer plugin installed. */
     fun discover(ctx: Context, done: (List<String>) -> Unit) {
         val prefix = localPrefix(ctx)
         if (prefix == null) { done(emptyList()); return }
@@ -179,7 +179,7 @@ object Fmt {
     fun date(ts: Long, withYear: Boolean = false): String {
         if (ts <= 0) return ""
         val c = Calendar.getInstance().apply { timeInMillis = ts * 1000 }
-        var s = T("su ma ti ke to pe la").split(" ")[c.get(Calendar.DAY_OF_WEEK) - 1] + " " + c.get(Calendar.DAY_OF_MONTH) + "." + (c.get(Calendar.MONTH) + 1) + "."
+        var s = T("Sun Mon Tue Wed Thu Fri Sat").split(" ")[c.get(Calendar.DAY_OF_WEEK) - 1] + " " + c.get(Calendar.DAY_OF_MONTH) + "." + (c.get(Calendar.MONTH) + 1) + "."
         if (withYear) s += c.get(Calendar.YEAR)
         return s + " " + p2(c.get(Calendar.HOUR_OF_DAY)) + ":" + p2(c.get(Calendar.MINUTE))
     }
@@ -197,7 +197,7 @@ object Fmt {
         return if (h > 0) "$h:${p2(m.toInt())}:${p2(r.toInt())}" else "$m:${p2(r.toInt())}"
     }
 
-    /** OpenWebifin "length" ("53:40" tai "1:53:40") sekunneiksi */
+    /** the OpenWebif "length" ("53:40" or "1:53:40") in seconds */
     fun parseLength(str: String?): Long {
         if (str.isNullOrBlank()) return 0
         var sec = 0L
@@ -209,18 +209,18 @@ object Fmt {
     }
 
     fun size(bytes: Long): String = when {
-        bytes >= 1073741824L -> String.format(java.util.Locale.US, "%.1f ", bytes / 1073741824.0).let { if (I18n.en()) it else it.replace('.', ',') } + T("Gt")
-        bytes >= 1048576L -> "${bytes / 1048576} " + T("Mt")
-        else -> "${bytes / 1024} " + T("kt")
+        bytes >= 1073741824L -> String.format(java.util.Locale.US, "%.1f ", bytes / 1073741824.0).let { if (I18n.decimalComma()) it.replace('.', ',') else it } + T("GB")
+        bytes >= 1048576L -> "${bytes / 1048576} " + T("MB")
+        else -> "${bytes / 1024} " + T("kB")
     }
 
     private val castLabels = mapOf(
-        "actor" to N("Näyttelijät"), "actors" to N("Näyttelijät"), "director" to N("Ohjaaja"), "producer" to N("Tuottaja"),
-        "writer" to N("Käsikirjoitus"), "scriptwriter" to N("Käsikirjoitus"), "presenter" to N("Juontaja"), "guest" to N("Vieraat"),
-        "commentator" to N("Selostaja"), "narrator" to N("Kertoja"), "composer" to N("Musiikki")
+        "actor" to N("Cast"), "actors" to N("Cast"), "director" to N("Director"), "producer" to N("Producer"),
+        "writer" to N("Writer"), "scriptwriter" to N("Writer"), "presenter" to N("Presenter"), "guest" to N("Guests"),
+        "commentator" to N("Commentator"), "narrator" to N("Narrator"), "composer" to N("Music")
     )
 
-    /** Siistii DVB-kuvauksen: tekstin perään liimautuneet "actor: X"-kentät omille riveilleen. */
+    /** Tidies a DVB description: "actor: X" fields glued to the end of the text go on their own lines. */
     fun desc(text: String?): String {
         val s = (text ?: "").replace('\u008a', '\n').replace("\r", "")
         val re = Regex("(actors?|director|producer|scriptwriter|writer|presenter|guest|commentator|narrator|composer):\\s*", RegexOption.IGNORE_CASE)
@@ -241,15 +241,15 @@ object Fmt {
     }
 
     private val langs = mapOf(
-        "fin" to N("suomi"), "swe" to N("ruotsi"), "sve" to N("ruotsi"), "eng" to N("englanti"), "dut" to N("hollanti"), "nld" to N("hollanti"),
-        "ger" to N("saksa"), "deu" to N("saksa"), "fre" to N("ranska"), "fra" to N("ranska"), "spa" to N("espanja"), "ita" to N("italia"),
-        "rus" to N("venäjä"), "dan" to N("tanska"), "nor" to N("norja"), "est" to N("viro"), "sme" to N("saame"), "smi" to N("saame"),
-        "qaa" to N("alkuperäinen"), "mis" to N("muu"), "und" to N("tuntematon"), "nar" to N("kuvailutulkkaus"), "qad" to N("kuvailutulkkaus"),
-        "fi" to N("suomi"), "sv" to N("ruotsi"), "en" to N("englanti"), "de" to N("saksa"), "fr" to N("ranska"), "no" to N("norja"), "da" to N("tanska")
+        "fin" to N("Finnish"), "swe" to N("Swedish"), "sve" to N("Swedish"), "eng" to N("English"), "dut" to N("Dutch"), "nld" to N("Dutch"),
+        "ger" to N("German"), "deu" to N("German"), "fre" to N("French"), "fra" to N("French"), "spa" to N("Spanish"), "ita" to N("Italian"),
+        "rus" to N("Russian"), "dan" to N("Danish"), "nor" to N("Norwegian"), "est" to N("Estonian"), "sme" to N("Sami"), "smi" to N("Sami"),
+        "qaa" to N("original"), "mis" to N("other"), "und" to N("unknown"), "nar" to N("audio description"), "qad" to N("audio description"),
+        "fi" to N("Finnish"), "sv" to N("Swedish"), "en" to N("English"), "de" to N("German"), "fr" to N("French"), "no" to N("Norwegian"), "da" to N("Danish")
     )
 
     fun lang(code: String?): String {
-        if (code.isNullOrBlank()) return T("tuntematon")
+        if (code.isNullOrBlank()) return T("unknown")
         return langs[code.lowercase()]?.let { T(it) } ?: code
     }
 }

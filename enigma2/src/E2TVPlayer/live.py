@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 E2TVPlayer contributors
 #
-# Live-lähetysten tekstitykset.
+# Subtitles of live broadcasts.
 #
-# TV hakee live-kanavan osoitteesta /e2tvplayer/live?id=..&sref=.. . Boksi hakee saman
-# kanavan omalta striimipalvelimeltaan (127.0.0.1:8001), välittää tavut sellaisenaan TV:lle
-# ja purkaa samalla tekstitykset samasta virrasta. Koska purku tapahtuu täsmälleen siitä
-# virrasta, jonka TV saa, aikaleimat ovat samassa ajassa kuin TV:n toistokohta – samoin
-# kuin tallenteissa.
+# The TV plays a live channel from /e2tvplayer/live?id=..&sref=.. . The box fetches the same
+# channel from its own stream server (127.0.0.1:8001), relays the bytes to the TV as they are
+# and extracts the subtitles from the same stream. Because the extraction works on exactly the
+# stream the TV receives, the timestamps are in the same time base as the TV's playback
+# position - just like with recordings.
 
 from __future__ import absolute_import, print_function
 
@@ -27,7 +27,7 @@ def log(msg):
 
 
 class LiveSession(object):
-	"""Tekstitysten purku jatkuvasta TS-virrasta."""
+	"""Subtitle extraction from a continuous TS stream."""
 
 	def __init__(self, sid, sref):
 		self.id = sid
@@ -54,11 +54,11 @@ class LiveSession(object):
 		self.audio = []
 		self.decoders = {}       # pid -> [DvbSubDecoder]
 		self.dec_list = []
-		self.bufs = {}           # PSI-osiot
-		self.pes = {}            # tekstitys-PES:t
-		self.pending = []        # tekstitysjoukot ennen kuin videon aikaleima tiedetään
-		self.cues = {}           # avain -> lista
-		self.images = {}         # (avain, n) -> png
+		self.bufs = {}           # PSI sections
+		self.pes = {}            # subtitle PES packets
+		self.pending = []        # subtitle sets before the video timestamp is known
+		self.cues = {}           # key -> list
+		self.images = {}         # (key, n) -> png
 		self.counter = {}
 		self.open_cue = {}
 		self.last_key = {}
@@ -114,7 +114,7 @@ class LiveSession(object):
 				pkt = view[k * PKT:(k + 1) * PKT]
 				self.packet(((pkt[1] & 0x1f) << 8) | pkt[2], pkt)
 				if self.wanted() != wanted:
-					# PAT/PMT tai videon aikaleima luettiin juuri: käydään palan loppu läpi uusilla PID:eillä
+					# PAT/PMT or the video timestamp was just read: go through the rest of the chunk with the new PIDs
 					k0 = k + 1
 					break
 
@@ -187,7 +187,7 @@ class LiveSession(object):
 		new_keys = [t["key"] for t in info["tracks"]]
 		if self.pmt is not None and new_keys == [t["key"] for t in self.tracks]:
 			self.pmt = pmt
-			return   # sama raitajoukko, versio vain vaihtui
+			return   # the same tracks, only the version changed
 		self.pmt = pmt
 		self.pmt_pids = {self.pmt_pids_for(pmt)} if len(self.pmt_pids) > 1 else self.pmt_pids
 		self.video_pid = info["video_pid"]
@@ -251,7 +251,7 @@ class LiveSession(object):
 	def sink(self, key, pts, img, timeout):
 		t = ((pts - self.base_pts) % PTS_WRAP) / 90000.0
 		if t > 12 * 3600:
-			t = 0.0   # tekstitys hieman ennen ensimmäistä videokuvaa
+			t = 0.0   # a subtitle slightly before the first video frame
 		prev = self.open_cue.get(key)
 		if img is not None and prev is not None and self.last_key.get(key) == img[5]:
 			return
@@ -276,7 +276,7 @@ class LiveSession(object):
 		self.open_cue[key] = cue
 		self.last_key[key] = ik
 
-	# --- rajapinta ---
+	# --- interface ---
 	def snapshot(self, key=None, start=0):
 		self.last_used = time.time()
 		out = {"status": self.status, "error": self.error, "gen": self.gen, "tracks": list(self.tracks),
@@ -303,10 +303,10 @@ def session(sid, sref=None, create=False):
 	return s
 
 
-# ---------------------------------------------------------------- välitys (Twisted)
+# ---------------------------------------------------------------- relay (Twisted)
 
 def stream(request, sid, sref, port=STREAM_PORT):
-	"""Välittää kanavan TV:lle ja purkaa tekstitykset. Palauttaa NOT_DONE_YET."""
+	"""Relays the channel to the TV and extracts the subtitles. Returns NOT_DONE_YET."""
 	from twisted.internet import reactor, protocol
 	from twisted.web.client import Agent
 	from twisted.web.server import NOT_DONE_YET
@@ -323,8 +323,8 @@ def stream(request, sid, sref, port=STREAM_PORT):
 	gen = s.gen
 	state = {"done": False, "relay": None}
 
-	# Vanha ffmpeg TV:ssä ei välttämättä osaa chunked-siirtoa, joten vastataan HTTP/1.0:lla
-	# ilman pituutta; yhteyden sulkeutuminen päättää virran.
+	# An old ffmpeg in the TV may not handle chunked transfer, so answer with HTTP/1.0
+	# without a length; closing the connection ends the stream.
 	request.clientproto = b"HTTP/1.0"
 	request.setHeader(b"Content-Type", b"video/mp2t")
 	request.setHeader(b"Cache-Control", b"no-cache")
@@ -390,7 +390,7 @@ def stream(request, sid, sref, port=STREAM_PORT):
 			return
 		if response.code != 200:
 			s.status = "error"
-			s.error = "striimipalvelin vastasi %d" % response.code
+			s.error = "stream server answered %d" % response.code
 			request.setResponseCode(502)
 			finish()
 			return
@@ -398,7 +398,7 @@ def stream(request, sid, sref, port=STREAM_PORT):
 
 	def failed(err):
 		s.status = "error"
-		s.error = "striimipalvelin ei vastaa (%s)" % err.getErrorMessage()
+		s.error = "stream server does not respond (%s)" % err.getErrorMessage()
 		log(s.error)
 		if not state["done"]:
 			try:

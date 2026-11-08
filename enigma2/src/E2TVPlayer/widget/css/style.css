@@ -1,4 +1,4 @@
-/* 1280x720, vanha Orsay-WebKit: ei flexboxia, vain absoluuttinen asettelu */
+/* 1280x720, old Orsay WebKit: no flexbox, absolute layout only */
 * { margin: 0; padding: 0; }
 body {
 	width: 1280px; height: 720px; overflow: hidden;
@@ -132,9 +132,9 @@ body.playing #app { display: none; }
 #sublayer { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; display: none; overflow: hidden; }
 #subimg { position: absolute; left: 0; top: 0; }
 
-/* Tizen: TV näyttää värit tarkasti, joten tausta tehdään sinisen sävyiseksi kuten vanhoissa Samsungeissa */
-/* Tausta #app-näkymään eikä bodyyn: AVPlayn <object> on bodyn päällä ja näyttää videotason (musta),
-   mutta #app on sen päällä. Toiston ajaksi #app piilotetaan, jolloin video näkyy. */
+/* Tizen shows colours accurately, so the background is made bluish like on the old Samsungs */
+/* The background goes on #app, not on body: the AVPlay <object> is above body and shows the video
+   plane (black), but #app is above it. During playback #app is hidden so the video shows. */
 html.tizen body { background: #000; }
 html.tizen #app { background: #0a1638; background: -webkit-linear-gradient(top, #0d1c47 0%, #060d27 100%); background: linear-gradient(to bottom, #0d1c47 0%, #060d27 100%); }
 html.tizen body.playing { background: transparent; }

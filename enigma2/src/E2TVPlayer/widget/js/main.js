@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later | Copyright (C) 2026 E2TVPlayer contributors */
-/* Sovelluksen käynnistys ja näppäinten jakelu. */
+/* App start-up and key dispatching. */
 var widgetAPI = new Common.API.Widget();
 var tvKey = new Common.API.TVKeyValue();
 var pluginAPI = new Common.API.Plugin();
@@ -8,7 +8,7 @@ var App = {
 	view: null,
 	statusTimer: null,
 
-	/* Käynnistysmerkintä boksin lokiin (http://boksi/e2tvplayer/loki): laite, versio ja kieli */
+	/* Start-up entry in the box log (http://box/e2tvplayer/logs): device, version and language */
 	deviceInfo: function () {
 		var d = [], v;
 		function add(k, val) { if (val !== null && val !== undefined && String(val) !== '') { d.push(k + '=' + val); } }
@@ -62,12 +62,12 @@ var App = {
 		anchor.focus();
 
 		try {
-			/* Äänenvoimakkuus ja mykistys jätetään TV:n hoidettavaksi */
+			/* volume and mute are left to the TV */
 			pluginAPI.unregistKey(tvKey.KEY_VOL_UP);
 			pluginAPI.unregistKey(tvKey.KEY_VOL_DOWN);
 			pluginAPI.unregistKey(tvKey.KEY_MUTE);
 		} catch (e) { }
-		/* TOOLS avaa ääni/tekstitys-valikon (MENU jää TV:lle) */
+		/* TOOLS opens the audio/subtitle menu (MENU stays with the TV) */
 		try { if (tvKey.KEY_TOOLS !== undefined) { pluginAPI.registKey(tvKey.KEY_TOOLS); } } catch (eT) { }
 		try { pluginAPI.setOnScreenSaver(); } catch (e2) { }
 		try { widgetAPI.sendReadyEvent(); } catch (e3) { }
@@ -80,7 +80,7 @@ var App = {
 			if (Api.canDiscover()) {
 				App.discover();
 			} else {
-				Dialog.alert(T('Boksin osoite puuttuu'), T('Syötä Enigma2-boksin IP-osoite.'));
+				Dialog.alert(T('Box address missing'), T('Enter the IP address of the Enigma2 box.'));
 			}
 			return;
 		}
@@ -89,9 +89,9 @@ var App = {
 		App.go('movies');
 	},
 
-	/* Etsii lähiverkosta boksin, jossa E2TVPlayer on (Tizen: TV:n oma IP tiedetään) */
+	/* Searches the local network for a box with E2TVPlayer (Tizen: the TV's own IP is known) */
 	discover: function () {
-		U.busy(true, T('Etsitään boksia…'));
+		U.busy(true, T('Searching for the box…'));
 		Api.discover(function (found) {
 			U.busy(false);
 			var use = function (h) {
@@ -103,16 +103,16 @@ var App = {
 				App.go('movies');
 			};
 			if (found.length === 1) {
-				U.toast(T('Boksi löytyi: ') + found[0]);
+				U.toast(T('Box found: ') + found[0]);
 				use(found[0]);
 			} else if (found.length > 1) {
 				var b = [], i;
 				for (i = 0; i < found.length && i < 4; i++) {
 					(function (h) { b.push({ label: h, fn: function () { use(h); } }); })(found[i]);
 				}
-				Dialog.open(T('Valitse boksi'), T('Lähiverkosta löytyi useampi boksi.'), b, 0);
+				Dialog.open(T('Choose a box'), T('More than one box was found on the network.'), b, 0);
 			} else {
-				Dialog.alert(T('Boksia ei löytynyt'), T('Syötä Enigma2-boksin IP-osoite.'));
+				Dialog.alert(T('Box not found'), T('Enter the IP address of the Enigma2 box.'));
 			}
 		});
 	},
@@ -129,7 +129,7 @@ var App = {
 		Views[name].enter(from);
 	},
 
-	/* toTV: EXIT palaa TV-kuvaan, RETURN Smart Hubiin */
+	/* toTV: EXIT returns to TV, RETURN to the Smart Hub */
 	exit: function (toTV) {
 		Player.stop();
 		try {
@@ -141,13 +141,13 @@ var App = {
 
 	confirmExit: function (toTV) {
 		App.exitDialog = true;
-		Dialog.open(T('Lopetetaanko E2TVPlayer?'), '', [
-			{ label: T('Kyllä'), fn: function () { App.exitDialog = false; App.exit(toTV); } },
-			{ label: T('Ei'), fn: function () { App.exitDialog = false; } }
+		Dialog.open(T('Quit E2TVPlayer?'), '', [
+			{ label: T('Yes'), fn: function () { App.exitDialog = false; App.exit(toTV); } },
+			{ label: T('No'), fn: function () { App.exitDialog = false; } }
 		], 0, function () { App.exitDialog = false; });
 	},
 
-	/* EXIT: toistosta takaisin listaan, listasta kysely. EXIT kyselyssä = lopeta. */
+	/* EXIT: from playback back to the list, in the list a dialog. EXIT in the dialog = quit. */
 	onExitKey: function () {
 		if (Dialog.isOpen) {
 			if (App.exitDialog) { Dialog.close(); App.exitDialog = false; App.exit(true); }
@@ -171,13 +171,13 @@ var App = {
 		}
 		try {
 			if (U.$('busy').style.display === 'block') {
-				handled = true;                       /* odotetaan vastausta */
+				handled = true;                       /* wait for the answer */
 			} else if (Dialog.isOpen) {
 				handled = Dialog.onKey(k);
 			} else if (Player.active || Player.tracksOpen()) {
 				handled = Player.onKey(k);
 			} else if (Player.isMenuKey(k)) {
-				Player.showTracks();                  /* TOOLS listoissa: kieli ja kuvakaappaus */
+				Player.showTracks();                  /* TOOLS in the lists: language and screenshot */
 				handled = true;
 			} else {
 				handled = Views[App.view].onKey(k);
@@ -206,16 +206,16 @@ var App = {
 		Api.status(function (s) {
 			var parts = [];
 			var standby = s.inStandby === true || s.inStandby === 'true';
-			if (standby) { parts.push(T('Boksi valmiustilassa')); }
+			if (standby) { parts.push(T('Box in standby')); }
 			else {
 				if (s.currservice_station) { parts.push(U.esc(s.currservice_station)); }
 				if (s.currservice_name) { parts.push(U.esc(s.currservice_name)); }
 			}
 			var rec = s.isRecording === true || s.isRecording === 'true';
-			U.$('nowbar').innerHTML = (rec ? T('<span class="rec">● TALLENTAA</span> &nbsp; ') : '') +
-				T('Boksi ') + U.esc(Api.host) + (parts.length ? ' &nbsp;·&nbsp; ' + parts.join(' — ') : '');
+			U.$('nowbar').innerHTML = (rec ? T('<span class="rec">● RECORDING</span> &nbsp; ') : '') +
+				T('Box ') + U.esc(Api.host) + (parts.length ? ' &nbsp;·&nbsp; ' + parts.join(' — ') : '');
 		}, function (err) {
-			U.$('nowbar').innerHTML = T('<span class="rec">Ei yhteyttä boksiin</span> &nbsp; ') + U.esc(err);
+			U.$('nowbar').innerHTML = T('<span class="rec">No connection to the box</span> &nbsp; ') + U.esc(err);
 		});
 	}
 };

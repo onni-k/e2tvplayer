@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONObject
 import java.util.Calendar
 
-/** Rivi listassa: tallenne, kansio, kanavanippu tai kanava. */
+/** A row in the list: recording, folder, bouquet or channel. */
 class Row(
     val type: String,             // up, dir, movie, bouquet, service
     val title: String,
@@ -89,9 +89,9 @@ class MainActivity : Activity() {
         dMeta = findViewById(R.id.dMeta)
         dDesc = findViewById(R.id.dDesc)
         footer = findViewById(R.id.footer)
-        tabRec.text = T("Tallenteet")
-        tabCh.text = T("Kanavat")
-        tabSet.text = T("Asetukset")
+        tabRec.text = T("Recordings")
+        tabCh.text = T("Channels")
+        tabSet.text = T("Settings")
         langCur = I18n.cur()
         Box.hello(BuildConfigCompat.version(this))
         findViewById<TextView>(R.id.title).text =
@@ -129,7 +129,7 @@ class MainActivity : Activity() {
         ui.removeCallbacks(ticker)
         ui.postDelayed(ticker, 30000)
         if (Box.host.isNotEmpty()) refreshStatus()
-        // toistosta palattua päivitetään edistymispalkit
+        // after playback, refresh the progress bars
         if (mode == "movies" && movieData != null) renderMovies(currentIndex())
     }
 
@@ -153,26 +153,26 @@ class MainActivity : Activity() {
         Box.get("/api/statusinfo", timeoutMs = 8000, ok = { s ->
             val parts = ArrayList<String>()
             val standby = s.optString("inStandby") == "true" || s.optBoolean("inStandby", false)
-            if (standby) parts.add(T("valmiustilassa")) else {
+            if (standby) parts.add(T("in standby")) else {
                 s.optString("currservice_station").takeIf { it.isNotEmpty() }?.let { parts.add(it) }
                 s.optString("currservice_name").takeIf { it.isNotEmpty() }?.let { parts.add(it) }
             }
             val rec = s.optString("isRecording") == "true" || s.optBoolean("isRecording", false)
-            val html = (if (rec) T("<font color='#FF5A5A'><b>● TALLENTAA</b></font> &nbsp; ") else "") +
-                T("Boksi ") + Html.escapeHtml(Box.host) + (if (parts.isEmpty()) "" else " · " + Html.escapeHtml(parts.joinToString(" — ")))
+            val html = (if (rec) T("<font color='#FF5A5A'><b>● RECORDING</b></font> &nbsp; ") else "") +
+                T("Box ") + Html.escapeHtml(Box.host) + (if (parts.isEmpty()) "" else " · " + Html.escapeHtml(parts.joinToString(" — ")))
             nowbar.text = Html.fromHtml(html)
-        }, fail = { err -> nowbar.text = Html.fromHtml(T("<font color='#FF5A5A'>Ei yhteyttä boksiin</font> · ") + Html.escapeHtml(err)) })
+        }, fail = { err -> nowbar.text = Html.fromHtml(T("<font color='#FF5A5A'>No connection to the box</font> · ") + Html.escapeHtml(err)) })
     }
 
     private fun updateTabs() {
         tabRec.isSelected = mode == "movies"
         tabCh.isSelected = mode == "channels"
         tabSort.visibility = if (mode == "movies") View.VISIBLE else View.GONE
-        tabSort.text = if (sortByName()) T("A–Ö") else T("Uusin ensin")
+        tabSort.text = if (sortByName()) T("A–Z") else T("Newest first")
         footer.text = if (mode == "movies")
-            T("OK toista   ·   pitkä OK: valikko (poista, alusta)   ·   ▲ ylös välilehtiin   ·   BACK ylempi kansio")
+            T("OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs   ·   BACK parent folder")
         else
-            T("OK katso   ·   ▲ ylös välilehtiin   ·   BACK takaisin")
+            T("OK watch   ·   ▲ up to tabs   ·   BACK back")
     }
 
     private fun setBusy(on: Boolean) { busy.visibility = if (on) View.VISIBLE else View.GONE }
@@ -207,7 +207,7 @@ class MainActivity : Activity() {
         dDesc.text = r?.desc ?: ""
     }
 
-    // ---------------------------------------------------------------- tallenteet
+    // ---------------------------------------------------------------- recordings
 
     private fun sortByName() = Box.prefs.getString("sort", "date") == "name"
 
@@ -240,7 +240,7 @@ class MainActivity : Activity() {
             setBusy(false)
             movieData = null
             crumb.text = ""
-            setRows(emptyList(), 0, "$err\n\n" + T("Tarkista boksin osoite: Asetukset"))
+            setRows(emptyList(), 0, "$err\n\n" + T("Check the box address: Settings"))
         })
     }
 
@@ -255,8 +255,8 @@ class MainActivity : Activity() {
         val meta = StringBuilder()
         if (station.isNotEmpty()) meta.append(Html.escapeHtml(station)).append("<br/>")
         if (rt > 0) meta.append(Fmt.date(rt, true)).append("<br/>")
-        meta.append(T("Kesto ")).append(if (len > 0) Fmt.time(len) else "?").append(" &nbsp; ").append(Html.escapeHtml(size))
-        if (posMs > 0) meta.append(T("<br/><font color='#4FA3FF'>Katsottu ")).append(Fmt.time(posMs / 1000)).append(T(" asti</font>"))
+        meta.append(T("Duration ")).append(if (len > 0) Fmt.time(len) else "?").append(" &nbsp; ").append(Html.escapeHtml(size))
+        if (posMs > 0) meta.append(T("<br/><font color='#4FA3FF'>Watched up to ")).append(Fmt.time(posMs / 1000)).append(T("</font>"))
         var desc = m.optString("description")
         val ext = m.optString("descriptionExtended")
         if (ext.isNotEmpty() && ext != desc) desc = if (desc.isEmpty()) ext else "$desc\n\n$ext"
@@ -274,14 +274,14 @@ class MainActivity : Activity() {
         val data = movieData ?: return
         val d = dir ?: return
         val rows = ArrayList<Row>()
-        if (d != root) rows.add(Row("up", "..", T("Ylempi kansio"), icon = "↰"))
+        if (d != root) rows.add(Row("up", "..", T("Parent folder"), icon = "↰"))
         val bms = data.optJSONArray("bookmarks")
         val dirs = ArrayList<String>()
         if (bms != null) for (i in 0 until bms.length()) dirs.add(bms.optString(i).trimEnd('/'))
         dirs.sortBy { it.lowercase() }
         for (name in dirs) {
             if (name.isEmpty() || name.startsWith(".") || name == "trashcan") continue
-            rows.add(Row("dir", name, T("Kansio"), icon = "▸", path = "$d$name/"))
+            rows.add(Row("dir", name, T("Folder"), icon = "▸", path = "$d$name/"))
         }
         val ms = ArrayList<JSONObject>()
         val arr = data.optJSONArray("movies")
@@ -292,8 +292,8 @@ class MainActivity : Activity() {
         var idx = index ?: (remember[d] ?: 0)
         if (selectPath != null) rows.indexOfFirst { it.path == selectPath }.takeIf { it >= 0 }?.let { idx = it }
         val rel = if (root != null && d.startsWith(root!!)) d.substring(root!!.length).trimEnd('/') else d
-        crumb.text = T("Tallenteet") + (if (rel.isNotEmpty()) " › " + rel.replace("/", " › ") else "") + "  (${ms.size})"
-        setRows(rows, idx, T("Kansiossa ei ole tallenteita"), focus)
+        crumb.text = T("Recordings") + (if (rel.isNotEmpty()) " › " + rel.replace("/", " › ") else "") + "  (${ms.size})"
+        setRows(rows, idx, T("No recordings in this folder"), focus)
     }
 
     private fun openDir(path: String, selectPath: String? = null) {
@@ -325,7 +325,7 @@ class MainActivity : Activity() {
         if (!fromStart && pos > 30000) {
             AlertDialog.Builder(this, R.style.E2Dialog)
                 .setTitle(r.title)
-                .setItems(arrayOf(T("Jatka kohdasta ") + Fmt.time(pos / 1000), T("Alusta"))) { _, w ->
+                .setItems(arrayOf(T("Resume from ") + Fmt.time(pos / 1000), T("From the start"))) { _, w ->
                     if (w == 1) playMovie(r, fromStart = true) else start()
                 }.show()
         } else start()
@@ -334,7 +334,7 @@ class MainActivity : Activity() {
     private fun movieMenu(r: Row) {
         AlertDialog.Builder(this, R.style.E2Dialog)
             .setTitle(r.title)
-            .setItems(arrayOf(T("Toista alusta"), T("Poista tallenne"), if (sortByName()) T("Järjestä: uusin ensin") else T("Järjestä: A–Ö"))) { _, w ->
+            .setItems(arrayOf(T("Play from the start"), T("Delete recording"), if (sortByName()) T("Sort: newest first") else T("Sort: A–Z"))) { _, w ->
                 when (w) {
                     0 -> playMovie(r, fromStart = true)
                     1 -> confirmDelete(r)
@@ -345,10 +345,10 @@ class MainActivity : Activity() {
 
     private fun confirmDelete(r: Row) {
         AlertDialog.Builder(this, R.style.E2Dialog)
-            .setTitle(T("Poistetaanko tallenne?"))
+            .setTitle(T("Delete the recording?"))
             .setMessage(r.title + "\n" + r.sub)
-            .setNegativeButton(T("Peruuta"), null)
-            .setPositiveButton(T("Poista")) { _, _ ->
+            .setNegativeButton(T("Cancel"), null)
+            .setPositiveButton(T("Delete")) { _, _ ->
                 setBusy(true)
                 Box.get("/api/moviedelete", mapOf("sRef" to r.ref), ok = { res ->
                     setBusy(false)
@@ -359,13 +359,13 @@ class MainActivity : Activity() {
                             if (arr.optJSONObject(i)?.optString("filename") == r.path) { arr.remove(i); break }
                         }
                         renderMovies(maxOf(0, currentIndex() - 0))
-                        toast(T("Tallenne poistettu"))
-                    } else toast(T("Poisto epäonnistui: ") + res.optString("message"))
-                }, fail = { setBusy(false); toast(T("Poisto epäonnistui: ") + it) })
+                        toast(T("Recording deleted"))
+                    } else toast(T("Delete failed: ") + res.optString("message"))
+                }, fail = { setBusy(false); toast(T("Delete failed: ") + it) })
             }.show()
     }
 
-    // ---------------------------------------------------------------- kanavat
+    // ---------------------------------------------------------------- channels
 
     private fun showChannels() {
         mode = "channels"
@@ -386,14 +386,14 @@ class MainActivity : Activity() {
             if (arr != null) for (i in 0 until arr.length()) arr.optJSONObject(i)?.let { l.add(it) }
             bouquets = l
             if (l.size == 1) openBouquet(l[0]) else renderBouquets()
-        }, fail = { err -> if (gen == loadGen) { setBusy(false); crumb.text = T("Kanavat"); setRows(emptyList(), 0, err) } })
+        }, fail = { err -> if (gen == loadGen) { setBusy(false); crumb.text = T("Channels"); setRows(emptyList(), 0, err) } })
     }
 
     private fun renderBouquets() {
         bouquet = null
-        val rows = bouquets.map { Row("bouquet", it.optString("servicename"), "Kanavanippu", icon = "▸", ref = it.optString("servicereference")) }
-        crumb.text = T("Kanavat")
-        setRows(rows, bouquetIndex, T("Ei kanavanippuja"))
+        val rows = bouquets.map { Row("bouquet", it.optString("servicename"), T("Bouquet"), icon = "▸", ref = it.optString("servicereference")) }
+        crumb.text = T("Channels")
+        setRows(rows, bouquetIndex, T("No bouquets"))
     }
 
     private fun openBouquet(b: JSONObject) {
@@ -408,7 +408,7 @@ class MainActivity : Activity() {
             if (arr != null) for (i in 0 until arr.length()) {
                 val s = arr.optJSONObject(i) ?: continue
                 val ref = s.optString("servicereference")
-                if (ref.isEmpty() || ref.startsWith("1:64:") || ref.startsWith("1:320:")) continue   // välimerkit
+                if (ref.isEmpty() || ref.startsWith("1:64:") || ref.startsWith("1:320:")) continue   // markers
                 l.add(s)
             }
             bouquet = b
@@ -453,8 +453,8 @@ class MainActivity : Activity() {
             }
             Row("service", s.optString("servicename"), sub, right, icon = "${i + 1}", progress = prog, meta = meta, desc = desc, ref = ref)
         }
-        crumb.text = T("Kanavat › ") + (bouquet?.optString("servicename") ?: "")
-        setRows(rows, index, T("Nipussa ei ole kanavia"), focus)
+        crumb.text = T("Channels › ") + (bouquet?.optString("servicename") ?: "")
+        setRows(rows, index, T("No channels in this bouquet"), focus)
     }
 
     private fun playChannel(index: Int) {
@@ -469,12 +469,12 @@ class MainActivity : Activity() {
         })
     }
 
-    // ---------------------------------------------------------------- asetukset
+    // ---------------------------------------------------------------- settings
 
     private fun settings() {
         val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(48, 24, 48, 0) }
         val info = TextView(this).apply {
-            text = T("Enigma2-boksin IP-osoite (esim. 192.168.1.10). OpenWebifin pitää olla käytössä portissa 80.")
+            text = T("IP address of the Enigma2 box (e.g. 192.168.1.10). OpenWebif must be enabled on port 80.")
             setTextColor(0xFFC9D1D9.toInt())
         }
         val edit = EditText(this).apply {
@@ -487,14 +487,14 @@ class MainActivity : Activity() {
         box.addView(edit)
         val langAtOpen = I18n.pref()
         val lang = TextView(this).apply {
-            text = T("Sovelluksen kieli") + ":  ◀ " + I18n.label() + " ▶"
+            text = T("App language") + ":  ◀ " + I18n.label() + " ▶"
             setTextColor(0xFFC9D1D9.toInt())
             setPadding(0, 24, 0, 8)
             isFocusable = true
             isClickable = true
             setBackgroundResource(android.R.drawable.list_selector_background)
         }
-        val relabel = { lang.text = T("Sovelluksen kieli") + ":  ◀ " + I18n.label() + " ▶" }
+        val relabel = { lang.text = T("App language") + ":  ◀ " + I18n.label() + " ▶" }
         lang.setOnClickListener { I18n.cycle(1); relabel() }
         lang.setOnKeyListener { _, k, e ->
             if (e.action == KeyEvent.ACTION_DOWN && (k == KeyEvent.KEYCODE_DPAD_LEFT || k == KeyEvent.KEYCODE_DPAD_RIGHT)) {
@@ -503,11 +503,11 @@ class MainActivity : Activity() {
         }
         box.addView(lang)
         AlertDialog.Builder(this, R.style.E2Dialog)
-            .setTitle(T("Asetukset – E2TVPlayer ") + BuildConfigCompat.version(this))
+            .setTitle(T("Settings – E2TVPlayer ") + BuildConfigCompat.version(this))
             .setView(box)
-            .setPositiveButton(T("Tallenna")) { _, _ -> setHost(edit.text.toString()) }
-            .setNeutralButton(T("Etsi boksi")) { _, _ -> findBox(first = false) }
-            .setNegativeButton(T("Peruuta"), null)
+            .setPositiveButton(T("Save")) { _, _ -> setHost(edit.text.toString()) }
+            .setNeutralButton(T("Find box")) { _, _ -> findBox(first = false) }
+            .setNegativeButton(T("Cancel"), null)
             .setOnDismissListener { if (I18n.pref() != langAtOpen && I18n.cur() != langCur) recreate() }
             .show()
     }
@@ -524,22 +524,22 @@ class MainActivity : Activity() {
 
     private fun findBox(first: Boolean) {
         setBusy(true)
-        crumb.text = T("Etsitään boksia lähiverkosta…")
+        crumb.text = T("Searching for the box on the network…")
         Box.discover(this) { found ->
             setBusy(false)
             when {
-                found.size == 1 -> { toast(T("Boksi löytyi: ") + found[0]); setHost(found[0]) }
+                found.size == 1 -> { toast(T("Box found: ") + found[0]); setHost(found[0]) }
                 found.size > 1 -> AlertDialog.Builder(this, R.style.E2Dialog)
-                    .setTitle(T("Valitse boksi"))
+                    .setTitle(T("Choose a box"))
                     .setItems(found.toTypedArray()) { _, w -> setHost(found[w]) }
                     .show()
                 else -> {
                     crumb.text = ""
                     AlertDialog.Builder(this, R.style.E2Dialog)
-                        .setTitle(T("Boksia ei löytynyt"))
-                        .setMessage(T("Lähiverkosta ei löytynyt boksia, jossa on E2TVPlayer-lisäosa. Anna osoite käsin."))
-                        .setPositiveButton(T("Anna osoite")) { _, _ -> settings() }
-                        .setNegativeButton(if (first) T("Sulje") else T("Peruuta"), null)
+                        .setTitle(T("Box not found"))
+                        .setMessage(T("No box with the E2TVPlayer plugin was found on the network. Enter the address manually."))
+                        .setPositiveButton(T("Enter address")) { _, _ -> settings() }
+                        .setNegativeButton(if (first) T("Close") else T("Cancel"), null)
                         .show()
                 }
             }
@@ -548,7 +548,7 @@ class MainActivity : Activity() {
 
     private fun toast(msg: String) = android.widget.Toast.makeText(this, msg, android.widget.Toast.LENGTH_LONG).show()
 
-    // ---------------------------------------------------------------- näppäimet
+    // ---------------------------------------------------------------- keys
 
     private fun activate(pos: Int) {
         val r = adapter.rows.getOrNull(pos) ?: return
@@ -571,13 +571,13 @@ class MainActivity : Activity() {
             if (event.action == KeyEvent.ACTION_UP) back()
             return true
         }
-        // ▲ listan ylimmältä riviltä: aina aktiiviseen välilehteen (ei lähimpään)
+        // ▲ from the top row of the list: always to the active tab (not the nearest)
         if (event.keyCode == KeyEvent.KEYCODE_DPAD_UP && event.action == KeyEvent.ACTION_DOWN &&
             list.hasFocus() && currentIndex() == 0) {
             (if (mode == "movies") tabRec else tabCh).requestFocus()
             return true
         }
-        // TV-kaukosäätimen värinäppäimet ja valikkonappi niissä laitteissa, joissa ne ovat
+        // colour keys and the menu key of the TV remote on devices that have them
         if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
             val pos = currentIndex()
             when (event.keyCode) {
@@ -605,13 +605,13 @@ class MainActivity : Activity() {
 
     private fun confirmExit() {
         AlertDialog.Builder(this, R.style.E2Dialog)
-            .setTitle(T("Lopetetaanko E2TVPlayer?"))
-            .setPositiveButton(T("Kyllä")) { _, _ -> finish() }
-            .setNegativeButton(T("Ei"), null)
+            .setTitle(T("Quit E2TVPlayer?"))
+            .setPositiveButton(T("Yes")) { _, _ -> finish() }
+            .setNegativeButton(T("No"), null)
             .show()
     }
 
-    // ---------------------------------------------------------------- lista
+    // ---------------------------------------------------------------- list
 
     inner class RowAdapter : RecyclerView.Adapter<RowAdapter.VH>() {
         var rows: List<Row> = emptyList()

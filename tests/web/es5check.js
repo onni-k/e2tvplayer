@@ -1,4 +1,4 @@
-// Vanhat TV-selaimet (Orsay 2014, Tizen 2015) ymmärtävät vain ES5:tä
+// old TV browsers (Orsay 2014, Tizen 2015) understand only ES5
 const fs = require('fs'), path = require('path'), acorn = require('acorn');
 const dirs = ['../../enigma2/src/E2TVPlayer/widget/js', '../../enigma2/src/E2TVPlayer/tizen'];
 let bad = 0;

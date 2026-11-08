@@ -2,14 +2,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 E2TVPlayer contributors
 #
-# DVB-tekstitysten (ETSI EN 300 743) purku Enigma2-tallenteesta.
+# Extraction of DVB subtitles (ETSI EN 300 743) from an Enigma2 recording.
 #
-# Samsungin 2014-TV:n soitin ei näytä TS-tallenteen DVB-tekstityksiä HTTP-toistossa,
-# joten boksi purkaa ne itse: jokainen tekstitysruutu tallennetaan PNG-kuvaksi ja
-# näyttöajat JSON-listaksi. TV-sovellus piirtää kuvat videon päälle oikeaan aikaan.
+# The player of the Samsung TVs does not show the DVB subtitles of a TS recording played
+# over HTTP, so the box extracts them itself: every subtitle screen is saved as a PNG image
+# and the display times as a JSON list. The TV app draws the images over the video in time.
 #
-# Tulokset tallennetaan kansioon /media/hdd/e2tvplayer/tekstitykset/<tallenne>_<tunniste>/,
-# joten purku tehdään vain kerran tallennetta kohden.
+# The results are stored in /media/hdd/e2tvplayer/subtitles/<recording>_<hash>/,
+# so a recording is extracted only once.
 
 from __future__ import absolute_import, print_function
 
@@ -24,10 +24,10 @@ import time
 import zlib
 
 PKT = 188
-CHUNK = PKT * 8192          # ~1.5 Mt kerrallaan
+CHUNK = PKT * 8192          # ~1.5 MB at a time
 PTS_WRAP = 1 << 33
-OLD_CACHE_DIRS = (".e2samsungtv", ".e2tvplayer")   # aiemmin tallenteen viereen tehdyt kansiot
-CACHE_VERSION = 2
+OLD_CACHE_DIRS = (".e2samsungtv", ".e2tvplayer")   # folders that older versions made next to the recordings
+CACHE_VERSION = 3   # 3: English track names
 
 
 def log(msg):
@@ -41,7 +41,7 @@ def u16(b, i):
 # ---------------------------------------------------------------- PNG
 
 def png_rgba(width, height, rows):
-	"""rows: lista bytes-olioita, kukin width*4 tavua RGBA."""
+	"""rows: list of bytes objects, each width*4 bytes of RGBA."""
 	raw = b"".join(b"\x00" + r for r in rows)
 
 	def chunk(tag, data):
@@ -54,11 +54,11 @@ def png_rgba(width, height, rows):
 		chunk(b"IEND", b""))
 
 
-# ---------------------------------------------------------------- värit
+# ---------------------------------------------------------------- colours
 
 def ycrcb_to_rgba(y, cr, cb, t):
 	if y == 0:
-		return b"\x00\x00\x00\x00"       # Y=0 tarkoittaa täysin läpinäkyvää
+		return b"\x00\x00\x00\x00"       # Y=0 means fully transparent
 	r = y + 1.402 * (cr - 128)
 	g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128)
 	b = y + 1.772 * (cb - 128)
@@ -67,7 +67,7 @@ def ycrcb_to_rgba(y, cr, cb, t):
 
 
 def default_clut(depth):
-	"""Standardin oletusvärit (EN 300 743 kohta 10), jos lähetys ei määrittele CLUTia."""
+	"""Default colours of the standard (EN 300 743 clause 10) when the broadcast defines no CLUT."""
 	if depth == 1:   # 2-bit
 		return [b"\x00\x00\x00\x00", b"\xff\xff\xff\xff", b"\x00\x00\x00\xff", b"\x7f\x7f\x7f\xff"]
 	n = 16 if depth == 2 else 256
@@ -104,7 +104,7 @@ class Clut(object):
 			self.tables[3][eid] = rgba
 
 
-# ---------------------------------------------------------------- pikselidata
+# ---------------------------------------------------------------- pixel data
 
 class Bits(object):
 	__slots__ = ("d", "i", "b", "end")
@@ -223,7 +223,7 @@ class Region(object):
 
 
 def draw_field(region, data, start, end, x0, y0):
-	"""Piirtää objektin yhden kentän (parittomat/parilliset rivit) alueeseen."""
+	"""Draws one field (odd/even lines) of an object into the region."""
 	depth = region.depth
 	w, h, pix = region.w, region.h, region.pix
 	map24 = [0, 7, 8, 15]
@@ -303,13 +303,13 @@ def draw_field(region, data, start, end, x0, y0):
 			state["x"] = x0
 			state["y"] += 2
 		else:
-			return   # tuntematon: lopetetaan tämä kenttä
+			return   # unknown: stop this field
 
 
-# ---------------------------------------------------------------- dekooderi
+# ---------------------------------------------------------------- decoder
 
 class DvbSubDecoder(object):
-	"""Purkaa yhden tekstityssivun (composition page + ancillary page) näyttöjoukot."""
+	"""Decodes the display sets of one subtitle page (composition page + ancillary page)."""
 
 	def __init__(self, page_id, anc_id, sink):
 		self.page_id = page_id
@@ -367,7 +367,7 @@ class DvbSubDecoder(object):
 		if pts is None:
 			return
 		if self.in_set:
-			self.end_of_set()   # edellinen joukko jäi ilman END-segmenttiä
+			self.end_of_set()   # the previous set had no END segment
 		self.cur_pts = pts
 		self.timeout = d[s]
 		state = (d[s + 1] >> 2) & 3
@@ -432,7 +432,7 @@ class DvbSubDecoder(object):
 		oid = u16(d, s)
 		coding = (d[s + 2] >> 2) & 3
 		if coding != 0:
-			return   # merkkijono-objektit ovat harvinaisia, ohitetaan
+			return   # string objects are rare, skip them
 		top_len = u16(d, s + 3)
 		bot_len = u16(d, s + 5)
 		ts = s + 7
@@ -456,7 +456,7 @@ class DvbSubDecoder(object):
 		self.sink(self.cur_pts, self.render(), self.timeout)
 
 	def render(self):
-		"""Palauttaa (x, y, w, h, png_bytes, avain) tai None, jos sivu on tyhjä."""
+		"""Returns (x, y, w, h, png_bytes, key) or None if the page is empty."""
 		parts = []
 		for (rid, rx, ry) in self.page_regions:
 			r = self.regions.get(rid)
@@ -526,12 +526,12 @@ def payload_of(pkt):
 
 
 SUB_TYPES = {0x10: "", 0x11: "4:3", 0x12: "16:9", 0x13: "2.21:1", 0x14: "HD",
-	0x20: "kuulovammaiset", 0x21: "kuulovammaiset", 0x22: "kuulovammaiset", 0x23: "kuulovammaiset", 0x24: "kuulovammaiset"}
+	0x20: "hard of hearing", 0x21: "hard of hearing", 0x22: "hard of hearing", 0x23: "hard of hearing", 0x24: "hard of hearing"}
 
 
 def meta_service_id(path):
-	"""Enigma2 kirjoittaa tallenteen viereen .ts.meta-tiedoston, jonka ensimmäinen rivi on
-	palveluviite (esim. 1:0:19:FA0:4:2D:FFFF0000:0:0:0:). Neljäs kenttä on ohjelman numero."""
+	"""Enigma2 writes a .ts.meta file next to the recording; its first line is the
+	service reference (e.g. 1:0:19:FA0:4:2D:FFFF0000:0:0:0:). The fourth field is the program number."""
 	try:
 		with open(path + ".meta", "rb") as f:
 			line = f.readline().decode("latin-1", "ignore").strip()
@@ -544,23 +544,23 @@ def meta_service_id(path):
 
 
 def read_psi(path, limit=32 * 1024 * 1024):
-	"""Lukee PAT/PMT:n ja ensimmäisen videon PTS:n tallenteen alusta.
+	"""Reads the PAT/PMT and the first video PTS from the start of a recording.
 
-	Enigma2 tallentaa kanavanipun alkuperäisen PAT-taulun, jossa ovat kaikki nipun
-	ohjelmat, mutta vain tallennetun kanavan PMT:n. Siksi PMT etsitään kaikista
-	PAT:n luettelemista PID:eistä, ja .meta-tiedoston ohjelmanumero ratkaisee, jos
-	tallenteessa on useampi PMT."""
+	Enigma2 records the original PAT of the multiplex, which lists every program of it,
+	but only the PMT of the recorded channel. So the PMT is searched for in every PID
+	the PAT lists, and the program number from the .meta file decides if the
+	recording has more than one PMT."""
 	info = {"offset": 0, "video_pid": None, "base_pts": None, "tracks": [], "teletext": [], "service_id": None}
 	sid = meta_service_id(path)
 	with open(path, "rb") as f:
 		data = f.read(limit)
 	off = find_sync(data)
 	if off < 0:
-		raise ValueError("ei TS-tiedosto")
+		raise ValueError("not a TS file")
 	info["offset"] = off
-	programs = {}        # ohjelmanumero -> PMT-PID (PAT:sta)
-	bufs = {}            # PID -> keskeneräinen PSI-osio
-	pmts = {}            # ohjelmanumero -> PMT-osio
+	programs = {}        # program number -> PMT PID (from the PAT)
+	bufs = {}            # PID -> incomplete PSI section
+	pmts = {}            # program number -> PMT section
 	seen = set()
 	pmt = None
 	i = off
@@ -585,7 +585,7 @@ def read_psi(path, limit=32 * 1024 * 1024):
 				info["base_pts"] = parse_pts(pl, 9)
 				break
 			continue
-		# PSI: PAT (PID 0) ja mahdolliset PMT:t. Muut PID:t ohitetaan, kunnes PAT on luettu.
+		# PSI: the PAT (PID 0) and possible PMTs. Other PIDs are skipped until the PAT has been read.
 		if pid != 0 and (not programs or pid not in programs.values()):
 			continue
 		if pusi:
@@ -621,7 +621,7 @@ def read_psi(path, limit=32 * 1024 * 1024):
 				if info["video_pid"] is None:
 					break
 	if pmt is None and pmts:
-		# .meta puuttui tai ohjelmanumero ei täsmännyt: otetaan se PMT, jonka PID:itä tiedostossa on eniten
+		# no .meta or no matching program number: take the PMT whose PIDs are most common in the file
 		def score(item):
 			tmp = {"video_pid": None, "tracks": [], "teletext": []}
 			try:
@@ -635,8 +635,8 @@ def read_psi(path, limit=32 * 1024 * 1024):
 		if info["video_pid"] is not None:
 			info["base_pts"] = first_pts(data, off, info["video_pid"])
 	if pmt is None:
-		raise ValueError("PMT puuttuu (PAT: %s, ohjelma %s)" % (
-			", ".join("%d->%d" % kv for kv in sorted(programs.items())) or "ei löytynyt", sid))
+		raise ValueError("PMT missing (PAT: %s, program %s)" % (
+			", ".join("%d->%d" % kv for kv in sorted(programs.items())) or "not found", sid))
 	return info
 
 
@@ -678,7 +678,7 @@ def parse_pmt(p, info):
 			if tag == 0x0a and ln >= 3:
 				lang = body[0:3].decode("latin-1", "ignore")
 				if ln >= 4 and body[3] == 3 and codec:
-					codec += " (kuvailutulkkaus)"
+					codec += " (audio description)"
 			elif st == 0x06 and tag in AUDIO_DESC:
 				codec = AUDIO_DESC[tag]
 			if tag == 0x59:
@@ -697,7 +697,7 @@ def parse_pmt(p, info):
 						info["teletext"].append({"pid": epid, "lang": body[k:k + 3].decode("latin-1", "ignore"),
 							"page": "%d%02x" % ((body[k + 3] & 7) or 8, body[k + 4])})
 		if codec:
-			# ääniraidat PMT-järjestyksessä: TV-soittimet numeroivat ne samoin
+			# audio tracks in PMT order: the TV players number them the same way
 			info.setdefault("audio", []).append({"pid": epid, "lang": lang, "codec": codec})
 
 
@@ -705,18 +705,19 @@ AUDIO_TYPES = {0x03: "MPEG", 0x04: "MPEG", 0x0f: "AAC", 0x11: "AAC", 0x81: "Dolb
 AUDIO_DESC = {0x6a: "Dolby Digital", 0x7a: "Dolby Digital+", 0x7c: "AAC", 0x7b: "DTS"}
 
 
-# ---------------------------------------------------------------- purkutyö
+# ---------------------------------------------------------------- extraction job
 
-LANG_FI = {"fin": "suomi", "swe": "ruotsi", "sve": "ruotsi", "eng": "englanti", "dut": "hollanti", "nld": "hollanti",
-	"ger": "saksa", "deu": "saksa", "fre": "ranska", "fra": "ranska", "nor": "norja", "dan": "tanska",
-	"sme": "saame", "smi": "saame", "rus": "venäjä", "est": "viro", "qaa": "alkuperäinen"}
+# track names in English; the TV apps translate them
+LANG_NAMES = {"fin": "Finnish", "swe": "Swedish", "sve": "Swedish", "eng": "English", "dut": "Dutch", "nld": "Dutch",
+	"ger": "German", "deu": "German", "fre": "French", "fra": "French", "nor": "Norwegian", "dan": "Danish",
+	"sme": "Sami", "smi": "Sami", "rus": "Russian", "est": "Estonian", "qaa": "original"}
 
 
 def track_label(t):
-	name = LANG_FI.get(t["lang"].lower(), t["lang"] or "tuntematon")
+	name = LANG_NAMES.get(t["lang"].lower(), t["lang"] or "unknown")
 	extra = SUB_TYPES.get(t.get("subtype"), "")
-	if extra == "kuulovammaiset":
-		name += " (kuulovammaiset)"
+	if extra == "hard of hearing":
+		name += " (hard of hearing)"
 	return name
 
 
@@ -724,7 +725,7 @@ _swept = []
 
 
 def sweep_old_caches():
-	"""Poistaa kerran aiempien versioiden tallenteiden viereen tekemät .e2tvplayer-kansiot."""
+	"""Removes, once, the cache folders that older versions made next to the recordings."""
 	if _swept:
 		return
 	_swept.append(1)
@@ -740,7 +741,7 @@ def sweep_old_caches():
 
 def cache_root():
 	from .shots import data_dir
-	return data_dir("tekstitykset")
+	return data_dir("subtitles")
 
 
 def cache_dir_for(path):
@@ -763,12 +764,12 @@ class Job(threading.Thread):
 		self.tracks = []
 		self.teletext = []
 		self.audio = []
-		self.cues = {}          # avain -> lista
+		self.cues = {}          # key -> list
 		self.dw, self.dh = 720, 576
 		self.last_used = time.time()
 		self.finished_at = 0
 
-	# --- välimuisti ---
+	# --- cache ---
 	def stat_key(self):
 		st = os.stat(self.path)
 		return [int(st.st_size), int(st.st_mtime), CACHE_VERSION]
@@ -803,8 +804,8 @@ class Job(threading.Thread):
 			log("index save failed: %s" % e)
 
 	def cleanup_orphans(self):
-		"""Poistaa välimuistista tallenteet, joita ei enää ole."""
-		for old in OLD_CACHE_DIRS:   # aiempien versioiden välimuisti pois
+		"""Removes recordings that no longer exist from the cache."""
+		for old in OLD_CACHE_DIRS:   # remove the cache of older versions
 			shutil.rmtree(os.path.join(os.path.dirname(self.path), old), ignore_errors=True)
 		sweep_old_caches()
 		root = cache_root()
@@ -819,11 +820,11 @@ class Job(threading.Thread):
 					p = json.load(f).get("path")
 			except Exception:
 				p = None
-			# poistetaan, jos tallenne on poistettu (tai keskeneräinen purku ilman indeksiä on vanha)
+			# remove if the recording was deleted (or an unfinished extraction without an index is old)
 			if (p and not os.path.exists(p)) or (not p and time.time() - os.path.getmtime(d) > 86400):
 				shutil.rmtree(d, ignore_errors=True)
 
-	# --- itse purku ---
+	# --- the extraction itself ---
 	def run(self):
 		try:
 			if self.load_cache():
@@ -841,7 +842,7 @@ class Job(threading.Thread):
 				self.progress = 1.0
 				return
 			if info["base_pts"] is None:
-				raise ValueError("videon aikaleimaa ei löytynyt")
+				raise ValueError("no video timestamp found")
 			if os.path.isdir(self.cache):
 				shutil.rmtree(self.cache, ignore_errors=True)
 			os.makedirs(self.cache)
@@ -863,17 +864,17 @@ class Job(threading.Thread):
 	def extract(self, info):
 		base = info["base_pts"]
 		decoders = {}     # pid -> [decoder]
-		open_cue = {}     # avain -> viimeisin avoin vihje
+		open_cue = {}     # key -> latest open cue
 		last_key = {}
 
 		def make_sink(key):
 			def sink(pts, img, timeout):
 				t = ((pts - base) % PTS_WRAP) / 90000.0
 				if t > 6 * 3600:
-					return   # aikaleima ennen tallenteen alkua
+					return   # timestamp before the start of the recording
 				prev = open_cue.get(key)
 				if img is not None and prev is not None and last_key.get(key) == img[5]:
-					return   # sama kuva edelleen näkyvissä
+					return   # the same image is still shown
 				if prev is not None:
 					prev["e"] = round(min(t, prev["e"]), 2)
 					open_cue[key] = None
@@ -957,14 +958,14 @@ class Job(threading.Thread):
 							packet(pid, view[k * PKT:(k + 1) * PKT])
 						k = b2.find(bytes((lo,)), k + 1)
 				if good < npk:
-					# tahdistus katosi: etsitään seuraava kohta, jossa paketit alkavat
+					# lost sync: find the next place where packets start
 					o = find_sync(chunk, good * PKT + 1)
 					pos += (o if o >= 0 else len(chunk))
 				else:
 					pos += npk * PKT
 				f.seek(pos)
 				self.progress = min(0.999, float(pos) / max(1, size))
-				time.sleep(0.002)   # annetaan Enigma2:n käyttöliittymälle vuoroja
+				time.sleep(0.002)   # give the Enigma2 user interface some time
 				if time.time() - last_save > 20:
 					self.save_index("running")
 					last_save = time.time()
@@ -974,7 +975,7 @@ class Job(threading.Thread):
 		for d in dec_ref:
 			d.end_of_set()
 
-	# --- rajapinta ---
+	# --- interface ---
 	def snapshot(self, key=None, start=0):
 		self.last_used = time.time()
 		with self.lock:
@@ -999,11 +1000,11 @@ def job_for(path, start=True):
 			if job.status == "stopped":
 				job = None
 			elif job.status == "error" and time.time() - job.finished_at > 600:
-				job = None   # uusi yritys 10 min kuluttua (esim. tallennus oli vielä kesken)
+				job = None   # retry after 10 min (e.g. the recording was still in progress)
 		if job is None:
 			if not start:
 				return None
-			# vain yksi purku kerrallaan: pysäytetään muut keskeneräiset
+			# only one extraction at a time: stop the other unfinished ones
 			for p, j in list(_jobs.items()):
 				if j.status in ("starting", "running"):
 					j.stop_flag = True

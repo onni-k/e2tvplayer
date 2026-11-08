@@ -31,7 +31,7 @@
 		</div>
 		<div id="nowbar"></div>
 
-		<!-- Tallenteet / kanavat: lista vasemmalla, tiedot oikealla -->
+		<!-- Recordings / channels: list on the left, details on the right -->
 		<div id="browser">
 			<div id="listbox">
 				<div id="list"></div>
@@ -45,45 +45,45 @@
 			</div>
 		</div>
 
-		<!-- Asetukset -->
+		<!-- Settings -->
 		<div id="settings">
-			<div class="s-head">Boksin osoite</div>
-			<div class="s-help">Numeronäppäimet syöttävät, vasen/oikea vaihtaa kenttää, ylös/alas muuttaa arvoa.</div>
+			<div class="s-head">Box address</div>
+			<div class="s-help">Number keys enter digits, left/right moves between fields, up/down changes the value.</div>
 			<div id="s-fields"></div>
 			<div id="s-info"></div>
-			<div class="s-keys"><span class="k k-ok">OK</span> Tallenna &nbsp; <span class="k k-red"></span> Palauta oletus &nbsp; <span class="k k-green"></span> Näytön koko &nbsp; <span class="k k-ret">RETURN</span> Peruuta</div>
+			<div class="s-keys"><span class="k k-ok">OK</span> Save &nbsp; <span class="k k-red"></span> Reset &nbsp; <span class="k k-green"></span> Screen size &nbsp; <span class="k k-ret">RETURN</span> Cancel</div>
 		</div>
 
 		<div id="footer"></div>
 	</div>
 
-	<!-- Boksin purkamat tekstitykset videon päällä -->
+	<!-- Subtitles extracted by the box, over the video -->
 	<div id="sublayer"><img id="subimg" src="" alt="" /></div>
-	<!-- Toiston päälle tuleva palkki -->
+	<!-- Bar shown over playback -->
 	<div id="osd">
 		<div id="osd-title"></div>
 		<div id="osd-sub"></div>
 		<div id="osd-bar"><div id="osd-fill"></div></div>
 		<div id="osd-time"></div>
 		<div id="osd-state"></div>
-		<div id="osd-keys">&#9664;&#9654; 15 s &nbsp; &#9650;&#9660; 5 min &nbsp; &#9194;&#9193; 1 min &nbsp; OK tauko &nbsp; RETURN lopeta</div>
+		<div id="osd-keys">&#9664;&#9654; 15 s &nbsp; &#9650;&#9660; 5 min &nbsp; &#9194;&#9193; 1 min &nbsp; OK pause &nbsp; RETURN stop</div>
 	</div>
-	<!-- INFO-paneeli toiston aikana -->
+	<!-- INFO panel during playback -->
 	<div id="info">
 		<div id="i-title"></div>
 		<div id="i-meta"></div>
 		<div id="i-desc"></div>
 		<div id="i-next"></div>
 	</div>
-	<!-- MENU/TOOLS: ääni ja tekstitys -->
+	<!-- TOOLS: audio, subtitles, language, screenshot -->
 	<div id="tracks">
-		<div class="tr-head">Ääni ja tekstitys</div>
+		<div class="tr-head">Audio and subtitles</div>
 		<div id="tr-rows"></div>
 		<div id="tr-diag"></div>
-		<div class="tr-keys">▲▼ rivi &nbsp; ◀▶ vaihda &nbsp; OK/RETURN sulje</div>
+		<div class="tr-keys">▲▼ row &nbsp; ◀▶ change &nbsp; OK/RETURN close</div>
 	</div>
 	<div id="subs"></div>
-	<div id="busy"><div id="busy-text">Ladataan&hellip;</div></div>
+	<div id="busy"><div id="busy-text">Loading&hellip;</div></div>
 	<div id="dialog">
 		<div id="dlg-title"></div>
 		<div id="dlg-text"></div>
