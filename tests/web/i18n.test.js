@@ -4,10 +4,11 @@ const fs = require('fs'), { JSDOM } = require('jsdom');
 const W = __dirname + '/../../enigma2/src/E2TVPlayer/widget/';
 let fails = 0;
 function ok(c, m) { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fails++; }
-function load(lang, stored, orsay) {
+function load(lang, stored, orsay, nnavi) {
   const dom = new JSDOM(fs.readFileSync(W + 'index.html', 'utf8').replace(/<script[^>]*><\/script>/g, ''), { runScripts: 'outside-only', url: 'http://localhost/' });
   const w = dom.window;
   Object.defineProperty(w.navigator, 'language', { get: () => lang });
+  if (nnavi !== undefined) { w.document.getElementById('pluginNNavi').GetLanguage = () => nnavi; }
   if (orsay !== undefined) w.pluginAPI = { GetLanguage: () => orsay };
   if (stored) w.localStorage.setItem('e2tallenteet', JSON.stringify({ lang: stored }));
   w.eval(fs.readFileSync(W + 'js/util.js', 'utf8'));
@@ -41,4 +42,10 @@ w = load('de-DE');
 ok(w.eval("I18n.sys()") === 'en', 'kääntämätön TV:n kieli -> englanti');
 ok(w.eval("TL('ruotsi (kuulovammaiset)')") === 'Swedish (hard of hearing)', 'boksin tekstitysnimi käännetään');
 ok(w.eval("I18n.langs().join(',')") === 'fi,en', 'kielilista po-tiedostoista');
+// NNavi-lisäosa ensin (vanhan Samsungin ensisijainen kielilähde)
+w = load('en-US', null, 0, 24);
+ok(w.eval("I18n.sys()") === 'fi', 'NNavi 24 voittaa pluginAPI:n ja selaimen');
+ok(/nnavi=24 api=0 nav=en-US → fi/.test(w.eval("I18n.diag()")), 'diagnostiikka: ' + w.eval("I18n.diag()"));
+w = load('fi-FI', null, undefined, -1);
+ok(w.eval("I18n.sys()") === 'fi' && w.eval("I18n.diag()").indexOf('nnavi') < 0, 'NNavi -1 ohitetaan');
 console.log(fails ? fails + ' virhettä' : 'kaikki ok'); process.exit(fails ? 1 : 0);

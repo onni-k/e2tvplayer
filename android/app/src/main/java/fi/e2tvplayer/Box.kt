@@ -34,6 +34,25 @@ object Box {
         set(v) { prefs.edit().putString("host", v.trim()).apply() }
 
     fun base(): String = "http://$host"
+
+    /** Käynnistysmerkintä boksin lokiin (http://boksi/e2tvplayer/loki). */
+    fun hello(version: String) {
+        if (host.isBlank()) return
+        val loc = java.util.Locale.getDefault()
+        val msg = "start platform=android app=$version model=${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}" +
+            " | device=${android.os.Build.DEVICE} | android=${android.os.Build.VERSION.RELEASE} (sdk ${android.os.Build.VERSION.SDK_INT})" +
+            " | lang=locale=${loc.toLanguageTag()} → ${I18n.sys()}, " + T("käytössä") + " " + I18n.name(I18n.cur()) +
+            " | pref=${I18n.pref()}"
+        pool.execute {
+            try {
+                val c = java.net.URL(base() + "/e2tvplayer/log?m=" + java.net.URLEncoder.encode(msg, "UTF-8")).openConnection() as java.net.HttpURLConnection
+                c.connectTimeout = 5000
+                c.readTimeout = 5000
+                c.inputStream.use { it.readBytes() }
+                c.disconnect()
+            } catch (e: Exception) { }
+        }
+    }
     fun hostname(): String = host.substringBefore(':')
 
     fun enc(s: String): String = URLEncoder.encode(s, "UTF-8").replace("+", "%20")

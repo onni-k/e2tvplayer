@@ -434,7 +434,8 @@ var Player = {
 			else if (ids[r] === 'shot') { rows.push(row(r, T('Kuvakaappaus'), Shot.busy ? T('odota…') : T('OK: ota kuva 10 s päästä'), false)); }
 		}
 		U.$('tr-rows').innerHTML = rows.join('');
-		U.$('tr-diag').innerHTML = Player.active ? U.esc(Player.boxStatus()) + '<br/>' + U.esc(Player.diag) : '';
+		U.$('tr-diag').innerHTML = (Player.active ? U.esc(Player.boxStatus()) + '<br/>' + U.esc(Player.diag) + '<br/>' : '') +
+			U.esc(T('Kieli') + ': ' + I18n.diag());
 	},
 
 	changeTrack: function (d) {

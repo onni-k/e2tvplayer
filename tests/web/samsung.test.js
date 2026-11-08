@@ -41,6 +41,7 @@ const $=id=>w.document.getElementById(id);
 const key=c=>w.App.keyDown({keyCode:c});
 const K=w.tvKey; const txt=id=>$(id).textContent.replace(/\s+/g,' ').trim();
 const check=(c,m)=>{if(!c){console.log('FAIL',m);process.exitCode=1}else console.log('ok  ',m)};
+{const h=urls.find(u=>u.includes('/e2tvplayer/log?'));check(h&&decodeURIComponent(h).includes('start platform=orsay')&&decodeURIComponent(h).includes('lang=nav=fi-FI'),'käynnistysmerkintä boksin lokiin: '+(h?decodeURIComponent(h).slice(0,120):'-'));}
 check($('list').querySelectorAll('.row').length===3,'juuri: kansio + 2 tallennetta (.Trash piilossa)');
 check(txt('nowbar').includes('TALLENTAA'),'tilarivi: '+txt('nowbar'));
 check(txt('crumb').includes('(2)'),'polku: '+txt('crumb'));

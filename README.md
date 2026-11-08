@@ -92,6 +92,7 @@ Samsungin soitin ei näytä DVB-tekstityksiä, joten boksi purkaa ne kuviksi (`s
 | `/e2tvplayer/info` | tunnistus (Google TV -sovelluksen boksihaku) |
 | `/e2tvplayer/subs`, `/subimg` | tallenteen tekstitykset (Samsung) |
 | `/e2tvplayer/live`, `/livesubs`, `/liveimg` | live-välitys ja sen tekstitykset (Samsung) |
+| `/e2tvplayer/log`, `/loki` | TV-sovellusten käynnistysmerkinnät (laite, kieli, versio) ja niiden katselu |
 
 Vanha polku `/e2samsungtv/` toimii edelleen, jotta aiemmin asennettu Samsung-sovellus ei mene rikki.
 

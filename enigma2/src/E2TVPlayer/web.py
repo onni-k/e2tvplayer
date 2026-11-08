@@ -23,7 +23,7 @@ try:
 except ImportError:  # pragma: no cover - vain testausta varten
 	resource = None
 
-VERSION = "0.1.013"
+VERSION = "0.1.014"
 APP_ID = "E2Tallenteet"   # TV:n sisäinen tunnus pidetään ennallaan: päivitys korvaa vanhan sovelluksen
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"
@@ -39,6 +39,34 @@ _zip_cache = {}
 
 def log(msg):
 	print("[E2TVPlayer] %s" % msg)
+
+
+LOG_MAX = 256 * 1024
+
+
+def log_file():
+	from .shots import data_dir
+	return os.path.join(os.path.dirname(data_dir("kuvakaappaukset")), "e2tvplayer.log")
+
+
+def client_log(addr, msg):
+	"""TV-sovellusten käynnistysmerkinnät ym. -> /media/hdd/e2tvplayer/e2tvplayer.log"""
+	import time
+	msg = msg.replace("\r", " ").replace("\n", " ")[:4000]
+	line = "%s %s %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), addr, msg)
+	log("TV %s: %s" % (addr, msg))
+	try:
+		p = log_file()
+		if os.path.exists(p) and os.path.getsize(p) > LOG_MAX:
+			with open(p, "rb") as f:
+				f.seek(-LOG_MAX // 2, 2)
+				tail = f.read()
+			with open(p, "wb") as f:
+				f.write(tail[tail.find(b"\n") + 1:])
+		with open(p, "ab") as f:
+			f.write(line.encode("utf-8"))
+	except Exception as e:
+		log("log write failed: %s" % e)
 
 
 def _to_str(value):
@@ -316,6 +344,22 @@ if resource is not None:
 			host = request_host(request)
 			if path and path[0] in ("kuvat", "kuva"):
 				return self.render_shots(request, path)
+			if path and path[0] == "log":
+				# /e2tvplayer/log?m=...  (TV-sovellus kirjaa käynnistyksen ja laitteen tiedot)
+				m = request.args.get(b"m") or request.args.get("m") or [b""]
+				addr = getattr(request.getClientAddress(), "host", "?") if hasattr(request, "getClientAddress") else "?"
+				client_log(addr, _to_str(m[0]))
+				request.setHeader(b"Access-Control-Allow-Origin", b"*")
+				request.setHeader(b"Content-Type", b"text/plain")
+				return b"ok"
+			if path and path[0] in ("loki", "logi"):
+				request.setHeader(b"Content-Type", b"text/plain; charset=utf-8")
+				request.setHeader(b"Cache-Control", b"no-cache")
+				try:
+					with open(log_file(), "rb") as f:
+						return f.read()
+				except Exception:
+					return b"(tyhja / empty)"
 			if len(path) == 3 and path[0] == "web" and path[1] == "lib" and path[2] == "html2canvas.min.js":
 				with open(os.path.join(WIDGET_DIR, "lib", path[2]), "rb") as f:
 					data = f.read()

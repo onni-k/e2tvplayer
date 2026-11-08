@@ -339,6 +339,14 @@ msgstr ""
 msgid " – haetaan "
 msgstr ""
 
+#: web/util.js android/Box.kt
+msgid "käytössä"
+msgstr ""
+
+#: web/util.js
+msgid "valittu"
+msgstr ""
+
 #: web/util.js android/I18n.kt
 msgid "automaattinen"
 msgstr ""
@@ -957,6 +965,14 @@ msgstr ""
 
 #: box/info.py
 msgid "Näytä kuvat"
+msgstr ""
+
+#: box/info.py
+msgid "TV-sovellusten käynnistysloki (laite, kieli, versio):"
+msgstr ""
+
+#: box/info.py
+msgid "Näytä loki"
 msgstr ""
 
 #: box/info.py

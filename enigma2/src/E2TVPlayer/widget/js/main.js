@@ -8,11 +8,52 @@ var App = {
 	view: null,
 	statusTimer: null,
 
+	/* Käynnistysmerkintä boksin lokiin (http://boksi/e2tvplayer/loki): laite, versio ja kieli */
+	deviceInfo: function () {
+		var d = [], v;
+		function add(k, val) { if (val !== null && val !== undefined && String(val) !== '') { d.push(k + '=' + val); } }
+		var tizenApp = document.documentElement.className.indexOf('tizen') >= 0;
+		add('platform', tizenApp ? 'tizen' : 'orsay');
+		add('app', typeof BOX_PLUGIN_VERSION !== 'undefined' ? BOX_PLUGIN_VERSION : null);
+		try { add('widget', window.curWidget && curWidget.id); } catch (e0) { }
+		try {
+			if (typeof webapis !== 'undefined' && webapis.productinfo) {
+				try { add('model', webapis.productinfo.getRealModel()); } catch (e1) { }
+				try { add('modelcode', webapis.productinfo.getModel()); } catch (e2) { }
+				try { add('firmware', webapis.productinfo.getFirmware()); } catch (e3) { }
+			}
+		} catch (e4) { }
+		try {
+			if (typeof tizen !== 'undefined' && tizen.systeminfo) {
+				add('tizen', tizen.systeminfo.getCapability('http://tizen.org/feature/platform.version'));
+			}
+		} catch (e5) { }
+		add('firmware', I18n._call('pluginNNavi', 'GetFirmware'));
+		add('modelcode', I18n._call('pluginNNavi', 'GetModelCode'));
+		add('product', I18n._call('pluginTVMW', 'GetProductCode'));
+		try { add('screen', screen.width + 'x' + screen.height + ' win=' + window.innerWidth + 'x' + window.innerHeight); } catch (e6) { }
+		add('lang', I18n.diag());
+		add('pref', I18n.pref());
+		try { add('ua', navigator.userAgent); } catch (e7) { }
+		return d.join(' | ');
+	},
+
+	hello: function () {
+		if (!Api.host) { return; }
+		try {
+			var x = new XMLHttpRequest();
+			x.onreadystatechange = function () { };
+			x.open('GET', Api.base() + '/e2tvplayer/log?m=' + encodeURIComponent('start ' + App.deviceInfo()), true);
+			x.send(null);
+		} catch (e) { }
+	},
+
 	onLoad: function () {
 		I18n.applyStatic();
 		Store.load();
 		Screen.apply();
 		Api.init();
+		App.hello();
 		Browser.init();
 		Player.init();
 

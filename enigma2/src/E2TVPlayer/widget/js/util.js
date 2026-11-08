@@ -161,6 +161,7 @@ var I18N_DATA = {
    "hollanti": "Dutch",
    "italia": "Italian",
    "kuvailutulkkaus": "audio description",
+   "käytössä": "in use",
    "muu": "other",
    "norja": "Norwegian",
    "näkymä": "view",
@@ -177,6 +178,7 @@ var I18N_DATA = {
    "tanska": "Danish",
    "tekstitys": "subtitles",
    "tuntematon": "unknown",
+   "valittu": "chosen",
    "venäjä": "Russian",
    "videokuva": "video frame",
    "virhe": "error",
@@ -209,24 +211,51 @@ var I18n = {
 		try { if (typeof Store !== 'undefined') { v = Store.get('lang', 'auto'); } } catch (e) { }
 		return (v !== 'auto' && I18n.has(v)) ? v : 'auto';
 	},
-	/* TV:n kieli kaksikirjaimisena, '' jos ei selviä */
-	tvLang: function () {
-		var l = '';
+	/* Kielilähteet järjestyksessä; raw-arvot talteen lokia ja TOOLS-valikkoa varten */
+	src: null,
+	_call: function (id, fn) {
 		try {
-			if (typeof pluginAPI !== 'undefined' && pluginAPI && typeof pluginAPI.GetLanguage === 'function') {
-				var c = pluginAPI.GetLanguage();
-				if (c !== null && c !== undefined && c !== '') {
-					if (typeof c === 'number' || /^\d+$/.test(String(c))) { l = ORSAY_LANGS[parseInt(c, 10)] || 'en'; }
-					else { l = String(c); }
-				}
+			var o = typeof id === 'string' ? document.getElementById(id) : id;
+			if (o && typeof o[fn] !== 'undefined') {
+				var v = o[fn]();
+				if (v !== null && v !== undefined && String(v) !== '' && String(v) !== '-1') { return String(v); }
 			}
 		} catch (e) { }
-		if (!l) {
-			try { l = String(navigator.language || navigator.userLanguage || navigator.browserLanguage || ''); } catch (e2) { }
-		}
-		l = l.toLowerCase();
+		return null;
+	},
+	norm: function (raw) {
+		if (raw === null || raw === undefined) { return ''; }
+		var l = String(raw).toLowerCase();
+		if (/^\d+$/.test(l)) { return ORSAY_LANGS[parseInt(l, 10)] || ''; }
 		if (ISO3[l.substring(0, 3)]) { return ISO3[l.substring(0, 3)]; }
-		return l.substring(0, 2);
+		return /^[a-z]{2}/.test(l) ? l.substring(0, 2) : '';
+	},
+	sources: function () {
+		if (I18n.src) { return I18n.src; }
+		var r = [], nav = null;
+		r.push(['nnavi', I18n._call('pluginNNavi', 'GetLanguage')]);
+		r.push(['tvmw', I18n._call('pluginTVMW', 'GetLanguage')]);
+		r.push(['api', typeof pluginAPI !== 'undefined' ? I18n._call(pluginAPI, 'GetLanguage') : null]);
+		try { nav = String(navigator.language || navigator.userLanguage || navigator.browserLanguage || '') || null; } catch (e) { }
+		r.push(['nav', nav]);
+		I18n.src = r;
+		return r;
+	},
+	/* TV:n kieli kaksikirjaimisena, '' jos ei selviä. Orsay: NNavi/TVMW-lisäosa, muuten selaimen kieli */
+	tvLang: function () {
+		var r = I18n.sources();
+		for (var i = 0; i < r.length; i++) {
+			var l = I18n.norm(r[i][1]);
+			if (l) { return l; }
+		}
+		return '';
+	},
+	/* "nnavi=24 nav=en-US -> fi" */
+	diag: function () {
+		var r = I18n.sources(), out = [];
+		for (var i = 0; i < r.length; i++) { if (r[i][1] !== null) { out.push(r[i][0] + '=' + r[i][1]); } }
+		return out.join(' ') + ' → ' + (I18n.tvLang() || '?') + ', ' + T('käytössä') + ' ' + I18n.name(I18n.cur()) +
+			(I18n.pref() === 'auto' ? '' : ' (' + T('valittu') + ')');
 	},
 	sys: function () {
 		var l = I18n.tvLang();

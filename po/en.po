@@ -341,6 +341,14 @@ msgstr "box does not respond"
 msgid " – haetaan "
 msgstr " – loading "
 
+#: web/util.js android/Box.kt
+msgid "käytössä"
+msgstr "in use"
+
+#: web/util.js
+msgid "valittu"
+msgstr "chosen"
+
 #: web/util.js android/I18n.kt
 msgid "automaattinen"
 msgstr "automatic"
@@ -960,6 +968,14 @@ msgstr "Pictures taken from the TOOLS menu of the TV app are saved in"
 #: box/info.py
 msgid "Näytä kuvat"
 msgstr "Show the pictures"
+
+#: box/info.py
+msgid "TV-sovellusten käynnistysloki (laite, kieli, versio):"
+msgstr "Start-up log of the TV apps (device, language, version):"
+
+#: box/info.py
+msgid "Näytä loki"
+msgstr "Show the log"
 
 #: box/info.py
 msgid "Boksi purkaa tallenteen DVB-tekstitykset ensimmäisellä toistokerralla kansioon %s. Live-kanavilla tekstitykset puretaan lähetyksestä."

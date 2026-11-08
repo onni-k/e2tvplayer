@@ -93,6 +93,7 @@ class MainActivity : Activity() {
         tabCh.text = T("Kanavat")
         tabSet.text = T("Asetukset")
         langCur = I18n.cur()
+        Box.hello(BuildConfigCompat.version(this))
         findViewById<TextView>(R.id.title).text =
             Html.fromHtml("E2<font color='#4FA3FF'>TV</font>Player")
 

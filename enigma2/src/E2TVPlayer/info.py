@@ -196,6 +196,7 @@ def page_html(host, version, title, mount, zip_name, has_apk, registered=True):
 	out.append("<p>%s<br><code>%s</code><br><a href='/%s/kuvat'>%s</a></p>" % (
 		T("TV-sovelluksen TOOLS-valikosta otetut kuvat tallentuvat kansioon"),
 		shots.shots_dir(), mount, T("Näytä kuvat")))
+	out.append("<p>%s <a href='/%s/loki'>%s</a></p>" % (T("TV-sovellusten käynnistysloki (laite, kieli, versio):"), mount, T("Näytä loki")))
 	try:
 		if not shots.find_ffmpeg():
 			out.append("<p><i>%s</i></p>" % T("Videokuva Samsung-kuviin: opkg install ffmpeg"))
