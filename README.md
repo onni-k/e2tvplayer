@@ -91,7 +91,7 @@ The Samsung player does not show DVB subtitles, so the box renders them into ima
 |---|---|
 | `/media/hdd/e2tvplayer/screenshots` | screenshots taken from the TOOLS menu |
 | `/media/hdd/e2tvplayer/subtitles` | extracted subtitles of recordings (removed when the recording is deleted) |
-| `/media/hdd/e2tvplayer/e2tvplayer.log` | start-up log of the TV apps (device, version, language) |
+| `/media/hdd/e2tvplayer/e2tvplayer.log` | log of the TV apps: start-up (device, version, language) and updates (Samsung sync, package downloads) |
 
 Without `/media/hdd` the folders are under `/tmp`. Folders from older versions are renamed or removed automatically.
 

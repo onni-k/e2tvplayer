@@ -22,7 +22,7 @@ try:
 except ImportError:  # pragma: no cover - for testing only
 	resource = None
 
-VERSION = "0.1.016"
+VERSION = "0.1.017"
 APP_ID = "E2Tallenteet"   # the TV's internal id is kept: an update replaces the old app
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"
@@ -46,6 +46,27 @@ LOG_MAX = 256 * 1024
 def log_file():
 	from .shots import data_dir
 	return os.path.join(os.path.dirname(data_dir("screenshots")), "e2tvplayer.log")
+
+
+def client_addr(request):
+	try:
+		return request.getClientAddress().host
+	except Exception:
+		try:
+			return request.getClientIP()
+		except Exception:
+			return "?"
+
+
+def update_log(request, what, size=None):
+	"""Update/sync requests of the TVs to the log: what, plugin version, size and the TV browser."""
+	try:
+		ua = request.getHeader(b"user-agent") or request.getHeader("user-agent") or b""
+		ua = _to_str(ua)[:160]
+	except Exception:
+		ua = ""
+	client_log(client_addr(request), "update %s | version=%s%s | ua=%s" % (
+		what, VERSION, "" if size is None else " | size=%d" % size, ua))
 
 
 def client_log(addr, msg):
@@ -261,9 +282,11 @@ if resource is not None:
 				data = build_zip(host)
 			except Exception as e:
 				log("zip build failed: %s" % e)
+				update_log(request, "samsung-sync widgetlist.xml FAILED: %s" % e)
 				request.setResponseCode(500)
 				return b"zip build failed"
 			log("widgetlist.xml requested (host %s, zip %d bytes)" % (host, len(data)))
+			update_log(request, "samsung-sync widgetlist.xml (box %s)" % host, len(data))
 			request.setHeader(b"Content-Type", b"text/xml; charset=utf-8")
 			request.setHeader(b"Cache-Control", b"no-cache")
 			return widgetlist_xml(host, len(data)).encode("utf-8")
@@ -346,8 +369,7 @@ if resource is not None:
 			if path and path[0] == "log":
 				# /e2tvplayer/log?m=...  (the TV app logs its start-up and device details)
 				m = request.args.get(b"m") or request.args.get("m") or [b""]
-				addr = getattr(request.getClientAddress(), "host", "?") if hasattr(request, "getClientAddress") else "?"
-				client_log(addr, _to_str(m[0]))
+				client_log(client_addr(request), _to_str(m[0]))
 				request.setHeader(b"Access-Control-Allow-Origin", b"*")
 				request.setHeader(b"Content-Type", b"text/plain")
 				return b"ok"
@@ -371,6 +393,7 @@ if resource is not None:
 				return self.render_live(request, path[0])
 			if path and path[-1].lower().endswith(".zip"):
 				data = build_zip(host)
+				update_log(request, "samsung-sync %s" % path[-1], len(data))
 				log("app zip downloaded (%d bytes)" % len(data))
 				request.setHeader(b"Content-Type", b"application/zip")
 				request.setHeader(b"Content-Length", str(len(data)).encode("ascii"))
@@ -379,6 +402,7 @@ if resource is not None:
 			if path and path[-1].lower().endswith(".wgt"):
 				data = build_wgt(host)
 				log("Tizen app downloaded (%d bytes)" % len(data))
+				update_log(request, "tizen-package E2TVPlayer.wgt", len(data))
 				request.setHeader(b"Content-Type", b"application/widget")
 				request.setHeader(b"Content-Disposition", b'attachment; filename="E2TVPlayer.wgt"')
 				request.setHeader(b"Content-Length", str(len(data)).encode("ascii"))
@@ -393,6 +417,7 @@ if resource is not None:
 				with open(apk, "rb") as f:
 					data = f.read()
 				log("Google TV app downloaded (%d bytes)" % len(data))
+				update_log(request, "googletv-package E2TVPlayer.apk (app %s)" % apk_version(), len(data))
 				request.setHeader(b"Content-Type", b"application/vnd.android.package-archive")
 				request.setHeader(b"Content-Disposition", b'attachment; filename="E2TVPlayer.apk"')
 				request.setHeader(b"Content-Length", str(len(data)).encode("ascii"))
@@ -405,6 +430,8 @@ if resource is not None:
 					return b""
 				with open(p, "rb") as f:
 					data = f.read()
+				if path[2] == "util.js":   # the first file the Tizen loader fetches
+					update_log(request, "tizen-code from the box")
 				request.setHeader(b"Content-Type", b"text/css; charset=utf-8" if path[1] == "css" else b"application/javascript; charset=utf-8")
 				request.setHeader(b"Cache-Control", b"no-cache")
 				return data

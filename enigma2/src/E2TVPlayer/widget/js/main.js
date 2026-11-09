@@ -46,6 +46,18 @@ var App = {
 			x.open('GET', Api.base() + '/e2tvplayer/log?m=' + encodeURIComponent('start ' + App.deviceInfo()), true);
 			x.send(null);
 		} catch (e) { }
+		/* Orsay: the extra language probe a few seconds later, as its own log line */
+		setTimeout(function () {
+			I18n.probeMore(function (r) {
+				if (!r) { return; }
+				try {
+					var y = new XMLHttpRequest();
+					y.onreadystatechange = function () { };
+					y.open('GET', Api.base() + '/e2tvplayer/log?m=' + encodeURIComponent('langprobe ' + I18n.moreText()), true);
+					y.send(null);
+				} catch (e2) { }
+			});
+		}, 3000);
 	},
 
 	onLoad: function () {

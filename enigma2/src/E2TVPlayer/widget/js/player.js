@@ -435,7 +435,7 @@ var Player = {
 		}
 		U.$('tr-rows').innerHTML = rows.join('');
 		U.$('tr-diag').innerHTML = (Player.active ? U.esc(Player.boxStatus()) + '<br/>' + U.esc(Player.diag) + '<br/>' : '') +
-			U.esc(T('Language') + ': ' + I18n.diag());
+			U.esc(T('Language') + ': ' + I18n.diag() + (I18n.more ? ' | ' + I18n.moreText() : ''));
 	},
 
 	changeTrack: function (d) {

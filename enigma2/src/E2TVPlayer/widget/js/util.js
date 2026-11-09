@@ -455,29 +455,65 @@ var I18n = {
 			return 'err:' + String(e && e.message ? e.message : e).substring(0, 40);
 		}
 	},
-	/* every language source: [[name, raw value], ...] in order of preference */
+	/* the language sources read at start-up: [[name, raw value], ...] in order of preference */
 	sources: function () {
 		if (I18n.src) { return I18n.src; }
 		var r = [], P = I18n._probe;
-		var orsay = !!document.getElementById('pluginNNavi') && typeof tizen === 'undefined';
-		if (orsay) {
+		if (I18n.isOrsay()) {
 			r.push(['nnavi', P('pluginNNavi', 'GetLanguage')]);
-			r.push(['nnavi2', P('pluginObjectNNavi', 'GetLanguage')]);
-			r.push(['sefnnavi', I18n._sef('NNAVI', 'GetLanguage')]);
-			r.push(['seftv', I18n._sef('TV', 'GetLanguage')]);
-			r.push(['tv', P('pluginObjectTV', 'GetLanguage')]);
-			r.push(['tvmenu', P('pluginObjectTV', 'GetMenuLanguage')]);
-			try { if (window.webapis && webapis.tv && webapis.tv.info) { r.push(['webapis', P(webapis.tv.info, 'getLanguage')]); r.push(['webapismenu', P(webapis.tv.info, 'getMenuLanguage')]); } } catch (e1) { }
 			r.push(['api', typeof pluginAPI !== 'undefined' ? P(pluginAPI, 'GetLanguage') : 'noobj']);
 			r.push(['widget', P(window.curWidget, 'getLanguage')]);
 			r.push(['tvmw', P('pluginTVMW', 'GetLanguage')]);
-			r.push(['tvmwcountry', P('pluginTVMW', 'GetCountry')]);
 		}
 		var nav = null;
 		try { nav = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || null; } catch (e) { }
 		r.push(['nav', nav === null ? 'null' : String(nav)]);
 		I18n.src = r;
 		return r;
+	},
+	isOrsay: function () { return !!document.getElementById('pluginNNavi') && typeof tizen === 'undefined'; },
+	/* Orsay: more plugins probed a few seconds after start-up, for the log and the TOOLS menu only.
+	   The plugin objects are created here and not in index.html, so a plugin the TV does not like
+	   cannot stop the app from installing or starting. If a probe ever hangs or crashes the app,
+	   the flag left in Store makes the next start skip it. */
+	more: null,
+	probeMore: function (done) {
+		if (!I18n.isOrsay() || I18n.more) { if (done) { done(I18n.more); } return; }
+		if (Store.get('langProbe', 0)) {
+			I18n.more = [['probe', 'skipped (did not finish last time)']];
+			Store.set('langProbe', 0);
+			if (done) { done(I18n.more); }
+			return;
+		}
+		Store.set('langProbe', 1);
+		var r = [], P = I18n._probe;
+		try {
+			var div = document.createElement('div');
+			div.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:hidden';
+			div.innerHTML = '<object id="pluginObjectNNavi" border="0" classid="clsid:SAMSUNG-INFOLINK-NNAVI"></object>' +
+				'<object id="pluginObjectTV" border="0" classid="clsid:SAMSUNG-INFOLINK-TV"></object>' +
+				'<object id="pluginSef" border="0" classid="clsid:SAMSUNG-INFOLINK-SEF"></object>';
+			document.body.appendChild(div);
+		} catch (e) { r.push(['objects', 'err:' + e]); }
+		setTimeout(function () {
+			r.push(['nnavi2', P('pluginObjectNNavi', 'GetLanguage')]);
+			r.push(['tv', P('pluginObjectTV', 'GetLanguage')]);
+			r.push(['tvmenu', P('pluginObjectTV', 'GetMenuLanguage')]);
+			r.push(['tvcountry', P('pluginObjectTV', 'GetCountry')]);
+			r.push(['tvmwcountry', P('pluginTVMW', 'GetCountry')]);
+			r.push(['sefnnavi', I18n._sef('NNAVI', 'GetLanguage')]);
+			r.push(['seftv', I18n._sef('TV', 'GetLanguage')]);
+			r.push(['seftvmw', I18n._sef('TVMW', 'GetLanguage')]);
+			try { if (window.webapis && webapis.tv && webapis.tv.info) { r.push(['webapis', P(webapis.tv.info, 'getLanguage')]); } } catch (e1) { }
+			I18n.more = r;
+			Store.set('langProbe', 0);
+			if (done) { done(r); }
+		}, 500);
+	},
+	moreText: function () {
+		var m = I18n.more || [], out = [];
+		for (var i = 0; i < m.length; i++) { out.push(m[i][0] + '=' + m[i][1]); }
+		return out.join(' ');
 	},
 	_ok: function (v) { return v && v !== 'null' && v !== 'undef' && v !== 'noobj' && v !== '-1' && v.indexOf('err:') !== 0; },
 	/* The TV language as a two-letter code, '' if unknown */

@@ -55,8 +55,8 @@ ok(w.eval("I18n.sys()") === 'fi', 'NNavi 6 -> Finnish');
 w = load('en-US', null, undefined, 1);
 ok(w.eval("I18n.sys()") === 'sv', 'NNavi 1 -> Swedish');
 w = load('en-US', null, 0, 6);
-ok(/^nnavi=6 api=0 nav=en-US \(-nnavi2,sefnnavi,seftv,tv,tvmenu,widget,tvmw,tvmwcountry\) → fi \[nnavi\]/.test(w.eval("I18n.diag()")), 'NNavi wins, diagnostics: ' + w.eval("I18n.diag()"));
-ok(/nnavi2=undef/.test(w.eval("I18n.diag(true)")) && /tvmw=undef/.test(w.eval("I18n.diag(true)")), 'the log lists every source: ' + w.eval("I18n.diag(true)"));
+ok(/^nnavi=6 api=0 nav=en-US \(-widget,tvmw\) → fi \[nnavi\]/.test(w.eval("I18n.diag()")), 'NNavi wins, diagnostics: ' + w.eval("I18n.diag()"));
+ok(/widget=noobj/.test(w.eval("I18n.diag(true)")) && /tvmw=undef/.test(w.eval("I18n.diag(true)")), 'the log lists every source: ' + w.eval("I18n.diag(true)"));
 w = load('c', null, undefined, -1, 17);
 ok(w.eval("I18n.sys()") === 'fi' && /\[tvmw\]/.test(w.eval("I18n.diag()")), 'UE40H6275: only TVMW 17 (country) -> Finnish: ' + w.eval("I18n.diag()"));
 w = load('en-US', null, undefined, 1, 17);
@@ -66,4 +66,16 @@ ok(w.eval("I18n.sys()") === 'en', 'browser language wins over TVMW 17');
 w = load('fi-FI', null, 'fin');
 ok(w.eval("I18n.sys()") === 'fi', 'string code fin -> Finnish');
 
-console.log(fails ? fails + ' failures' : 'all ok'); process.exit(fails ? 1 : 0);
+// the delayed extra probe (Orsay) and its crash guard
+w = load('en-US', null, undefined, 6);
+let more = null; w.I18n.probeMore(r => { more = r; });
+setTimeout(() => {
+  ok(more && /nnavi2=undef/.test(w.eval('I18n.moreText()')) && w.eval("Store.get('langProbe')") === 0, 'extra probe: ' + w.eval('I18n.moreText()'));
+  const w2 = load('en-US', null, undefined, 6); w2.eval("Store.set('langProbe', 1)");
+  let m2 = null; w2.I18n.probeMore(r => { m2 = r; });
+  ok(m2 && /skipped/.test(w2.eval('I18n.moreText()')), 'probe skipped after an unfinished one');
+  const w3 = load('en-US');
+  let m3 = 'x'; w3.eval("window.tizen = {}"); w3.I18n.probeMore(r => { m3 = r; });
+  ok(m3 === null, 'no extra probe on Tizen');
+  console.log(fails ? fails + ' failures' : 'all ok'); process.exit(fails ? 1 : 0);
+}, 800);
