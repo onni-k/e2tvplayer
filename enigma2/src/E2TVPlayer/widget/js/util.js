@@ -388,7 +388,7 @@ var I18N_DATA = {
    probably the country; it is used only when no real language source answers. */
 var NNAVI_CODES = { 0: 'en', 1: 'sv', 2: 'de', 3: 'no', 4: 'da', 5: 'fr', 6: 'fi' };
 var LANG_CODES = {
-	nnavi: NNAVI_CODES, nnavi2: NNAVI_CODES, sefnnavi: NNAVI_CODES,
+	nnavi: NNAVI_CODES, nnavi2: NNAVI_CODES,
 	api: { 0: 'en', 1: 'fr', 5: 'de', 24: 'fi', 25: 'sv' },
 	tvmw: { 17: 'fi' }
 };
@@ -443,18 +443,6 @@ var I18n = {
 			return 'err:' + String(e && e.message ? e.message : e).substring(0, 40);
 		}
 	},
-	_sef: function (module, cmd) {
-		var sef = document.getElementById('pluginSef');
-		if (!sef || typeof sef.Open === 'undefined') { return 'noobj'; }
-		try {
-			sef.Open(module, '1.000', module);
-			var v = sef.Execute(cmd);
-			try { sef.Close(); } catch (e0) { }
-			return (v === null || v === undefined) ? 'null' : String(v);
-		} catch (e) {
-			return 'err:' + String(e && e.message ? e.message : e).substring(0, 40);
-		}
-	},
 	/* the language sources read at start-up: [[name, raw value], ...] in order of preference */
 	sources: function () {
 		if (I18n.src) { return I18n.src; }
@@ -472,9 +460,10 @@ var I18n = {
 		return r;
 	},
 	isOrsay: function () { return !!document.getElementById('pluginNNavi') && typeof tizen === 'undefined'; },
-	/* Orsay: more plugins probed a few seconds after start-up, for the log and the TOOLS menu only.
-	   The plugin objects are created here and not in index.html, so a plugin the TV does not like
-	   cannot stop the app from installing or starting. If a probe ever hangs or crashes the app,
+	/* Orsay: more sources probed a few seconds after start-up, for the log and the TOOLS menu only.
+	   NOTE: the Orsay installer rejects an app whose files mention plugins a user app may not use
+	   (e.g. the TV and SEF plugins): the app silently disappears after User App Sync. Only the
+	   PLAYER, TVMW and NNAVI plugins may appear anywhere in the widget (checked by the tests). If a probe ever hangs or crashes the app,
 	   the flag left in Store makes the next start skip it. */
 	more: null,
 	probeMore: function (done) {
@@ -490,20 +479,15 @@ var I18n = {
 		try {
 			var div = document.createElement('div');
 			div.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:hidden';
-			div.innerHTML = '<object id="pluginObjectNNavi" border="0" classid="clsid:SAMSUNG-INFOLINK-NNAVI"></object>' +
-				'<object id="pluginObjectTV" border="0" classid="clsid:SAMSUNG-INFOLINK-TV"></object>' +
-				'<object id="pluginSef" border="0" classid="clsid:SAMSUNG-INFOLINK-SEF"></object>';
+			div.innerHTML = '<object id="pluginObjectNNavi" border="0" classid="clsid:SAMSUNG-INFOLINK-NNAVI"></object>';
 			document.body.appendChild(div);
 		} catch (e) { r.push(['objects', 'err:' + e]); }
 		setTimeout(function () {
 			r.push(['nnavi2', P('pluginObjectNNavi', 'GetLanguage')]);
-			r.push(['tv', P('pluginObjectTV', 'GetLanguage')]);
-			r.push(['tvmenu', P('pluginObjectTV', 'GetMenuLanguage')]);
-			r.push(['tvcountry', P('pluginObjectTV', 'GetCountry')]);
+			r.push(['nnavimenu', P('pluginNNavi', 'GetMenuLanguage')]);
+			r.push(['nnavisys', P('pluginNNavi', 'GetSystemLanguage')]);
+			r.push(['tvmwmenu', P('pluginTVMW', 'GetMenuLanguage')]);
 			r.push(['tvmwcountry', P('pluginTVMW', 'GetCountry')]);
-			r.push(['sefnnavi', I18n._sef('NNAVI', 'GetLanguage')]);
-			r.push(['seftv', I18n._sef('TV', 'GetLanguage')]);
-			r.push(['seftvmw', I18n._sef('TVMW', 'GetLanguage')]);
 			try { if (window.webapis && webapis.tv && webapis.tv.info) { r.push(['webapis', P(webapis.tv.info, 'getLanguage')]); } } catch (e1) { }
 			I18n.more = r;
 			Store.set('langProbe', 0);

@@ -70,7 +70,7 @@ ok(w.eval("I18n.sys()") === 'fi', 'string code fin -> Finnish');
 w = load('en-US', null, undefined, 6);
 let more = null; w.I18n.probeMore(r => { more = r; });
 setTimeout(() => {
-  ok(more && /nnavi2=undef/.test(w.eval('I18n.moreText()')) && w.eval("Store.get('langProbe')") === 0, 'extra probe: ' + w.eval('I18n.moreText()'));
+  ok(more && /nnavi2=undef nnavimenu=undef/.test(w.eval('I18n.moreText()')) && w.eval("Store.get('langProbe')") === 0, 'extra probe: ' + w.eval('I18n.moreText()'));
   const w2 = load('en-US', null, undefined, 6); w2.eval("Store.set('langProbe', 1)");
   let m2 = null; w2.I18n.probeMore(r => { m2 = r; });
   ok(m2 && /skipped/.test(w2.eval('I18n.moreText()')), 'probe skipped after an unfinished one');
