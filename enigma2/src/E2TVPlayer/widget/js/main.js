@@ -32,7 +32,7 @@ var App = {
 		add('modelcode', I18n._call('pluginNNavi', 'GetModelCode'));
 		add('product', I18n._call('pluginTVMW', 'GetProductCode'));
 		try { add('screen', screen.width + 'x' + screen.height + ' win=' + window.innerWidth + 'x' + window.innerHeight); } catch (e6) { }
-		add('lang', I18n.diag());
+		add('lang', I18n.diag(true));
 		add('pref', I18n.pref());
 		try { add('ua', navigator.userAgent); } catch (e7) { }
 		return d.join(' | ');

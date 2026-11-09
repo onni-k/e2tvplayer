@@ -379,14 +379,21 @@ var I18N_DATA = {
  }
 };
 /* I18N-DATA-END */
-/* Samsung Orsay reports the TV menu language as a number; each plugin has its own numbering.
-   NNavi/pluginAPI: 0 = English, 1 = French, 5 = German, 24 = Finnish, 25 = Swedish.
-   TVMW: 17 = Finnish (seen on a UE40H6275). Raw values are written to the box log on start-up. */
+/* Samsung Orsay reports the TV menu language as a number; the numbering is not documented and
+   differs between plugins, so every known source is probed and the raw results are written to
+   the box log and shown in the TOOLS menu. Numeric codes are mapped per source:
+   NNavi (Samsung SDK table): 0 = English, 1 = Swedish, 2 = German, 3 = Norwegian, 4 = Danish, 5 = French, 6 = Finnish.
+   pluginAPI (older table): 0 = English, 1 = French, 5 = German, 24 = Finnish, 25 = Swedish.
+   TVMW GetLanguage gives 17 on a Finnish UE40H6275 whatever the menu language is, so it is
+   probably the country; it is used only when no real language source answers. */
+var NNAVI_CODES = { 0: 'en', 1: 'sv', 2: 'de', 3: 'no', 4: 'da', 5: 'fr', 6: 'fi' };
 var LANG_CODES = {
-	nnavi: { 0: 'en', 1: 'fr', 5: 'de', 24: 'fi', 25: 'sv' },
+	nnavi: NNAVI_CODES, nnavi2: NNAVI_CODES, sefnnavi: NNAVI_CODES,
 	api: { 0: 'en', 1: 'fr', 5: 'de', 24: 'fi', 25: 'sv' },
 	tvmw: { 17: 'fi' }
 };
+/* sources used only as a last resort */
+var LANG_WEAK = { tvmw: true };
 var ISO3 = { fin: 'fi', swe: 'sv', sve: 'sv', eng: 'en', ger: 'de', deu: 'de', fre: 'fr', fra: 'fr' };
 var I18n = {
 	SOURCE: 'en',
@@ -423,31 +430,82 @@ var I18n = {
 		if (ISO3[l.substring(0, 3)]) { return ISO3[l.substring(0, 3)]; }
 		return /^[a-z]{2}(\b|[-_]|$)/.test(l) ? l.substring(0, 2) : '';
 	},
+	/* raw result of obj.fn(args): a value, 'null', 'undef' (no such method) or 'err:...' */
+	_probe: function (o, fn, args) {
+		try {
+			if (typeof o === 'string') { o = document.getElementById(o); }
+			if (!o) { return 'noobj'; }
+			if (typeof o[fn] === 'undefined') { return 'undef'; }
+			var v = o[fn].apply(o, args || []);
+			if (v === null || v === undefined) { return 'null'; }
+			return String(v);
+		} catch (e) {
+			return 'err:' + String(e && e.message ? e.message : e).substring(0, 40);
+		}
+	},
+	_sef: function (module, cmd) {
+		var sef = document.getElementById('pluginSef');
+		if (!sef || typeof sef.Open === 'undefined') { return 'noobj'; }
+		try {
+			sef.Open(module, '1.000', module);
+			var v = sef.Execute(cmd);
+			try { sef.Close(); } catch (e0) { }
+			return (v === null || v === undefined) ? 'null' : String(v);
+		} catch (e) {
+			return 'err:' + String(e && e.message ? e.message : e).substring(0, 40);
+		}
+	},
+	/* every language source: [[name, raw value], ...] in order of preference */
 	sources: function () {
 		if (I18n.src) { return I18n.src; }
-		var r = [], nav = null;
-		r.push(['nnavi', I18n._call('pluginNNavi', 'GetLanguage')]);
-		r.push(['tvmw', I18n._call('pluginTVMW', 'GetLanguage')]);
-		r.push(['api', typeof pluginAPI !== 'undefined' ? I18n._call(pluginAPI, 'GetLanguage') : null]);
-		try { nav = String(navigator.language || navigator.userLanguage || navigator.browserLanguage || '') || null; } catch (e) { }
-		r.push(['nav', nav]);
+		var r = [], P = I18n._probe;
+		var orsay = !!document.getElementById('pluginNNavi') && typeof tizen === 'undefined';
+		if (orsay) {
+			r.push(['nnavi', P('pluginNNavi', 'GetLanguage')]);
+			r.push(['nnavi2', P('pluginObjectNNavi', 'GetLanguage')]);
+			r.push(['sefnnavi', I18n._sef('NNAVI', 'GetLanguage')]);
+			r.push(['seftv', I18n._sef('TV', 'GetLanguage')]);
+			r.push(['tv', P('pluginObjectTV', 'GetLanguage')]);
+			r.push(['tvmenu', P('pluginObjectTV', 'GetMenuLanguage')]);
+			try { if (window.webapis && webapis.tv && webapis.tv.info) { r.push(['webapis', P(webapis.tv.info, 'getLanguage')]); r.push(['webapismenu', P(webapis.tv.info, 'getMenuLanguage')]); } } catch (e1) { }
+			r.push(['api', typeof pluginAPI !== 'undefined' ? P(pluginAPI, 'GetLanguage') : 'noobj']);
+			r.push(['widget', P(window.curWidget, 'getLanguage')]);
+			r.push(['tvmw', P('pluginTVMW', 'GetLanguage')]);
+			r.push(['tvmwcountry', P('pluginTVMW', 'GetCountry')]);
+		}
+		var nav = null;
+		try { nav = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || null; } catch (e) { }
+		r.push(['nav', nav === null ? 'null' : String(nav)]);
 		I18n.src = r;
 		return r;
 	},
-	/* The TV language as a two-letter code, '' if unknown. Orsay: NNavi/TVMW plugins, otherwise the browser */
+	_ok: function (v) { return v && v !== 'null' && v !== 'undef' && v !== 'noobj' && v !== '-1' && v.indexOf('err:') !== 0; },
+	/* The TV language as a two-letter code, '' if unknown */
 	tvLang: function () {
-		var r = I18n.sources();
-		for (var i = 0; i < r.length; i++) {
-			var l = I18n.norm(r[i][1], r[i][0]);
-			if (l) { return l; }
+		var r = I18n.sources(), weak = '', i, l;
+		for (i = 0; i < r.length; i++) {
+			if (!I18n._ok(r[i][1])) { continue; }
+			l = I18n.norm(r[i][1], r[i][0]);
+			if (!l) { continue; }
+			if (LANG_WEAK[r[i][0]]) { if (!weak) { weak = l; } } else { return l; }
 		}
+		return weak;
+	},
+	/* the source that decided, for the diagnostics */
+	tvLangSource: function () {
+		var r = I18n.sources(), l = I18n.tvLang();
+		for (var i = 0; i < r.length; i++) { if (I18n._ok(r[i][1]) && I18n.norm(r[i][1], r[i][0]) === l && l) { return r[i][0]; } }
 		return '';
 	},
-	/* e.g. "tvmw=17 nav=c → fi, in use suomi" */
-	diag: function () {
-		var r = I18n.sources(), out = [];
-		for (var i = 0; i < r.length; i++) { if (r[i][1] !== null) { out.push(r[i][0] + '=' + r[i][1]); } }
-		return out.join(' ') + ' → ' + (I18n.tvLang() || '?') + ', ' + T('in use') + ' ' + I18n.name(I18n.cur()) +
+	/* all = true: also the sources that gave nothing (for the log) */
+	diag: function (all) {
+		var r = I18n.sources(), out = [], miss = [];
+		for (var i = 0; i < r.length; i++) {
+			if (all || I18n._ok(r[i][1]) || r[i][1].indexOf('err:') === 0) { out.push(r[i][0] + '=' + r[i][1]); } else { miss.push(r[i][0]); }
+		}
+		var src = I18n.tvLangSource();
+		return out.join(' ') + (miss.length ? ' (-' + miss.join(',') + ')' : '') + ' → ' + (I18n.tvLang() || '?') +
+			(src ? ' [' + src + ']' : '') + ', ' + T('in use') + ' ' + I18n.name(I18n.cur()) +
 			(I18n.pref() === 'auto' ? '' : ' (' + T('chosen') + ')');
 	},
 	/* a TV language without a translation falls back to English */

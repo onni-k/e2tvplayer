@@ -41,7 +41,7 @@ const $=id=>w.document.getElementById(id);
 const key=c=>w.App.keyDown({keyCode:c});
 const K=w.tvKey; const txt=id=>$(id).textContent.replace(/\s+/g,' ').trim();
 const check=(c,m)=>{if(!c){console.log('FAIL',m);process.exitCode=1}else console.log('ok  ',m)};
-{const h=urls.find(u=>u.includes('/e2tvplayer/log?'));check(h&&decodeURIComponent(h).includes('start platform=orsay')&&decodeURIComponent(h).includes('lang=nav=en-US'),'start-up entry in the box log: '+(h?decodeURIComponent(h).slice(0,120):'-'));}
+{const h=urls.find(u=>u.includes('/e2tvplayer/log?'));check(h&&decodeURIComponent(h).includes('start platform=orsay')&&decodeURIComponent(h).includes('nav=en-US'),'start-up entry in the box log: '+(h?decodeURIComponent(h).slice(0,120):'-'));}
 check($('list').querySelectorAll('.row').length===3,'root: folder + 2 recordings (.Trash hidden)');
 check(txt('nowbar').includes('RECORDING'),'status bar: '+txt('nowbar'));
 check(txt('crumb').includes('(2)'),'path: '+txt('crumb'));

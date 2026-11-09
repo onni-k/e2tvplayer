@@ -45,17 +45,24 @@ ok(w.eval("T('Settings')") === 'Inställningar', 'stored choice wins over the TV
 
 // Samsung Orsay: plugin language codes (the browser language is not reliable there)
 w = load('en-US', null, 24);
-ok(w.eval("I18n.sys()") === 'fi', 'pluginAPI 24 -> Finnish');
+ok(w.eval("I18n.sys()") === 'fi', 'pluginAPI 24 -> Finnish (older table)');
 w = load('fi-FI', null, 0);
 ok(w.eval("I18n.sys()") === 'en', 'pluginAPI 0 -> English');
 w = load('fi-FI', null, 5);
 ok(w.eval("I18n.sys()") === 'en', 'pluginAPI 5 (German, no translation) -> English');
-w = load('en-US', null, undefined, 24);
-ok(w.eval("I18n.sys()") === 'fi', 'NNavi 24 -> Finnish');
-w = load('en-US', null, 0, 24);
-ok(/nnavi=24 api=0 nav=en-US → fi/.test(w.eval("I18n.diag()")), 'NNavi wins, diagnostics: ' + w.eval("I18n.diag()"));
+w = load('en-US', null, undefined, 6);
+ok(w.eval("I18n.sys()") === 'fi', 'NNavi 6 -> Finnish');
+w = load('en-US', null, undefined, 1);
+ok(w.eval("I18n.sys()") === 'sv', 'NNavi 1 -> Swedish');
+w = load('en-US', null, 0, 6);
+ok(/^nnavi=6 api=0 nav=en-US \(-nnavi2,sefnnavi,seftv,tv,tvmenu,widget,tvmw,tvmwcountry\) → fi \[nnavi\]/.test(w.eval("I18n.diag()")), 'NNavi wins, diagnostics: ' + w.eval("I18n.diag()"));
+ok(/nnavi2=undef/.test(w.eval("I18n.diag(true)")) && /tvmw=undef/.test(w.eval("I18n.diag(true)")), 'the log lists every source: ' + w.eval("I18n.diag(true)"));
 w = load('c', null, undefined, -1, 17);
-ok(w.eval("I18n.sys()") === 'fi', 'UE40H6275: TVMW 17 -> Finnish (NNavi -1 and nav=c ignored): ' + w.eval("I18n.diag()"));
+ok(w.eval("I18n.sys()") === 'fi' && /\[tvmw\]/.test(w.eval("I18n.diag()")), 'UE40H6275: only TVMW 17 (country) -> Finnish: ' + w.eval("I18n.diag()"));
+w = load('en-US', null, undefined, 1, 17);
+ok(w.eval("I18n.sys()") === 'sv', 'a real language source wins over TVMW 17');
+w = load('en-US', null, undefined, undefined, 17);
+ok(w.eval("I18n.sys()") === 'en', 'browser language wins over TVMW 17');
 w = load('fi-FI', null, 'fin');
 ok(w.eval("I18n.sys()") === 'fi', 'string code fin -> Finnish');
 
