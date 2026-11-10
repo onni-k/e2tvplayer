@@ -13,7 +13,10 @@ one of them, E2TVPlayer itself is not affected.
 
 Each app waits for onload and sendReadyEvent, probes every candidate method immediately,
 after 1 s and after 5 s, shows the results on the screen and writes them to the box log.
-The test apps can be turned off at http://<box>/e2tvplayer/langtest?on=0
+Results on a UE40H6275: the TV plugin GetLanguage follows the menu language (10 = Finnish,
+17 = English, 25 = Swedish), which E2TVPlayer now uses. The test apps are off by default:
+http://<box>/e2tvplayer/langtest?on=1 turns them on (then User App Sync).
+http://<box>/e2tvplayer/langtest?tv=0 stops E2TVPlayer from using the TV plugin.
 """
 from __future__ import absolute_import
 
@@ -37,25 +40,41 @@ SEF_MODULES = ["TV", "TVMW", "NNAVI", "APPCOMMON"]
 SEF_COMMANDS = ["GetLanguage", "GetMenuLanguage", "GetCountry"]
 
 
-def flag_file():
+def _flag(name):
 	from .shots import data_dir
-	return os.path.join(os.path.dirname(data_dir("screenshots")), "langtest.off")
+	return os.path.join(os.path.dirname(data_dir("screenshots")), name)
+
+
+def _set(name, present):
+	p = _flag(name)
+	if present:
+		open(p, "w").close()
+	elif os.path.exists(p):
+		os.remove(p)
 
 
 def enabled():
+	"""the test apps are installed by User App Sync (off by default)"""
 	try:
-		return not os.path.exists(flag_file())
+		return os.path.exists(_flag("langtest.on"))
 	except Exception:
 		return False
 
 
 def set_enabled(on):
-	p = flag_file()
-	if on:
-		if os.path.exists(p):
-			os.remove(p)
-	else:
-		open(p, "w").close()
+	_set("langtest.on", on)
+
+
+def tv_language():
+	"""E2TVPlayer reads the language from the Orsay TV plugin (on by default)"""
+	try:
+		return not os.path.exists(_flag("tvlang.off"))
+	except Exception:
+		return True
+
+
+def set_tv_language(on):
+	_set("tvlang.off", not on)
 
 
 def app_id(v):

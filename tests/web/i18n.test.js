@@ -4,12 +4,14 @@ const fs = require('fs'), { JSDOM } = require('jsdom');
 const W = __dirname + '/../../enigma2/src/E2TVPlayer/widget/';
 let fails = 0;
 function ok(c, m) { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fails++; }
-function load(lang, stored, orsay, nnavi, tvmw) {
+function load(lang, stored, orsay, nnavi, tvmw, tvplugin, boxTv) {
   const dom = new JSDOM(fs.readFileSync(W + 'index.html', 'utf8').replace(/<script[^>]*><\/script>/g, ''), { runScripts: 'outside-only', url: 'http://localhost/' });
   const w = dom.window;
   Object.defineProperty(w.navigator, 'language', { get: () => lang });
   if (nnavi !== undefined) { w.document.getElementById('pluginNNavi').GetLanguage = () => nnavi; }
   if (tvmw !== undefined) { w.document.getElementById('pluginTVMW').GetLanguage = () => tvmw; }
+  if (tvplugin !== undefined) { const o = w.document.createElement('object'); o.id = 'pluginObjectTV'; o.GetLanguage = () => tvplugin; w.document.body.appendChild(o); }
+  if (boxTv !== undefined) w.BOX_ORSAY_TVLANG = boxTv;
   if (orsay !== undefined) w.pluginAPI = { GetLanguage: () => orsay };
   if (stored) w.localStorage.setItem('e2tallenteet', JSON.stringify({ lang: stored }));
   w.eval(fs.readFileSync(W + 'js/util.js', 'utf8'));
@@ -55,14 +57,28 @@ ok(w.eval("I18n.sys()") === 'fi', 'NNavi 6 -> Finnish');
 w = load('en-US', null, undefined, 1);
 ok(w.eval("I18n.sys()") === 'sv', 'NNavi 1 -> Swedish');
 w = load('en-US', null, 0, 6);
-ok(/^nnavi=6 api=0 nav=en-US \(-widget,tvmw\) → fi \[nnavi\]/.test(w.eval("I18n.diag()")), 'NNavi wins, diagnostics: ' + w.eval("I18n.diag()"));
-ok(/widget=noobj/.test(w.eval("I18n.diag(true)")) && /tvmw=undef/.test(w.eval("I18n.diag(true)")), 'the log lists every source: ' + w.eval("I18n.diag(true)"));
+ok(/^nnavi=6 api=0 nav=en-US \(-tv,tvcache,tvmw\) → fi \[nnavi\]/.test(w.eval("I18n.diag()")), 'NNavi wins, diagnostics: ' + w.eval("I18n.diag()"));
+ok(/tv=undef tvcache=null/.test(w.eval("I18n.diag(true)")) && /tvmw=undef/.test(w.eval("I18n.diag(true)")), 'the log lists every source: ' + w.eval("I18n.diag(true)"));
 w = load('c', null, undefined, -1, 17);
 ok(w.eval("I18n.sys()") === 'fi' && /\[tvmw\]/.test(w.eval("I18n.diag()")), 'UE40H6275: only TVMW 17 (country) -> Finnish: ' + w.eval("I18n.diag()"));
 w = load('en-US', null, undefined, 1, 17);
 ok(w.eval("I18n.sys()") === 'sv', 'a real language source wins over TVMW 17');
 w = load('en-US', null, undefined, undefined, 17);
 ok(w.eval("I18n.sys()") === 'en', 'browser language wins over TVMW 17');
+// the Orsay TV plugin follows the menu language (measured on a UE40H6275)
+w = load('c', null, undefined, undefined, 17, 10);
+ok(w.eval("I18n.sys()") === 'fi' && /\[tv\]/.test(w.eval("I18n.diag()")), 'TV plugin 10 -> Finnish: ' + w.eval("I18n.diag()"));
+w = load('c', null, undefined, undefined, 17, 25);
+ok(w.eval("I18n.sys()") === 'sv', 'TV plugin 25 -> Swedish (TVMW 17 ignored)');
+w = load('c', null, undefined, undefined, 17, 17);
+ok(w.eval("I18n.sys()") === 'en' && w.eval("Store.get('tvLang')") === '17', 'TV plugin 17 -> English, value stored');
+w = load('c', JSON.stringify(0) && null, undefined, undefined, 17, undefined);
+w.eval("Store.set('tvLang', '25'); I18n.src = null; I18n._cur = null;");
+ok(w.eval("I18n.sys()") === 'sv' && /tvcache=25/.test(w.eval("I18n.diag()")), 'plugin not ready: the stored value is used: ' + w.eval("I18n.diag()"));
+w = load('c', null, undefined, undefined, 17, 25, false);
+w.document.getElementById('pluginObjectTV').remove();
+w.eval("I18n.src = null; I18n._cur = null; I18n._tvObj = null;");
+ok(w.eval("I18n.sys()") === 'fi' && !w.document.getElementById('pluginObjectTV'), 'box turned the TV plugin off: no plugin created, TVMW fallback');
 w = load('fi-FI', null, 'fin');
 ok(w.eval("I18n.sys()") === 'fi', 'string code fin -> Finnish');
 

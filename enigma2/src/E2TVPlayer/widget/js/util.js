@@ -380,14 +380,17 @@ var I18N_DATA = {
 };
 /* I18N-DATA-END */
 /* Samsung Orsay reports the TV menu language as a number; the numbering is not documented and
-   differs between plugins, so every known source is probed and the raw results are written to
-   the box log and shown in the TOOLS menu. Numeric codes are mapped per source:
-   NNavi (Samsung SDK table): 0 = English, 1 = Swedish, 2 = German, 3 = Norwegian, 4 = Danish, 5 = French, 6 = Finnish.
-   pluginAPI (older table): 0 = English, 1 = French, 5 = German, 24 = Finnish, 25 = Swedish.
-   TVMW GetLanguage gives 17 on a Finnish UE40H6275 whatever the menu language is, so it is
-   probably the country; it is used only when no real language source answers. */
+   differs between plugins. Measured on a UE40H6275 (T-INFOLINK2014) with the E2 Lang Test apps:
+   the TV plugin GetLanguage follows the menu language: 10 = Finnish, 17 = English, 25 = Swedish.
+   TVMW GetLanguage stays 17 whatever the menu language is (probably the region), so it is used
+   only as a last resort. NNavi and pluginAPI have no GetLanguage on that model; their tables
+   come from the Samsung SDK documentation:
+   NNavi: 0 = English, 1 = Swedish, 2 = German, 3 = Norwegian, 4 = Danish, 5 = French, 6 = Finnish.
+   pluginAPI: 0 = English, 1 = French, 5 = German, 24 = Finnish, 25 = Swedish. */
 var NNAVI_CODES = { 0: 'en', 1: 'sv', 2: 'de', 3: 'no', 4: 'da', 5: 'fr', 6: 'fi' };
+var TV_CODES = { 10: 'fi', 17: 'en', 25: 'sv' };
 var LANG_CODES = {
+	tv: TV_CODES, tvcache: TV_CODES,
 	nnavi: NNAVI_CODES, nnavi2: NNAVI_CODES,
 	api: { 0: 'en', 1: 'fr', 5: 'de', 24: 'fi', 25: 'sv' },
 	tvmw: { 17: 'fi' }
@@ -448,9 +451,11 @@ var I18n = {
 		if (I18n.src) { return I18n.src; }
 		var r = [], P = I18n._probe;
 		if (I18n.isOrsay()) {
+			var tv = P(I18n.tvPlugin(), 'GetLanguage');
+			r.push(['tv', tv]);
+			if (I18n._ok(tv)) { Store.set('tvLang', tv); } else { r.push(['tvcache', String(Store.get('tvLang', 'null'))]); }
 			r.push(['nnavi', P('pluginNNavi', 'GetLanguage')]);
 			r.push(['api', typeof pluginAPI !== 'undefined' ? P(pluginAPI, 'GetLanguage') : 'noobj']);
-			r.push(['widget', P(window.curWidget, 'getLanguage')]);
 			r.push(['tvmw', P('pluginTVMW', 'GetLanguage')]);
 		}
 		var nav = null;
@@ -459,11 +464,32 @@ var I18n = {
 		I18n.src = r;
 		return r;
 	},
+	/* The Orsay TV plugin, created here at run time. When the plugin was written out in the app
+	   files (0.1.016 in index.html, 0.1.017 in util.js), the TV dropped the app at User App Sync,
+	   although a separate test app using the same plugin installs fine. So the class id is put
+	   together here, and the box can turn this off (http://<box>/e2tvplayer/langtest?tv=0). */
+	_tvObj: null,
+	tvPlugin: function () {
+		if (I18n._tvObj) { return I18n._tvObj; }
+		if (typeof BOX_ORSAY_TVLANG !== 'undefined' && !BOX_ORSAY_TVLANG) { return null; }
+		var o = document.getElementById('pluginObjectTV');
+		if (!o) {
+			try {
+				var div = document.createElement('div');
+				div.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:hidden';
+				div.innerHTML = '<object id="pluginObjectTV" border="0" classid="' + ['clsid:SAMSUNG', 'INFOLINK', 'TV'].join('-') + '"></object>';
+				document.body.appendChild(div);
+				o = document.getElementById('pluginObjectTV');
+			} catch (e) { o = null; }
+		}
+		I18n._tvObj = o;
+		return o;
+	},
 	isOrsay: function () { return !!document.getElementById('pluginNNavi') && typeof tizen === 'undefined'; },
-	/* Orsay: more sources probed a few seconds after start-up, for the log and the TOOLS menu only.
-	   NOTE: the Orsay installer rejects an app whose files mention plugins a user app may not use
-	   (e.g. the TV and SEF plugins): the app silently disappears after User App Sync. Only the
-	   PLAYER, TVMW and NNAVI plugins may appear anywhere in the widget (checked by the tests). If a probe ever hangs or crashes the app,
+	/* Orsay: more sources probed a few seconds after start-up, for the log and the TOOLS menu.
+	   The TV plugin value is also stored, so the next start can use it even if the plugin is not
+	   ready immediately. Only the PLAYER, TVMW and NNAVI plugins may be written out in the widget
+	   files (checked by the tests), see tvPlugin. If a probe ever hangs or crashes the app,
 	   the flag left in Store makes the next start skip it. */
 	more: null,
 	probeMore: function (done) {
@@ -483,6 +509,9 @@ var I18n = {
 			document.body.appendChild(div);
 		} catch (e) { r.push(['objects', 'err:' + e]); }
 		setTimeout(function () {
+			var tv = P(I18n.tvPlugin(), 'GetLanguage');
+			r.push(['tv3s', tv]);
+			if (I18n._ok(tv)) { Store.set('tvLang', tv); }
 			r.push(['nnavi2', P('pluginObjectNNavi', 'GetLanguage')]);
 			r.push(['nnavimenu', P('pluginNNavi', 'GetMenuLanguage')]);
 			r.push(['nnavisys', P('pluginNNavi', 'GetSystemLanguage')]);
