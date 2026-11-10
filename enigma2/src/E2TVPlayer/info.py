@@ -191,6 +191,15 @@ def page_html(host, version, title, mount, zip_name, has_apk, registered=True):
 		"<b>%(t)s</b> appears in My Apps.</li></ol><p>Update: repeat step 3 and then restart the TV. <a "
 		"href='/%(m)s/%(z)s'>Download zip</a></p>") % h)
 
+	try:
+		from . import langtest
+		if langtest.enabled():
+			out.append("<p><small>%s <a href='/%s/langtest?on=0'>%s</a></small></p>" % (
+				T("User App Sync also installs two small language test apps (E2 Lang Test A and B)."),
+				mount, T("Turn them off")))
+	except Exception:
+		pass
+
 	out.append("<h2>%s</h2>" % T("Screenshots"))
 	out.append("<p>%s<br><code>%s</code><br><a href='/%s/shots'>%s</a></p>" % (
 		T("Pictures taken from the TOOLS menu of the TV app are saved in"),

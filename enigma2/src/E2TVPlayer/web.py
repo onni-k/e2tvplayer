@@ -22,7 +22,7 @@ try:
 except ImportError:  # pragma: no cover - for testing only
 	resource = None
 
-VERSION = "0.1.018"
+VERSION = "0.1.019"
 APP_ID = "E2Tallenteet"   # the TV's internal id is kept: an update replaces the old app
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"
@@ -255,20 +255,35 @@ def apk_version():
 		return None
 
 
-def widgetlist_xml(host, size):
+def _widget_entry(wid, title, size, desc, url):
 	return (
-		'<?xml version="1.0" encoding="UTF-8"?>\n'
-		'<rsp stat="ok">\n'
-		'\t<list>\n'
-		'\t\t<widget id="%(id)s">\n'
-		'\t\t\t<title>%(title)s</title>\n'
-		'\t\t\t<compression size="%(size)d" type="zip"/>\n'
-		'\t\t\t<description>Enigma2 recordings and channels through OpenWebif</description>\n'
-		'\t\t\t<download>http://%(host)s/%(mount)s/%(zip)s</download>\n'
+		'\t\t<widget id="%s">\n'
+		'\t\t\t<title>%s</title>\n'
+		'\t\t\t<compression size="%d" type="zip"/>\n'
+		'\t\t\t<description>%s</description>\n'
+		'\t\t\t<download>%s</download>\n'
 		'\t\t</widget>\n'
-		'\t</list>\n'
-		'</rsp>\n'
-	) % {"id": APP_ID, "title": APP_TITLE, "size": size, "host": host, "mount": MOUNT, "zip": ZIP_NAME}
+	) % (wid, title, size, desc, url)
+
+
+def widgetlist_xml(host, size, extra=()):
+	"""extra: [(id, title, size, description, zip name)] of the language test apps"""
+	entries = _widget_entry(APP_ID, APP_TITLE, size, "Enigma2 recordings and channels through OpenWebif",
+		"http://%s/%s/%s" % (host, MOUNT, ZIP_NAME))
+	for wid, title, sz, desc, name in extra:
+		entries += _widget_entry(wid, title, sz, desc, "http://%s/%s/%s" % (host, MOUNT, name))
+	return '<?xml version="1.0" encoding="UTF-8"?>\n<rsp stat="ok">\n\t<list>\n' + entries + '\t</list>\n</rsp>\n'
+
+
+def langtest_zips(host):
+	"""[(id, title, size, description, zip name)] of the enabled language test apps"""
+	from . import langtest
+	out = []
+	if langtest.enabled():
+		for v in sorted(langtest.VARIANTS):
+			data = langtest.build_zip(v, host, VERSION, WIDGET_DIR)
+			out.append((langtest.app_id(v), "E2 Lang Test " + v, len(data), "E2TVPlayer language test " + v, langtest.app_id(v) + ".zip"))
+	return out
 
 
 if resource is not None:
@@ -289,7 +304,12 @@ if resource is not None:
 			update_log(request, "samsung-sync widgetlist.xml (box %s)" % host, len(data))
 			request.setHeader(b"Content-Type", b"text/xml; charset=utf-8")
 			request.setHeader(b"Cache-Control", b"no-cache")
-			return widgetlist_xml(host, len(data)).encode("utf-8")
+			try:
+				extra = langtest_zips(host)
+			except Exception as e:
+				log("language test apps failed: %s" % e)
+				extra = []
+			return widgetlist_xml(host, len(data), extra).encode("utf-8")
 
 	class AppFolderResource(resource.Resource):
 		"""/e2tvplayer/E2TVPlayer.zip and /e2tvplayer/ (instructions page)."""
@@ -391,6 +411,27 @@ if resource is not None:
 				return self.render_subs(request, path[0])
 			if path and path[0] in ("live", "livesubs", "liveimg"):
 				return self.render_live(request, path[0])
+			if path and path[-1].startswith("E2LangTest") and path[-1].endswith(".zip"):
+				from . import langtest
+				v = path[-1][len("E2LangTest"):-4]
+				if v not in langtest.VARIANTS:
+					request.setResponseCode(404)
+					return b"not found"
+				data = langtest.build_zip(v, host, VERSION, WIDGET_DIR)
+				update_log(request, "samsung-sync %s" % path[-1], len(data))
+				request.setHeader(b"Content-Type", b"application/zip")
+				request.setHeader(b"Content-Length", str(len(data)).encode("ascii"))
+				request.setHeader(b"Cache-Control", b"no-cache")
+				return data
+			if path and path[0] == "langtest":
+				# /e2tvplayer/langtest?on=0|1  turns the Orsay language test apps off/on
+				from . import langtest
+				on = request.args.get(b"on") or request.args.get("on")
+				if on:
+					langtest.set_enabled(_to_str(on[0]) != "0")
+				request.setHeader(b"Content-Type", b"text/plain; charset=utf-8")
+				return ("language test apps: %s (change: ?on=0 / ?on=1, then User App Sync)\n" % (
+					"on" if langtest.enabled() else "off")).encode("utf-8")
 			if path and path[-1].lower().endswith(".zip"):
 				data = build_zip(host)
 				update_log(request, "samsung-sync %s" % path[-1], len(data))

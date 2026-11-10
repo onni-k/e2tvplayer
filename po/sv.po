@@ -989,6 +989,14 @@ msgstr "Videobild i Samsung-bilder: opkg install ffmpeg"
 msgid "Download"
 msgstr "Ladda ner"
 
+#: box/info.py
+msgid "User App Sync also installs two small language test apps (E2 Lang Test A and B)."
+msgstr "User App Sync installerar också två små språktestappar (E2 Lang Test A och B)."
+
+#: box/info.py
+msgid "Turn them off"
+msgstr "Stäng av dem"
+
 #: box/plugin.py
 msgid "OK / EXIT = close    up/down = scroll"
 msgstr "OK / EXIT = stäng    upp/ned = rulla"

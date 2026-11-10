@@ -987,6 +987,14 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
+#: box/info.py
+msgid "User App Sync also installs two small language test apps (E2 Lang Test A and B)."
+msgstr ""
+
+#: box/info.py
+msgid "Turn them off"
+msgstr ""
+
 #: box/plugin.py
 msgid "OK / EXIT = close    up/down = scroll"
 msgstr ""

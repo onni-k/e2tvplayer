@@ -109,6 +109,7 @@ Without `/media/hdd` the folders are under `/tmp`. Folders from older versions a
 | `/e2tvplayer/live`, `/livesubs`, `/liveimg` | live relay and its subtitles (Samsung) |
 | `/e2tvplayer/screenshot` (POST), `/shots`, `/shot/<name>` | screenshots |
 | `/e2tvplayer/log` (`?m=`), `/logs` | start-up log entries of the apps, log view |
+| `/e2tvplayer/E2LangTestA.zip`, `E2LangTestB.zip`, `/langtest?on=0\|1` | Orsay language test apps (installed by User App Sync next to E2TVPlayer), on/off |
 
 The old path `/e2samsungtv/` still works so that an old installed Samsung app keeps working.
 
