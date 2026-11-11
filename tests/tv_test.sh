@@ -18,6 +18,7 @@ key KEYCODE_DPAD_DOWN                # Series -> Test recording
 shot 03_details
 key KEYCODE_DPAD_CENTER              # play
 shot 04_playback 6
+key KEYCODE_MEDIA_PAUSE              # the test recording is only 30 s: pause while in the menu
 longok                               # long OK: audio and subtitles
 shot 05_menu
 key KEYCODE_DPAD_DOWN                # subtitles row
@@ -34,6 +35,7 @@ key KEYCODE_DPAD_DOWN
 key KEYCODE_DPAD_DOWN                # language row
 shot 06d_language_row
 key KEYCODE_BACK
+key KEYCODE_MEDIA_PLAY
 shot 07_subtitles 2
 key KEYCODE_BACK                     # back to the list and again from the start: the stored language turns subtitles on
 key KEYCODE_DPAD_CENTER
