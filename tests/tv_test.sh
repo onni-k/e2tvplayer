@@ -74,6 +74,16 @@ key KEYCODE_DPAD_DOWN                # channel +1
 shot 15_zap 6
 key KEYCODE_BACK
 shot 16_channel_list 2
+key KEYCODE_PROG_YELLOW              # yellow: channels -> programme guide
+shot 16b_guide 4
+key KEYCODE_DPAD_RIGHT               # next programme
+key KEYCODE_DPAD_DOWN                # next channel
+shot 16c_guide_move 2
+key KEYCODE_DPAD_RIGHT
+key KEYCODE_DPAD_CENTER              # coming programme: info dialog
+shot 16d_guide_info 1
+key KEYCODE_BACK
+key KEYCODE_BACK                     # guide -> channels
 key KEYCODE_BACK                     # only one bouquet -> recordings
 key KEYCODE_BACK                     # quit dialog
 shot 17_quit 2

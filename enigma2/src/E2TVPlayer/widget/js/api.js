@@ -119,6 +119,9 @@ var Api = {
 
 	epgNow: function (bref, ok, fail) { Api.get('/api/epgnow', { bRef: bref }, ok, fail, 20000); },
 
+	/* all coming events of one channel */
+	epgService: function (sref, ok, fail) { Api.get('/api/epgservice', { sRef: sref }, ok, fail, 20000); },
+
 	epgNext: function (bref, ok, fail) { Api.get('/api/epgnext', { bRef: bref }, ok, fail, 20000); },
 
 	/* DVB subtitles extracted by the box (E2TVPlayer) */

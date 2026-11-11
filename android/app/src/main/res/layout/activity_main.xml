@@ -30,6 +30,7 @@
 
             <TextView android:id="@+id/tabRec" style="@style/E2Tab" android:text="Recordings" />
             <TextView android:id="@+id/tabCh" style="@style/E2Tab" android:text="Channels" />
+            <TextView android:id="@+id/tabEpg" style="@style/E2Tab" android:text="Guide" />
             <TextView android:id="@+id/tabSort" style="@style/E2Tab" android:text="Newest first" />
             <TextView android:id="@+id/tabSet" style="@style/E2Tab" android:text="Settings" />
 
@@ -70,7 +71,16 @@
             android:textColor="@color/text_sub"
             android:textSize="13sp" />
 
+        <fi.e2tvplayer.EpgGridView
+            android:id="@+id/epg"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:visibility="gone" />
+
         <LinearLayout
+            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="10dp"

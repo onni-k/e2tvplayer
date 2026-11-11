@@ -56,6 +56,7 @@ warnings if OpenWebif is not on port 80 or login is turned on.
 | BACK | parent folder / quit dialog | stop (position is saved) | stop |
 
 The chosen subtitle and audio languages are remembered. Colour keys, MENU and INFO work on TVs that have them.
+The yellow key (or the Guide tab) cycles Recordings → Channels → Guide.
 
 ## Samsung Tizen (2015–)
 
@@ -64,7 +65,8 @@ The chosen subtitle and audio languages are remembered. Colour keys, MENU and IN
 3. Install it with the [Samsung Jellyfin Installer](https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer)
    (custom .wgt). It logs in to a Samsung account and signs the package for the TV.
 
-Keys and functions as on the old Samsung (TOOLS = audio, subtitles, language and screenshot; INFO = programme info).
+Keys and functions as on the old Samsung (TOOLS = audio, subtitles, language and screenshot; INFO = programme info;
+yellow = Recordings → Channels → Guide).
 Subtitles are extracted on the box as for the old Samsung, because the Tizen player does not show DVB subtitles.
 The app code is loaded from the box, so updating the box plugin updates the app (restart the app).
 
@@ -81,6 +83,9 @@ The app code is loaded from the box, so updating the box plugin updates the app 
 | INFO | programme info |
 | TOOLS | audio / subtitles / timing / language / screenshot |
 | RETURN / EXIT | back to the list; in the list, quit dialog |
+
+In the lists the yellow key cycles Recordings → Channels → Programme guide. In the guide: ▲▼ channel,
+◀▶ programme, CH +/− page, ◀◀ ▶▶ ±2 h, OK watch (running programme) or details (coming programme).
 
 The Samsung player does not show DVB subtitles, so the box renders them into images (`subs.py` for recordings,
 `live.py` for the live relay `/e2tvplayer/live`) and the app draws them over the video.
@@ -112,6 +117,11 @@ Without `/media/hdd` the folders are under `/tmp`. Folders from older versions a
 | `/e2tvplayer/E2LangTestA.zip`, `E2LangTestB.zip`, `/langtest?on=0\|1` | Orsay language test apps (off by default; `?on=1` installs them with User App Sync) and `?tv=0\|1` for the TV plugin language |
 
 The old path `/e2samsungtv/` still works so that an old installed Samsung app keeps working.
+
+## Development
+
+See [AGENTS.md](AGENTS.md) for the layout of the repository, code rules, tests and CI, and
+[docs/](docs/) for design notes. User-visible changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## Building
 

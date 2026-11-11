@@ -135,6 +135,28 @@ body.playing #app { display: none; }
 /* Tizen shows colours accurately, so the background is made bluish like on the old Samsungs */
 /* The background goes on #app, not on body: the AVPlay <object> is above body and shows the video
    plane (black), but #app is above it. During playback #app is hidden so the video shows. */
+/* programme guide (Views.epg) */
+#epg { position: absolute; left: 48px; top: 126px; width: 1184px; height: 520px; display: none; }
+#epg-head { position: absolute; left: 0; top: 0; width: 1184px; height: 28px; font-size: 16px; color: #8b98a8; }
+.epg-tick { position: absolute; top: 4px; padding-left: 4px; border-left: 1px solid #3a4656; height: 22px; line-height: 22px; }
+.epg-day { position: absolute; left: 0; top: 4px; color: #ffd479; }
+#epg-grid { position: absolute; left: 0; top: 30px; width: 1184px; height: 368px; overflow: hidden; }
+.epg-ch { position: absolute; left: 0; width: 200px; height: 42px; line-height: 42px; padding-left: 6px; font-size: 18px; color: #e6e6e6;
+	background: #161d27; white-space: nowrap; overflow: hidden; border-radius: 3px; }
+.epg-ch .n { display: inline-block; width: 34px; color: #8b98a8; font-size: 15px; }
+.epg-ch.sel { background: #22344d; color: #ffffff; }
+.epg-ev { position: absolute; height: 42px; line-height: 42px; padding-left: 6px; font-size: 17px; color: #cfd8e3; background: #1b2532;
+	white-space: nowrap; overflow: hidden; border-radius: 3px; }
+.epg-ev.now { background: #213047; }
+.epg-ev.wait, .epg-ev.none { color: #6d7a89; background: #141b24; }
+.epg-ev.sel { background: #2a5c99; color: #ffffff; }
+.epg-nowline { position: absolute; top: 0; width: 2px; background: #ff5a5a; }
+.epg-empty { position: absolute; left: 0; top: 140px; width: 1184px; text-align: center; color: #6d7a89; }
+#epg-info { position: absolute; left: 0; top: 408px; width: 1184px; height: 112px; overflow: hidden; }
+#epg-i-title { font-size: 24px; color: #ffffff; white-space: nowrap; overflow: hidden; }
+#epg-i-meta { font-size: 16px; color: #9fb3c8; margin-top: 4px; }
+#epg-i-desc { font-size: 17px; color: #c9d1d9; margin-top: 6px; line-height: 22px; height: 66px; overflow: hidden; }
+
 html.tizen body { background: #000; }
 html.tizen #app { background: #0a1638; background: -webkit-linear-gradient(top, #0d1c47 0%, #060d27 100%); background: linear-gradient(to bottom, #0d1c47 0%, #060d27 100%); }
 html.tizen body.playing { background: transparent; }
@@ -143,3 +165,6 @@ html.tizen .row.sel { background: #3d8bff; border-bottom-color: #3d8bff; }
 html.tizen #nowbar, html.tizen #scroll, html.tizen .fld { background: rgba(0, 10, 40, 0.35); }
 html.tizen .row .s, html.tizen .row .r2 { color: #a9b8d6; }
 html.tizen #crumb, html.tizen #footer { color: #b6c4e0; }
+html.tizen .epg-ch, html.tizen .epg-ev { background: rgba(0, 10, 40, 0.35); }
+html.tizen .epg-ev.now { background: rgba(40, 80, 160, 0.35); }
+html.tizen .epg-ev.sel { background: #3d8bff; }

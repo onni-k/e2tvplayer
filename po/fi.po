@@ -634,8 +634,8 @@ msgid "<span class=\"k k-ok\">OK</span>Watch"
 msgstr "<span class=\"k k-ok\">OK</span>Katso"
 
 #: web/views.js
-msgid "<span class=\"k k-yellow\"></span>Recordings"
-msgstr "<span class=\"k k-yellow\"></span>Tallenteet"
+msgid "<span class=\"k k-yellow\"></span>Guide"
+msgstr "<span class=\"k k-yellow\"></span>Ohjelmaopas"
 
 #: web/views.js
 msgid "<span class=\"k k-ret\">RETURN</span>Back"
@@ -669,7 +669,7 @@ msgstr "Virhe"
 msgid "Channels › "
 msgstr "Kanavat › "
 
-#: web/views.js android/MainActivity.kt
+#: web/views.js android/EpgGridView.kt android/MainActivity.kt
 msgid "No channels in this bouquet"
 msgstr "Nipussa ei ole kanavia"
 
@@ -733,6 +733,42 @@ msgstr "Korjaa"
 msgid "Screen size: "
 msgstr "Näytön koko: "
 
+#: web/views.js
+msgid "<span class=\"k k-ok\">OK</span>Watch / info"
+msgstr "<span class=\"k k-ok\">OK</span>Katso / tiedot"
+
+#: web/views.js
+msgid "<span class=\"k k-yellow\"></span>Recordings"
+msgstr "<span class=\"k k-yellow\"></span>Tallenteet"
+
+#: web/views.js
+msgid "<span class=\"k k-ret\">RETURN</span>Channels"
+msgstr "<span class=\"k k-ret\">RETURN</span>Kanavat"
+
+#: web/views.js
+msgid "◀◀▶▶ ±2 h"
+msgstr "◀◀▶▶ ±2 h"
+
+#: web/views.js
+msgid "Loading the guide…"
+msgstr "Haetaan ohjelmaopasta…"
+
+#: web/views.js android/MainActivity.kt
+msgid "Programme guide"
+msgstr "Ohjelmaopas"
+
+#: web/views.js android/EpgGridView.kt android/PlayerActivity.kt
+msgid "No programme information"
+msgstr "Ei ohjelmatietoja"
+
+#: web/views.js android/MainActivity.kt
+msgid "Watch channel"
+msgstr "Katso kanavaa"
+
+#: web/views.js android/MainActivity.kt
+msgid "Close"
+msgstr "Sulje"
+
 #: android/Box.kt
 msgid "OpenWebif requires a login – turn it off in the box settings"
 msgstr "OpenWebif vaatii kirjautumisen – ota se pois boksin asetuksista"
@@ -752,6 +788,10 @@ msgstr "Mt"
 #: android/Box.kt
 msgid "kB"
 msgstr "kt"
+
+#: android/MainActivity.kt
+msgid "Guide"
+msgstr "Ohjelmaopas"
 
 #: android/MainActivity.kt
 msgid "in standby"
@@ -776,6 +816,10 @@ msgstr "Uusin ensin"
 #: android/MainActivity.kt
 msgid "OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs   ·   BACK parent folder"
 msgstr "OK toista   ·   pitkä OK: valikko (poista, alusta)   ·   ▲ ylös välilehtiin   ·   BACK ylempi kansio"
+
+#: android/MainActivity.kt
+msgid "OK watch / info   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels"
+msgstr "OK katso / tiedot   ·   ◀▶ ohjelma   ·   ▲▼ kanava   ·   ◀◀▶▶ ±2 h   ·   BACK kanavat"
 
 #: android/MainActivity.kt
 msgid "OK watch   ·   ▲ up to tabs   ·   BACK back"
@@ -837,10 +881,6 @@ msgstr "Lähiverkosta ei löytynyt boksia, jossa on E2TVPlayer-lisäosa. Anna os
 msgid "Enter address"
 msgstr "Anna osoite"
 
-#: android/MainActivity.kt
-msgid "Close"
-msgstr "Sulje"
-
 #: android/PlayerActivity.kt
 msgid "▲▼ row   ◀▶ change   OK/BACK close"
 msgstr "▲▼ rivi   ◀▶ vaihda   OK/BACK sulje"
@@ -856,10 +896,6 @@ msgstr "▲▼ kanava   ·   OK ohjelmatiedot   ·   pitkä OK: ääni ja teksti
 #: android/PlayerActivity.kt
 msgid "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK pause and info   ·   long OK: audio and subtitles   ·   BACK stop"
 msgstr "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK tauko ja tiedot   ·   pitkä OK: ääni ja tekstitys   ·   BACK lopeta"
-
-#: android/PlayerActivity.kt
-msgid "No programme information"
-msgstr "Ei ohjelmatietoja"
 
 #: android/PlayerActivity.kt
 msgid " (audio description)"

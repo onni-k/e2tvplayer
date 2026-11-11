@@ -59,6 +59,19 @@ class Api(BaseHTTPRequestHandler):
         q = {k: v[0] for k, v in parse_qs(u.query).items()}
         if u.path == "/file":
             return self.send_file()
+        if u.path == "/api/epgservice":
+            # a programme guide: a few programmes per channel from half an hour ago on
+            ref = q.get("sRef", "")
+            k = 1 if ref == SREF1 else 2
+            names = ["Evening News", "Weather", "Documentary", "Film: The Long Night", "Late News"] if k == 1 \
+                else ["Football", "Studio", "Ice Hockey", "Sports News", "Night Music"]
+            ev, t = [], NOW - 1800 + 300 * k
+            for i in range(12):
+                d = (1800, 600, 3000, 5400, 1200)[i % 5]
+                ev.append({"sref": ref, "title": names[i % 5], "begin_timestamp": t, "duration_sec": d,
+                    "shortdesc": "", "longdesc": "Programme %d of the test guide." % (i + 1)})
+                t += d
+            return self.send_json({"events": ev})
         if u.path == "/api/getservices" and q.get("sRef"):
             return self.send_json(SERVICES)
         if u.path == "/api/movielist" and q.get("dirname", "").rstrip("/").endswith("Series"):

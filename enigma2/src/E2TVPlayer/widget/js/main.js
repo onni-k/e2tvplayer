@@ -137,6 +137,7 @@ var App = {
 	go: function (name) {
 		var from = App.view;
 		if (from === 'channels' && name !== 'channels') { Views.channels.leave(); }
+		if (from === 'epg' && name !== 'epg') { Views.epg.leave(); }
 		App.view = name;
 		Views[name].enter(from);
 	},

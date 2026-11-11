@@ -46,6 +46,9 @@ class MainActivity : Activity() {
     private lateinit var adapter: RowAdapter
     private lateinit var tabRec: TextView
     private lateinit var tabCh: TextView
+    private lateinit var tabEpg: TextView
+    private lateinit var epg: EpgGridView
+    private lateinit var content: View
     private lateinit var tabSort: TextView
     private lateinit var tabSet: TextView
     private lateinit var crumb: TextView
@@ -59,7 +62,11 @@ class MainActivity : Activity() {
     private lateinit var footer: TextView
     private val ui = Handler(Looper.getMainLooper())
 
-    private var mode = "movies"                 // movies, channels
+    private var mode = "movies"                 // movies, channels, epg
+    private var epgBouquet: JSONObject? = null
+    private var epgServices: List<JSONObject> = emptyList()
+    private val epgQueue = ArrayList<String>()
+    private var epgActive = 0
     private var root: String? = null
     private var dir: String? = null
     private var movieData: JSONObject? = null
@@ -78,6 +85,9 @@ class MainActivity : Activity() {
         list = findViewById(R.id.list)
         tabRec = findViewById(R.id.tabRec)
         tabCh = findViewById(R.id.tabCh)
+        tabEpg = findViewById(R.id.tabEpg)
+        epg = findViewById(R.id.epg)
+        content = findViewById(R.id.content)
         tabSort = findViewById(R.id.tabSort)
         tabSet = findViewById(R.id.tabSet)
         crumb = findViewById(R.id.crumb)
@@ -91,6 +101,7 @@ class MainActivity : Activity() {
         footer = findViewById(R.id.footer)
         tabRec.text = T("Recordings")
         tabCh.text = T("Channels")
+        tabEpg.text = T("Guide")
         tabSet.text = T("Settings")
         langCur = I18n.cur()
         Box.hello(BuildConfigCompat.version(this))
@@ -104,6 +115,10 @@ class MainActivity : Activity() {
 
         tabRec.setOnClickListener { showMovies() }
         tabCh.setOnClickListener { showChannels() }
+        tabEpg.setOnClickListener { showEpg() }
+        epg.needEvents = { ref -> queueEpg(ref) }
+        epg.onWatch = { row -> watchFromEpg(row) }
+        epg.onInfo = { row, ev -> epgInfo(row, ev) }
         tabSort.setOnClickListener { toggleSort() }
         tabSet.setOnClickListener { settings() }
         updateTabs()
@@ -131,6 +146,7 @@ class MainActivity : Activity() {
         if (Box.host.isNotEmpty()) refreshStatus()
         // after playback, refresh the progress bars
         if (mode == "movies" && movieData != null) renderMovies(currentIndex())
+        if (mode == "epg") epg.invalidate()
     }
 
     override fun onDestroy() {
@@ -167,12 +183,16 @@ class MainActivity : Activity() {
     private fun updateTabs() {
         tabRec.isSelected = mode == "movies"
         tabCh.isSelected = mode == "channels"
+        tabEpg.isSelected = mode == "epg"
+        epg.visibility = if (mode == "epg") View.VISIBLE else View.GONE
+        content.visibility = if (mode == "epg") View.GONE else View.VISIBLE
         tabSort.visibility = if (mode == "movies") View.VISIBLE else View.GONE
         tabSort.text = if (sortByName()) T("A–Z") else T("Newest first")
-        footer.text = if (mode == "movies")
-            T("OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs   ·   BACK parent folder")
-        else
-            T("OK watch   ·   ▲ up to tabs   ·   BACK back")
+        footer.text = when (mode) {
+            "movies" -> T("OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs   ·   BACK parent folder")
+            "epg" -> T("OK watch / info   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels")
+            else -> T("OK watch   ·   ▲ up to tabs   ·   BACK back")
+        }
     }
 
     private fun setBusy(on: Boolean) { busy.visibility = if (on) View.VISIBLE else View.GONE }
@@ -469,6 +489,107 @@ class MainActivity : Activity() {
         })
     }
 
+    // ---------------------------------------------------------------- programme guide
+
+    /** the bouquet open in the channel list, otherwise the one used last, otherwise the first */
+    private fun showEpg() {
+        mode = "epg"
+        updateTabs()
+        val b = bouquet
+        if (b != null && services.isNotEmpty()) {
+            if (epgBouquet?.optString("servicereference") != b.optString("servicereference")) setEpg(b, services, 0)
+            else setEpg(b, epgServices, epg.row)
+            return
+        }
+        if (epgBouquet != null) { setEpg(epgBouquet!!, epgServices, epg.row); return }
+        val gen = ++loadGen
+        setBusy(true)
+        Box.get("/api/getservices", ok = { data ->
+            if (gen != loadGen) return@get
+            val arr = data.optJSONArray("services")
+            val want = Box.prefs.getString("epgBouquet", "")
+            var pick: JSONObject? = null
+            if (arr != null) for (i in 0 until arr.length()) {
+                val o = arr.optJSONObject(i) ?: continue
+                if (pick == null || o.optString("servicereference") == want) pick = o
+            }
+            val p = pick
+            if (p == null) { setBusy(false); return@get }
+            Box.get("/api/getservices", mapOf("sRef" to p.optString("servicereference")), ok = { sd ->
+                if (gen != loadGen) return@get
+                setBusy(false)
+                val sa = sd.optJSONArray("services")
+                val l = ArrayList<JSONObject>()
+                if (sa != null) for (i in 0 until sa.length()) {
+                    val s = sa.optJSONObject(i) ?: continue
+                    val ref = s.optString("servicereference")
+                    if (ref.isEmpty() || ref.startsWith("1:64:") || ref.startsWith("1:320:")) continue
+                    l.add(s)
+                }
+                if (mode == "epg") setEpg(p, l, 0)
+            }, fail = { err -> if (gen == loadGen) { setBusy(false); toast(err) } })
+        }, fail = { err -> if (gen == loadGen) { setBusy(false); toast(err) } })
+    }
+
+    private fun setEpg(b: JSONObject, l: List<JSONObject>, row: Int) {
+        epgBouquet = b
+        epgServices = l
+        Box.prefs.edit().putString("epgBouquet", b.optString("servicereference")).apply()
+        crumb.text = T("Programme guide") + " › " + b.optString("servicename")
+        dTitle.text = ""
+        epg.setServices(l.map { it.optString("servicereference") }, l.map { it.optString("servicename") }, row)
+        epg.requestFocus()
+    }
+
+    /** at most two requests at a time */
+    private fun queueEpg(ref: String) {
+        if (!epgQueue.contains(ref)) epgQueue.add(ref)
+        pumpEpg()
+    }
+
+    private fun pumpEpg() {
+        while (epgActive < 2 && epgQueue.isNotEmpty()) {
+            val ref = epgQueue.removeAt(0)
+            epgActive++
+            Box.get("/api/epgservice", mapOf("sRef" to ref), timeoutMs = 20000, ok = { data ->
+                val ev = data.optJSONArray("events")
+                val l = ArrayList<EpgEvent>()
+                if (ev != null) for (i in 0 until ev.length()) {
+                    val o = ev.optJSONObject(i) ?: continue
+                    val b = o.optLong("begin_timestamp")
+                    val d = o.optLong("duration_sec")
+                    val t = o.optString("title")
+                    if (b > 0 && d > 0 && t.isNotEmpty()) l.add(EpgEvent(b, b + d, t, o.optString("shortdesc"), o.optString("longdesc")))
+                }
+                epgActive--
+                epg.setEvents(ref, l)
+                pumpEpg()
+            }, fail = {
+                epgActive--
+                epg.setEvents(ref, emptyList())
+                pumpEpg()
+            })
+        }
+    }
+
+    private fun watchFromEpg(row: Int) {
+        val b = epgBouquet ?: return
+        // the channel list follows the guide, so channel up/down works during playback
+        bouquet = b
+        services = epgServices
+        playChannel(row)
+    }
+
+    private fun epgInfo(row: Int, ev: EpgEvent) {
+        val name = epgServices.getOrNull(row)?.optString("servicename") ?: ""
+        AlertDialog.Builder(this, R.style.E2Dialog)
+            .setTitle(ev.title)
+            .setMessage("${Fmt.hm(ev.begin)}–${Fmt.hm(ev.end)} · $name\n\n${ev.text()}")
+            .setPositiveButton(T("Watch channel")) { _, _ -> watchFromEpg(row) }
+            .setNegativeButton(T("Close"), null)
+            .show()
+    }
+
     // ---------------------------------------------------------------- settings
 
     private fun settings() {
@@ -583,10 +704,13 @@ class MainActivity : Activity() {
             when (event.keyCode) {
                 KeyEvent.KEYCODE_PROG_RED -> { adapter.rows.getOrNull(pos)?.takeIf { it.type == "movie" }?.let { confirmDelete(it) }; return true }
                 KeyEvent.KEYCODE_PROG_GREEN -> { toggleSort(); return true }
-                KeyEvent.KEYCODE_PROG_YELLOW -> { if (mode == "movies") showChannels() else showMovies(); return true }
+                KeyEvent.KEYCODE_PROG_YELLOW -> {
+                    when (mode) { "movies" -> showChannels(); "channels" -> showEpg(); else -> showMovies() }
+                    return true
+                }
                 KeyEvent.KEYCODE_PROG_BLUE, KeyEvent.KEYCODE_SETTINGS -> { settings(); return true }
-                KeyEvent.KEYCODE_MENU -> { if (list.hasFocus()) longPress(pos); return true }
-                KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> { if (list.hasFocus()) activate(pos); return true }
+                KeyEvent.KEYCODE_MENU -> { if (list.hasFocus()) { longPress(pos); return true } }
+                KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> { if (list.hasFocus()) { activate(pos); return true } }
             }
         }
         return super.dispatchKeyEvent(event)
@@ -598,6 +722,7 @@ class MainActivity : Activity() {
             mode == "movies" && dir != null && dir != root -> upDir()
             mode == "channels" && bouquet != null && bouquets.size > 1 -> renderBouquets()
             mode == "channels" -> showMovies()
+            mode == "epg" -> showChannels()
             !focusInList && adapter.rows.isNotEmpty() -> setRows(adapter.rows, 0, "")
             else -> confirmExit()
         }

@@ -632,7 +632,7 @@ msgid "<span class=\"k k-ok\">OK</span>Watch"
 msgstr ""
 
 #: web/views.js
-msgid "<span class=\"k k-yellow\"></span>Recordings"
+msgid "<span class=\"k k-yellow\"></span>Guide"
 msgstr ""
 
 #: web/views.js
@@ -667,7 +667,7 @@ msgstr ""
 msgid "Channels › "
 msgstr ""
 
-#: web/views.js android/MainActivity.kt
+#: web/views.js android/EpgGridView.kt android/MainActivity.kt
 msgid "No channels in this bouquet"
 msgstr ""
 
@@ -731,6 +731,42 @@ msgstr ""
 msgid "Screen size: "
 msgstr ""
 
+#: web/views.js
+msgid "<span class=\"k k-ok\">OK</span>Watch / info"
+msgstr ""
+
+#: web/views.js
+msgid "<span class=\"k k-yellow\"></span>Recordings"
+msgstr ""
+
+#: web/views.js
+msgid "<span class=\"k k-ret\">RETURN</span>Channels"
+msgstr ""
+
+#: web/views.js
+msgid "◀◀▶▶ ±2 h"
+msgstr ""
+
+#: web/views.js
+msgid "Loading the guide…"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
+msgid "Programme guide"
+msgstr ""
+
+#: web/views.js android/EpgGridView.kt android/PlayerActivity.kt
+msgid "No programme information"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
+msgid "Watch channel"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
+msgid "Close"
+msgstr ""
+
 #: android/Box.kt
 msgid "OpenWebif requires a login – turn it off in the box settings"
 msgstr ""
@@ -749,6 +785,10 @@ msgstr ""
 
 #: android/Box.kt
 msgid "kB"
+msgstr ""
+
+#: android/MainActivity.kt
+msgid "Guide"
 msgstr ""
 
 #: android/MainActivity.kt
@@ -773,6 +813,10 @@ msgstr ""
 
 #: android/MainActivity.kt
 msgid "OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs   ·   BACK parent folder"
+msgstr ""
+
+#: android/MainActivity.kt
+msgid "OK watch / info   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels"
 msgstr ""
 
 #: android/MainActivity.kt
@@ -835,10 +879,6 @@ msgstr ""
 msgid "Enter address"
 msgstr ""
 
-#: android/MainActivity.kt
-msgid "Close"
-msgstr ""
-
 #: android/PlayerActivity.kt
 msgid "▲▼ row   ◀▶ change   OK/BACK close"
 msgstr ""
@@ -853,10 +893,6 @@ msgstr ""
 
 #: android/PlayerActivity.kt
 msgid "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK pause and info   ·   long OK: audio and subtitles   ·   BACK stop"
-msgstr ""
-
-#: android/PlayerActivity.kt
-msgid "No programme information"
 msgstr ""
 
 #: android/PlayerActivity.kt

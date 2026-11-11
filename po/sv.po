@@ -634,8 +634,8 @@ msgid "<span class=\"k k-ok\">OK</span>Watch"
 msgstr "<span class=\"k k-ok\">OK</span>Titta"
 
 #: web/views.js
-msgid "<span class=\"k k-yellow\"></span>Recordings"
-msgstr "<span class=\"k k-yellow\"></span>Inspelningar"
+msgid "<span class=\"k k-yellow\"></span>Guide"
+msgstr "<span class=\"k k-yellow\"></span>Programguide"
 
 #: web/views.js
 msgid "<span class=\"k k-ret\">RETURN</span>Back"
@@ -669,7 +669,7 @@ msgstr "Fel"
 msgid "Channels › "
 msgstr "Kanaler › "
 
-#: web/views.js android/MainActivity.kt
+#: web/views.js android/EpgGridView.kt android/MainActivity.kt
 msgid "No channels in this bouquet"
 msgstr "Inga kanaler i den här kanalgruppen"
 
@@ -733,6 +733,42 @@ msgstr "Rätta"
 msgid "Screen size: "
 msgstr "Skärmstorlek: "
 
+#: web/views.js
+msgid "<span class=\"k k-ok\">OK</span>Watch / info"
+msgstr "<span class=\"k k-ok\">OK</span>Titta / info"
+
+#: web/views.js
+msgid "<span class=\"k k-yellow\"></span>Recordings"
+msgstr "<span class=\"k k-yellow\"></span>Inspelningar"
+
+#: web/views.js
+msgid "<span class=\"k k-ret\">RETURN</span>Channels"
+msgstr "<span class=\"k k-ret\">RETURN</span>Kanaler"
+
+#: web/views.js
+msgid "◀◀▶▶ ±2 h"
+msgstr "◀◀▶▶ ±2 h"
+
+#: web/views.js
+msgid "Loading the guide…"
+msgstr "Laddar programguiden…"
+
+#: web/views.js android/MainActivity.kt
+msgid "Programme guide"
+msgstr "Programguide"
+
+#: web/views.js android/EpgGridView.kt android/PlayerActivity.kt
+msgid "No programme information"
+msgstr "Ingen programinformation"
+
+#: web/views.js android/MainActivity.kt
+msgid "Watch channel"
+msgstr "Titta på kanalen"
+
+#: web/views.js android/MainActivity.kt
+msgid "Close"
+msgstr "Stäng"
+
 #: android/Box.kt
 msgid "OpenWebif requires a login – turn it off in the box settings"
 msgstr "OpenWebif kräver inloggning – stäng av den i boxens inställningar"
@@ -752,6 +788,10 @@ msgstr "MB"
 #: android/Box.kt
 msgid "kB"
 msgstr "kB"
+
+#: android/MainActivity.kt
+msgid "Guide"
+msgstr "Programguide"
 
 #: android/MainActivity.kt
 msgid "in standby"
@@ -776,6 +816,10 @@ msgstr "Nyaste först"
 #: android/MainActivity.kt
 msgid "OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs   ·   BACK parent folder"
 msgstr "OK spela   ·   långt OK: meny (radera, från början)   ·   ▲ upp till flikarna   ·   BACK överordnad mapp"
+
+#: android/MainActivity.kt
+msgid "OK watch / info   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels"
+msgstr "OK titta / info   ·   ◀▶ program   ·   ▲▼ kanal   ·   ◀◀▶▶ ±2 h   ·   BACK kanaler"
 
 #: android/MainActivity.kt
 msgid "OK watch   ·   ▲ up to tabs   ·   BACK back"
@@ -837,10 +881,6 @@ msgstr "Ingen box med E2TVPlayer-tillägget hittades i nätverket. Ange adressen
 msgid "Enter address"
 msgstr "Ange adress"
 
-#: android/MainActivity.kt
-msgid "Close"
-msgstr "Stäng"
-
 #: android/PlayerActivity.kt
 msgid "▲▼ row   ◀▶ change   OK/BACK close"
 msgstr "▲▼ rad   ◀▶ ändra   OK/BACK stäng"
@@ -856,10 +896,6 @@ msgstr "▲▼ kanal   ·   OK programinfo   ·   långt OK: ljud och textning  
 #: android/PlayerActivity.kt
 msgid "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK pause and info   ·   long OK: audio and subtitles   ·   BACK stop"
 msgstr "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK paus och info   ·   långt OK: ljud och textning   ·   BACK stopp"
-
-#: android/PlayerActivity.kt
-msgid "No programme information"
-msgstr "Ingen programinformation"
 
 #: android/PlayerActivity.kt
 msgid " (audio description)"

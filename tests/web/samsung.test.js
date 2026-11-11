@@ -26,6 +26,7 @@ const R={
  '/api/epgnext':{events:[{sref:'1:0:19:11:1:20F6:EEEE0000:0:0:0:',title:'Weather',begin_timestamp:now+1200,duration_sec:300}]},
  '/api/moviedelete':{result:true,message:'ok'},
  '/api/getservices':q=>q.sRef?{services:[{servicereference:'1:64:1:0:0:0:0:0:0:0:',servicename:'--- HD ---'},{servicereference:'1:0:19:11:1:20F6:EEEE0000:0:0:0:',servicename:'Yle TV1'},{servicereference:'1:0:19:12:1:20F6:EEEE0000:0:0:0:',servicename:'Yle TV2'}]}:{services:[{servicereference:'1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.fav.tv"',servicename:'Suosikit'},{servicereference:'b2',servicename:'Kaikki'}]},
+ '/api/epgservice':q=>q.sRef.indexOf(':11:')>0?{events:[{title:'News',begin_timestamp:now-600,duration_sec:1800,shortdesc:'Daily news',longdesc:'The news of the day.'},{title:'Weather',begin_timestamp:now+1200,duration_sec:600,shortdesc:'',longdesc:'Rain.'},{title:'Late film',begin_timestamp:now+1800,duration_sec:5400,longdesc:'A film.'}]}:{events:[{title:'Sports',begin_timestamp:now-1200,duration_sec:7200,longdesc:'Football.'}]},
  '/api/epgnow':{events:[{sref:'1:0:19:11:1:20F6:EEEE0000:0:0:0:',title:'News',begin_timestamp:now-600,duration_sec:1800,shortdesc:'Daily news'}]}
 };
 const urls=[];
@@ -78,6 +79,22 @@ key(K.KEY_ENTER); check(calls.some(c=>/^Init http:\/\/192\.168\.1\.10\/e2tvplaye
 key(K.KEY_CH_DOWN); check(calls.some(c=>c.includes('sref=1%3A0%3A19%3A12')),'channel change');
 key(K.KEY_RETURN); key(K.KEY_RETURN); check(txt('crumb')==='Channels','back to bouquets'); key(K.KEY_RETURN);
 check(txt('crumb').startsWith('Recordings'),'back to recordings');
+// programme guide: yellow cycles recordings -> channels -> guide -> recordings
+key(K.KEY_YELLOW); key(K.KEY_YELLOW);
+check(w.App.view==='epg' && $('epg').style.display==='block' && $('browser').style.display==='none','guide opened with the yellow key');
+check(txt('crumb')==='Programme guide › Suosikit' && $('epg-grid').querySelectorAll('.epg-ch').length===2,'guide: bouquet and channels: '+txt('crumb'));
+check(urls.some(u=>u.includes('/api/epgservice?sRef=1%3A0%3A19%3A11')),'guide: channel events loaded');
+check(txt('epg-i-title')==='News' && $('epg-grid').querySelector('.epg-ev.sel.now'),'guide: the running programme selected: '+txt('epg-i-title')+' / '+$('epg-grid').innerHTML.slice(0,400));
+check($('epg-grid').querySelector('.epg-nowline'),'guide: now line');
+key(K.KEY_RIGHT); check(txt('epg-i-title')==='Weather','guide: right = next programme: '+txt('epg-i-title'));
+key(K.KEY_ENTER); check(w.Dialog.isOpen && txt('dlg-title')==='Weather','guide: OK on a coming programme shows its info');
+key(K.KEY_RETURN); key(K.KEY_LEFT); check(txt('epg-i-title')==='News','guide: left = previous');
+key(K.KEY_DOWN); check(txt('epg-i-title')==='Sports' && txt('epg-i-meta').startsWith('Yle TV2'),'guide: down = next channel');
+key(K.KEY_FF); check(w.Views.epg.t0>=w.Views.epg.floor30(now)+7200,'guide: FF = +2 h');
+key(K.KEY_RW); key(K.KEY_RW); check(w.Views.epg.t0===w.Views.epg.floor30(now),'guide: RW stops at now');
+key(K.KEY_UP); key(K.KEY_ENTER); check(w.Player.active && calls.some(c=>c.includes('live?')&&c.includes('sref=1%3A0%3A19%3A11')),'guide: OK on the running programme plays the channel');
+key(K.KEY_RETURN); check(!w.Player.active && w.App.view==='epg' && $('epg').style.display==='block','guide: back to the guide after playback');
+key(K.KEY_YELLOW); check(w.App.view==='movies' && $('epg').style.display==='none' && $('browser').style.display==='block','guide: yellow -> recordings');
 // settings
 key(K.KEY_BLUE); check($('settings').style.display==='block','settings');
 key(K.KEY_1);key(K.KEY_0);key(K.KEY_0); key(K.KEY_RIGHT);key(K.KEY_RIGHT);key(K.KEY_RIGHT);
