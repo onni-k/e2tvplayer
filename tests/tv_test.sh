@@ -82,7 +82,9 @@ key KEYCODE_DPAD_RIGHT               # next programme
 key KEYCODE_DPAD_DOWN                # next channel
 shot 16c_guide_move 2
 key KEYCODE_DPAD_RIGHT
-key KEYCODE_DPAD_CENTER              # coming programme: info dialog
+key KEYCODE_PROG_RED                 # red: timer for the selected programme
+shot 16c2_guide_timer 2
+key KEYCODE_DPAD_CENTER              # coming programme: info dialog (Delete timer)
 shot 16d_guide_info 1
 key KEYCODE_BACK
 key KEYCODE_BACK                     # guide -> channels

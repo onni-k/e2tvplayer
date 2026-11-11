@@ -589,6 +589,7 @@ Views.epg = {
 	t0: 0,
 	selTime: 0,
 	timer: null,
+	timers: [],          /* [{sref, begin, end, eit}] from the box */
 
 	now: function () { return Math.floor(new Date().getTime() / 1000); },
 	floor30: function (t) { return t - (t % 1800); },
@@ -610,6 +611,7 @@ Views.epg = {
 		U.show('settings', false);
 		U.show('epg', true);
 		footer(T('<span class="k k-ok">OK</span>Watch / info') +
+			T('<span class="k k-red"></span>Timer') +
 			T('<span class="k k-yellow"></span>Recordings') +
 			T('<span class="k k-blue"></span>Settings') +
 			T('<span class="k k-ret">RETURN</span>Channels') +
@@ -617,6 +619,7 @@ Views.epg = {
 		var now = E.now();
 		if (!E.t0 || E.t0 + E.SPAN < now) { E.t0 = E.floor30(now); E.selTime = now; }
 		E.pickBouquet();
+		E.loadTimers();
 		if (E.timer) { clearInterval(E.timer); }
 		E.timer = setInterval(function () { if (App.view === 'epg' && !Player.active) { E.render(); } }, 60000);
 	},
@@ -681,7 +684,9 @@ Views.epg = {
 					var ev = data.events || [], list = [], i;
 					for (i = 0; i < ev.length; i++) {
 						var b = Number(ev[i].begin_timestamp) || 0, d = Number(ev[i].duration_sec) || 0;
-						if (b && d && ev[i].title) { list.push({ b: b, e: b + d, title: ev[i].title, sub: ev[i].shortdesc || '', desc: ev[i].longdesc || '' }); }
+						if (b && d && ev[i].title) {
+							list.push({ b: b, e: b + d, id: ev[i].id, title: ev[i].title, sub: ev[i].shortdesc || '', desc: ev[i].longdesc || '' });
+						}
 					}
 					list.sort(function (x, y) { return x.b - y.b; });
 					E.ev[s] = { list: list, time: E.now() };
@@ -740,10 +745,11 @@ Views.epg = {
 				if (ev.e <= t0 || ev.b >= t1) { continue; }
 				any = true;
 				var x = E.CHAN_W + (Math.max(ev.b, t0) - t0) / 60 * ppm, w = (Math.min(ev.e, t1) - Math.max(ev.b, t0)) / 60 * ppm - 2;
-				var cls = 'epg-ev' + (i === cur ? ' sel' : '') + (ev.b <= now && now < ev.e ? ' now' : '');
+				var rec = E.timerOf(s.servicereference, ev);
+				var cls = 'epg-ev' + (i === cur ? ' sel' : '') + (ev.b <= now && now < ev.e ? ' now' : '') + (rec ? ' rec' : '');
 				if (i === cur) { sel = ev; }
 				g.push('<div class="' + cls + '" style="top:' + y + 'px;left:' + Math.round(x) + 'px;width:' + Math.max(2, Math.round(w)) + 'px">' +
-					(w > 24 ? U.esc(ev.title) : '') + '</div>');
+					(w > 24 ? (rec ? '<span class="dot">●</span> ' : '') + U.esc(ev.title) : '') + '</div>');
 			}
 			if (cur >= 0 && !sel) { sel = list[cur]; }
 			if (!any) {
@@ -759,7 +765,8 @@ Views.epg = {
 		var s0 = E.services[E.row];
 		if (sel) {
 			U.$('epg-i-title').innerHTML = U.esc(sel.title);
-			U.$('epg-i-meta').innerHTML = U.esc(s0.servicename + ' · ' + U.fmtDate(sel.b).split(' ')[0] + ' ' + E.hm(sel.b) + '–' + E.hm(sel.e) +
+			U.$('epg-i-meta').innerHTML = (E.timerOf(s0.servicereference, sel) ? '<span class="rec">● ' + U.esc(T('Timer set')) + '</span> &nbsp; ' : '') +
+				U.esc(s0.servicename + ' · ' + U.fmtDate(sel.b).split(' ')[0] + ' ' + E.hm(sel.b) + '–' + E.hm(sel.e) +
 				' · ' + Math.round((sel.e - sel.b) / 60) + ' min');
 			U.$('epg-i-desc').innerHTML = U.esc(sel.sub && sel.desc && sel.desc.indexOf(sel.sub) < 0 ? sel.sub + ' – ' + sel.desc : (sel.desc || sel.sub));
 		} else {
@@ -819,7 +826,22 @@ Views.epg = {
 		C.bouquet = E.bouquet;
 		C.services = E.services;
 		C.mode = 'services';
-		C.now = C.now || {};
+		/* now/next for the INFO panel: what the guide already knows at once, the box's view right after */
+		var now = E.now(), i, k;
+		C.now = {};
+		C.next = {};
+		for (i = 0; i < E.services.length; i++) {
+			var ref = E.services[i].servicereference, c = E.ev[ref], l = c ? c.list : [];
+			for (k = 0; k < l.length; k++) {
+				if (l[k].b <= now && now < l[k].e) {
+					C.now[ref] = { sref: ref, title: l[k].title, begin_timestamp: l[k].b, duration_sec: l[k].e - l[k].b, shortdesc: l[k].sub, longdesc: l[k].desc };
+					if (l[k + 1]) { C.next[ref] = { sref: ref, title: l[k + 1].title, begin_timestamp: l[k + 1].b }; }
+				}
+			}
+		}
+		C.loadEpg();
+		if (C.epgTimer) { clearInterval(C.epgTimer); }
+		C.epgTimer = setInterval(C.loadEpg, 120000);
 		C.renderServices(E.row);
 		C.play(Browser.list.current());
 		Player.onStopped = function () { if (App.view === 'epg') { E.row = Browser.list.index; E.setRow(E.row); } };
@@ -829,11 +851,57 @@ Views.epg = {
 		var E = Views.epg, ev = E.sel, s = E.services && E.services[E.row];
 		if (!s) { return; }
 		if (!ev) { E.watch(); return; }
-		var now = E.now();
-		Dialog.open(ev.title, U.esc(E.hm(ev.b) + '–' + E.hm(ev.e) + ' · ' + s.servicename) + '<br/><br/>' +
+		var now = E.now(), rec = E.timerOf(s.servicereference, ev);
+		Dialog.open(ev.title, U.esc(E.hm(ev.b) + '–' + E.hm(ev.e) + ' · ' + s.servicename) +
+			(rec ? ' &nbsp; <span class="rec">● ' + U.esc(T('Timer set')) + '</span>' : '') + '<br/><br/>' +
 			U.esc(ev.sub && ev.desc && ev.desc.indexOf(ev.sub) < 0 ? ev.sub + ' – ' + ev.desc : (ev.desc || ev.sub)),
-			[{ label: T('Watch channel'), fn: function () { E.watch(); } }, { label: T('Close'), fn: function () { } }],
+			[{ label: T('Watch channel'), fn: function () { E.watch(); } },
+				{ label: rec ? T('Delete timer') : T('Record'), fn: function () { E.toggleTimer(); } },
+				{ label: T('Close'), fn: function () { } }],
 			ev.b <= now ? 0 : 1);
+	},
+
+	/* ---- timers ---- */
+	refKey: function (r) { return String(r || '').split(':').slice(0, 10).join(':').toUpperCase(); },
+
+	loadTimers: function () {
+		var E = Views.epg;
+		Api.timerList(function (data) {
+			var t = data.timers || [], out = [], i;
+			for (i = 0; i < t.length; i++) {
+				out.push({ sref: t[i].serviceref, begin: Number(t[i].begin) || 0, end: Number(t[i].end) || 0, eit: t[i].eit });
+			}
+			E.timers = out;
+			if (App.view === 'epg' && !Player.active) { E.render(); }
+		}, function () { });
+	},
+
+	/* the timer that records this programme: the same event id, or a timer covering most of it */
+	timerOf: function (sref, ev) {
+		var E = Views.epg, key = E.refKey(sref), i, t;
+		for (i = 0; i < E.timers.length; i++) {
+			t = E.timers[i];
+			if (E.refKey(t.sref) !== key) { continue; }
+			if (ev.id !== undefined && t.eit !== undefined && String(t.eit) === String(ev.id)) { return t; }
+			if (Math.min(t.end, ev.e) - Math.max(t.begin, ev.b) > (ev.e - ev.b) / 2) { return t; }
+		}
+		return null;
+	},
+
+	toggleTimer: function () {
+		var E = Views.epg, ev = E.sel, s = E.services && E.services[E.row];
+		if (!ev || !s) { return; }
+		var t = E.timerOf(s.servicereference, ev);
+		var done = function (data) {
+			if (data && data.result === false) { Dialog.alert(T('Timer'), U.esc(data.message || T('Unknown error'))); }
+			else { U.toast(t ? T('Timer deleted') : T('Timer added') + ': ' + ev.title, 2500); }
+			E.loadTimers();
+		};
+		var fail = function (err) { Dialog.alert(T('Timer'), U.esc(err)); };
+		if (t) { Api.timerDelete(t.sref, t.begin, t.end, done, fail); }
+		else if (ev.e <= E.now()) { return; }
+		else if (ev.id === undefined || ev.id === null) { Dialog.alert(T('Timer'), U.esc(T('This programme cannot be recorded (no event id).'))); }
+		else { Api.timerAdd(s.servicereference, ev.id, done, fail); }
 	},
 
 	onKey: function (k) {
@@ -852,6 +920,8 @@ Views.epg = {
 				if (!ev || (ev.b <= now && now < ev.e)) { E.watch(); } else { E.info(); }
 				return true;
 			case tvKey.KEY_INFO: E.info(); return true;
+			case tvKey.KEY_RED:
+			case tvKey.KEY_REC: E.toggleTimer(); return true;
 			case tvKey.KEY_YELLOW: App.go('movies'); return true;
 			case tvKey.KEY_BLUE: App.go('settings'); return true;
 			case tvKey.KEY_RETURN: App.go('channels'); return true;

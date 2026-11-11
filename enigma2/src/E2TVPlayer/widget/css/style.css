@@ -150,6 +150,8 @@ body.playing #app { display: none; }
 .epg-ev.now { background: #213047; }
 .epg-ev.wait, .epg-ev.none { color: #6d7a89; background: #141b24; }
 .epg-ev.sel { background: #2a5c99; color: #ffffff; }
+.epg-ev .dot, #epg-i-meta .rec { color: #ff5a5a; }
+.epg-ev.rec { box-shadow: inset 0 -3px 0 #ff5a5a; }
 .epg-nowline { position: absolute; top: 0; width: 2px; background: #ff5a5a; }
 .epg-empty { position: absolute; left: 0; top: 140px; width: 1184px; text-align: center; color: #6d7a89; }
 #epg-info { position: absolute; left: 0; top: 408px; width: 1184px; height: 112px; overflow: hidden; }

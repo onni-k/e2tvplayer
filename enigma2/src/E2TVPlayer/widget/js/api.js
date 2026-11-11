@@ -119,6 +119,11 @@ var Api = {
 
 	epgNow: function (bref, ok, fail) { Api.get('/api/epgnow', { bRef: bref }, ok, fail, 20000); },
 
+	/* timers: list, add by EPG event, delete */
+	timerList: function (ok, fail) { Api.get('/api/timerlist', {}, ok, fail, 20000); },
+	timerAdd: function (sref, eventid, ok, fail) { Api.get('/api/timeraddbyeventid', { sRef: sref, eventid: eventid, justplay: 0 }, ok, fail, 20000); },
+	timerDelete: function (sref, begin, end, ok, fail) { Api.get('/api/timerdelete', { sRef: sref, begin: begin, end: end }, ok, fail, 20000); },
+
 	/* all coming events of one channel */
 	epgService: function (sref, ok, fail) { Api.get('/api/epgservice', { sRef: sref }, ok, fail, 20000); },
 

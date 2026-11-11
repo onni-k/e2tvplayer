@@ -2,6 +2,10 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 0.1.022
+* NEW: Timers from the programme guide (red key, or the details dialog)
+* FIX: Live INFO showed no programme when the channel was opened from the guide
+
 ## 0.1.021
 * NEW: Programme guide (yellow key: Recordings → Channels → Guide; Google TV: Guide tab)
 * NEW: AGENTS.md and design notes in docs/

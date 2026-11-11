@@ -13,6 +13,13 @@ on Google TV also the Guide tab).
 - Keys: ▲▼ channel, ◀▶ programme, CH +/− page, ◀◀ ▶▶ ±2 h, OK on the running programme (or a
   channel without data) watches the channel, OK on a coming programme / INFO shows its details,
   RETURN back to the channel list.
+- Timers: red (or REC) on a programme adds a timer with `/api/timeraddbyeventid` (the EPG event
+  id), or deletes the timer that records it (`/api/timerdelete`). Programmes with a timer are
+  marked with a red bar and ●; a timer counts as the programme's when it has the same event id or
+  covers more than half of it (so timers made on the box with margins match too). The details
+  dialog has the same Record / Delete timer button.
+- Watching from the guide fills the INFO data of the live player at once from the guide's own
+  events and then loads now/next of the bouquet, as opening the bouquet in the channel list does.
 - Watching from the guide makes the channel list follow the guide's bouquet, so CH +/− works
   during playback; after playback the guide is shown again.
 

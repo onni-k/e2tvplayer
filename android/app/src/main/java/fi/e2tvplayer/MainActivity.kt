@@ -67,6 +67,9 @@ class MainActivity : Activity() {
     private var epgServices: List<JSONObject> = emptyList()
     private val epgQueue = ArrayList<String>()
     private var epgActive = 0
+    /** timers on the box: service reference (10 fields), begin, end, event id */
+    private data class Timer(val ref: String, val begin: Long, val end: Long, val eit: Long)
+    private var timers: List<Timer> = emptyList()
     private var root: String? = null
     private var dir: String? = null
     private var movieData: JSONObject? = null
@@ -119,6 +122,7 @@ class MainActivity : Activity() {
         epg.needEvents = { ref -> queueEpg(ref) }
         epg.onWatch = { row -> watchFromEpg(row) }
         epg.onInfo = { row, ev -> epgInfo(row, ev) }
+        epg.hasTimer = { ref, ev -> timerOf(ref, ev) != null }
         tabSort.setOnClickListener { toggleSort() }
         tabSet.setOnClickListener { settings() }
         updateTabs()
@@ -190,7 +194,7 @@ class MainActivity : Activity() {
         tabSort.text = if (sortByName()) T("A–Z") else T("Newest first")
         footer.text = when (mode) {
             "movies" -> T("OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs   ·   BACK parent folder")
-            "epg" -> T("OK watch / info   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels")
+            "epg" -> T("OK watch / info   ·   red: timer   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels")
             else -> T("OK watch   ·   ▲ up to tabs   ·   BACK back")
         }
     }
@@ -531,6 +535,48 @@ class MainActivity : Activity() {
         }, fail = { err -> if (gen == loadGen) { setBusy(false); toast(err) } })
     }
 
+    // ---------------------------------------------------------------- timers
+
+    private fun refKey(r: String) = r.split(":").take(10).joinToString(":").uppercase()
+
+    private fun loadTimers() {
+        Box.get("/api/timerlist", ok = { data ->
+            val arr = data.optJSONArray("timers")
+            val l = ArrayList<Timer>()
+            if (arr != null) for (i in 0 until arr.length()) {
+                val o = arr.optJSONObject(i) ?: continue
+                l.add(Timer(refKey(o.optString("serviceref")), o.optLong("begin"), o.optLong("end"), o.optLong("eit", -1)))
+            }
+            timers = l
+            epg.invalidate()
+        }, fail = { })
+    }
+
+    /** the timer that records this programme: the same event id, or a timer covering most of it */
+    private fun timerOf(ref: String, ev: EpgEvent): Timer? {
+        val key = refKey(ref)
+        return timers.firstOrNull { t ->
+            t.ref == key && ((ev.id >= 0 && t.eit == ev.id) || minOf(t.end, ev.end) - maxOf(t.begin, ev.begin) > (ev.end - ev.begin) / 2)
+        }
+    }
+
+    private fun toggleTimer(row: Int, ev: EpgEvent) {
+        val ref = epg.refAt(row) ?: return
+        val t = timerOf(ref, ev)
+        val done = { data: JSONObject ->
+            if (data.has("result") && !data.optBoolean("result")) toast(T("Timer") + ": " + data.optString("message"))
+            else toast(if (t != null) T("Timer deleted") else T("Timer added") + ": " + ev.title)
+            loadTimers()
+        }
+        val fail = { err: String -> toast(T("Timer") + ": " + err) }
+        when {
+            t != null -> Box.get("/api/timerdelete", mapOf("sRef" to ref, "begin" to t.begin.toString(), "end" to t.end.toString()), ok = done, fail = fail)
+            ev.end <= System.currentTimeMillis() / 1000 -> return
+            ev.id < 0 -> toast(T("This programme cannot be recorded (no event id)."))
+            else -> Box.get("/api/timeraddbyeventid", mapOf("sRef" to ref, "eventid" to ev.id.toString(), "justplay" to "0"), ok = done, fail = fail)
+        }
+    }
+
     private fun setEpg(b: JSONObject, l: List<JSONObject>, row: Int) {
         epgBouquet = b
         epgServices = l
@@ -539,6 +585,7 @@ class MainActivity : Activity() {
         dTitle.text = ""
         epg.setServices(l.map { it.optString("servicereference") }, l.map { it.optString("servicename") }, row)
         epg.requestFocus()
+        loadTimers()
     }
 
     /** at most two requests at a time */
@@ -559,7 +606,7 @@ class MainActivity : Activity() {
                     val b = o.optLong("begin_timestamp")
                     val d = o.optLong("duration_sec")
                     val t = o.optString("title")
-                    if (b > 0 && d > 0 && t.isNotEmpty()) l.add(EpgEvent(b, b + d, t, o.optString("shortdesc"), o.optString("longdesc")))
+                    if (b > 0 && d > 0 && t.isNotEmpty()) l.add(EpgEvent(b, b + d, t, o.optString("shortdesc"), o.optString("longdesc"), o.optLong("id", -1)))
                 }
                 epgActive--
                 epg.setEvents(ref, l)
@@ -582,10 +629,12 @@ class MainActivity : Activity() {
 
     private fun epgInfo(row: Int, ev: EpgEvent) {
         val name = epgServices.getOrNull(row)?.optString("servicename") ?: ""
+        val rec = epg.refAt(row)?.let { timerOf(it, ev) } != null
         AlertDialog.Builder(this, R.style.E2Dialog)
             .setTitle(ev.title)
-            .setMessage("${Fmt.hm(ev.begin)}–${Fmt.hm(ev.end)} · $name\n\n${ev.text()}")
+            .setMessage("${Fmt.hm(ev.begin)}–${Fmt.hm(ev.end)} · $name" + (if (rec) "   ● " + T("Timer set") else "") + "\n\n${ev.text()}")
             .setPositiveButton(T("Watch channel")) { _, _ -> watchFromEpg(row) }
+            .setNeutralButton(if (rec) T("Delete timer") else T("Record")) { _, _ -> toggleTimer(row, ev) }
             .setNegativeButton(T("Close"), null)
             .show()
     }
@@ -702,7 +751,11 @@ class MainActivity : Activity() {
         if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
             val pos = currentIndex()
             when (event.keyCode) {
-                KeyEvent.KEYCODE_PROG_RED -> { adapter.rows.getOrNull(pos)?.takeIf { it.type == "movie" }?.let { confirmDelete(it) }; return true }
+                KeyEvent.KEYCODE_PROG_RED, KeyEvent.KEYCODE_MEDIA_RECORD -> {
+                    if (mode == "epg") { epg.selected?.let { toggleTimer(epg.row, it) }; return true }
+                    adapter.rows.getOrNull(pos)?.takeIf { it.type == "movie" }?.let { confirmDelete(it) }
+                    return true
+                }
                 KeyEvent.KEYCODE_PROG_GREEN -> { toggleSort(); return true }
                 KeyEvent.KEYCODE_PROG_YELLOW -> {
                     when (mode) { "movies" -> showChannels(); "channels" -> showEpg(); else -> showMovies() }

@@ -39,6 +39,24 @@ SERVICES = {"services": [{"servicereference": SREF1, "servicename": "Test Channe
                          {"servicereference": SREF2, "servicename": "Second channel"}]}
 
 
+
+TIMERS = []
+
+
+def fake_epg(ref):
+    """a programme guide: a few programmes per channel from half an hour ago on"""
+    k = 1 if ref == SREF1 else 2
+    names = ["Evening News", "Weather", "Documentary", "Film: The Long Night", "Late News"] if k == 1 \
+        else ["Football", "Studio", "Ice Hockey", "Sports News", "Night Music"]
+    ev, t = [], NOW - 1800 + 300 * k
+    for i in range(12):
+        d = (1800, 600, 3000, 5400, 1200)[i % 5]
+        ev.append({"id": k * 100 + i, "sref": ref, "title": names[i % 5], "begin_timestamp": t, "duration_sec": d,
+            "shortdesc": "", "longdesc": "Programme %d of the test guide." % (i + 1)})
+        t += d
+    return ev
+
+
 class Api(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -59,19 +77,21 @@ class Api(BaseHTTPRequestHandler):
         q = {k: v[0] for k, v in parse_qs(u.query).items()}
         if u.path == "/file":
             return self.send_file()
+        if u.path == "/api/timerlist":
+            return self.send_json({"result": True, "timers": TIMERS})
+        if u.path == "/api/timeraddbyeventid":
+            ev = [e for e in fake_epg(q.get("sRef", "")) if str(e["id"]) == q.get("eventid")]
+            if not ev:
+                return self.send_json({"result": False, "message": "No event found"})
+            e = ev[0]
+            TIMERS.append({"serviceref": q["sRef"], "begin": e["begin_timestamp"] - 120,
+                "end": e["begin_timestamp"] + e["duration_sec"] + 300, "eit": e["id"], "name": e["title"]})
+            return self.send_json({"result": True, "message": "Timer '%s' added" % e["title"]})
+        if u.path == "/api/timerdelete":
+            TIMERS[:] = [t for t in TIMERS if str(t["begin"]) != q.get("begin")]
+            return self.send_json({"result": True, "message": "Timer deleted"})
         if u.path == "/api/epgservice":
-            # a programme guide: a few programmes per channel from half an hour ago on
-            ref = q.get("sRef", "")
-            k = 1 if ref == SREF1 else 2
-            names = ["Evening News", "Weather", "Documentary", "Film: The Long Night", "Late News"] if k == 1 \
-                else ["Football", "Studio", "Ice Hockey", "Sports News", "Night Music"]
-            ev, t = [], NOW - 1800 + 300 * k
-            for i in range(12):
-                d = (1800, 600, 3000, 5400, 1200)[i % 5]
-                ev.append({"sref": ref, "title": names[i % 5], "begin_timestamp": t, "duration_sec": d,
-                    "shortdesc": "", "longdesc": "Programme %d of the test guide." % (i + 1)})
-                t += d
-            return self.send_json({"events": ev})
+            return self.send_json({"events": fake_epg(q.get("sRef", ""))})
         if u.path == "/api/getservices" and q.get("sRef"):
             return self.send_json(SERVICES)
         if u.path == "/api/movielist" and q.get("dirname", "").rstrip("/").endswith("Series"):

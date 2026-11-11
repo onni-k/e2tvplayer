@@ -16,7 +16,7 @@ import android.view.KeyEvent
 import android.view.View
 
 /** One programme of the guide. Times are unix seconds. */
-data class EpgEvent(val begin: Long, val end: Long, val title: String, val sub: String, val desc: String) {
+data class EpgEvent(val begin: Long, val end: Long, val title: String, val sub: String, val desc: String, val id: Long = -1) {
     fun text(): String = if (sub.isNotEmpty() && desc.isNotEmpty() && !desc.contains(sub)) "$sub – $desc" else desc.ifEmpty { sub }
 }
 
@@ -31,6 +31,10 @@ class EpgGridView @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? =
     var needEvents: (String) -> Unit = {}
     var onWatch: (Int) -> Unit = {}
     var onInfo: (Int, EpgEvent) -> Unit = { _, _ -> }
+    /** true when a timer records this programme of this channel */
+    var hasTimer: (String, EpgEvent) -> Boolean = { _, _ -> false }
+
+    fun refAt(row: Int): String? = refs.getOrNull(row)
 
     private var refs: List<String> = emptyList()
     private var names: List<String> = emptyList()
@@ -59,6 +63,8 @@ class EpgGridView @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? =
     private val pNowEv = Paint().apply { color = 0xFF213047.toInt() }
     private val pSel = Paint().apply { color = 0xFF2A5C99.toInt() }
     private val pChSel = Paint().apply { color = 0xFF22344D.toInt() }
+    private val pRec = Paint().apply { color = 0xFFFF5A5A.toInt() }
+    private val tRec = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFF5A5A.toInt(); textSize = 13 * dp }
     private val pLine = Paint().apply { color = 0xFF3A4656.toInt(); strokeWidth = dp }
     private val pNow = Paint().apply { color = 0xFFFF5A5A.toInt(); strokeWidth = 2 * dp }
     private val tText = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFCFD8E3.toInt(); textSize = 15 * dp }
@@ -149,7 +155,9 @@ class EpgGridView @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? =
                 val isSel = i == cur
                 if (isSel) sel = ev
                 c.drawRoundRect(r2, 3 * dp, 3 * dp, if (isSel) pSel else if (ev.begin <= now && now < ev.end) pNowEv else pEv)
-                if (r2.width() > 20 * dp) drawText(c, ev.title, r2, if (isSel) tTitleSmall() else tText)
+                val rec = hasTimer(refs[idx], ev)
+                if (rec) c.drawRect(r2.left, r2.bottom - 3 * dp, r2.right, r2.bottom, pRec)
+                if (r2.width() > 20 * dp) drawText(c, (if (rec) "● " else "") + ev.title, r2, if (isSel) tTitleSmall() else tText)
             }
             if (cur >= 0 && sel == null) sel = list[cur]
         }
@@ -164,8 +172,14 @@ class EpgGridView @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? =
         val name = names.getOrNull(row) ?: ""
         if (s != null) {
             c.drawText(TextUtils.ellipsize(s.title, tTitle, w, TextUtils.TruncateAt.END).toString(), 0f, iy + 20 * dp, tTitle)
+            var mx = 0f
+            if (hasTimer(refs[row], s)) {
+                val rt = "● " + T("Timer set") + "   "
+                c.drawText(rt, 0f, iy + 40 * dp, tRec)
+                mx = tRec.measureText(rt)
+            }
             c.drawText("$name · ${Fmt.date(s.begin).substringBefore(' ')} ${Fmt.hm(s.begin)}–${Fmt.hm(s.end)} · ${(s.end - s.begin) / 60} min",
-                0f, iy + 40 * dp, tMeta)
+                mx, iy + 40 * dp, tMeta)
             val text = s.text()
             if (text.isNotEmpty()) {
                 @Suppress("DEPRECATION")

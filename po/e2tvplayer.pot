@@ -736,6 +736,10 @@ msgid "<span class=\"k k-ok\">OK</span>Watch / info"
 msgstr ""
 
 #: web/views.js
+msgid "<span class=\"k k-red\"></span>Timer"
+msgstr ""
+
+#: web/views.js
 msgid "<span class=\"k k-yellow\"></span>Recordings"
 msgstr ""
 
@@ -759,12 +763,40 @@ msgstr ""
 msgid "No programme information"
 msgstr ""
 
+#: web/views.js android/EpgGridView.kt android/MainActivity.kt
+msgid "Timer set"
+msgstr ""
+
 #: web/views.js android/MainActivity.kt
 msgid "Watch channel"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
+msgid "Delete timer"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
+msgid "Record"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
 msgid "Close"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
+msgid "Timer"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
+msgid "Timer deleted"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
+msgid "Timer added"
+msgstr ""
+
+#: web/views.js android/MainActivity.kt
+msgid "This programme cannot be recorded (no event id)."
 msgstr ""
 
 #: android/Box.kt
@@ -816,7 +848,7 @@ msgid "OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs  
 msgstr ""
 
 #: android/MainActivity.kt
-msgid "OK watch / info   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels"
+msgid "OK watch / info   ·   red: timer   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels"
 msgstr ""
 
 #: android/MainActivity.kt

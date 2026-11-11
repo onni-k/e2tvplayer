@@ -738,6 +738,10 @@ msgid "<span class=\"k k-ok\">OK</span>Watch / info"
 msgstr "<span class=\"k k-ok\">OK</span>Titta / info"
 
 #: web/views.js
+msgid "<span class=\"k k-red\"></span>Timer"
+msgstr "<span class=\"k k-red\"></span>Timer"
+
+#: web/views.js
 msgid "<span class=\"k k-yellow\"></span>Recordings"
 msgstr "<span class=\"k k-yellow\"></span>Inspelningar"
 
@@ -761,13 +765,41 @@ msgstr "Programguide"
 msgid "No programme information"
 msgstr "Ingen programinformation"
 
+#: web/views.js android/EpgGridView.kt android/MainActivity.kt
+msgid "Timer set"
+msgstr "Timer inställd"
+
 #: web/views.js android/MainActivity.kt
 msgid "Watch channel"
 msgstr "Titta på kanalen"
 
 #: web/views.js android/MainActivity.kt
+msgid "Delete timer"
+msgstr "Ta bort timer"
+
+#: web/views.js android/MainActivity.kt
+msgid "Record"
+msgstr "Spela in"
+
+#: web/views.js android/MainActivity.kt
 msgid "Close"
 msgstr "Stäng"
+
+#: web/views.js android/MainActivity.kt
+msgid "Timer"
+msgstr "Timer"
+
+#: web/views.js android/MainActivity.kt
+msgid "Timer deleted"
+msgstr "Timer borttagen"
+
+#: web/views.js android/MainActivity.kt
+msgid "Timer added"
+msgstr "Timer tillagd"
+
+#: web/views.js android/MainActivity.kt
+msgid "This programme cannot be recorded (no event id)."
+msgstr "Programmet kan inte spelas in (händelse-id saknas)."
 
 #: android/Box.kt
 msgid "OpenWebif requires a login – turn it off in the box settings"
@@ -818,8 +850,8 @@ msgid "OK play   ·   long OK: menu (delete, from start)   ·   ▲ up to tabs  
 msgstr "OK spela   ·   långt OK: meny (radera, från början)   ·   ▲ upp till flikarna   ·   BACK överordnad mapp"
 
 #: android/MainActivity.kt
-msgid "OK watch / info   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels"
-msgstr "OK titta / info   ·   ◀▶ program   ·   ▲▼ kanal   ·   ◀◀▶▶ ±2 h   ·   BACK kanaler"
+msgid "OK watch / info   ·   red: timer   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels"
+msgstr "OK titta / info   ·   röd: timer   ·   ◀▶ program   ·   ▲▼ kanal   ·   ◀◀▶▶ ±2 h   ·   BACK kanaler"
 
 #: android/MainActivity.kt
 msgid "OK watch   ·   ▲ up to tabs   ·   BACK back"
