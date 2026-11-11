@@ -75,6 +75,9 @@ Finnish and a Swedish translation in the same change.
 | Box Python | the web tests import it; run the affected code with stub `Components` modules as the tests do |
 | Google TV app | CI `tv-test` job (emulator + `tests/fake_box.py`); add a step and a screenshot to `tests/tv_test.sh` |
 
+`tests/test.ts` is only 30 s long: in `tests/tv_test.sh`, pause playback around long sequences of
+menu steps, or the player finishes and the rest of the run happens outside the app.
+
 Tests that drive keys check the visible result (text, classes, requests made), not internal state
 only. There is no local Android SDK in cloud sessions: Kotlin is proven by the CI build and the
 emulator job; say so when you report.
