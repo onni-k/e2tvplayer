@@ -70,6 +70,8 @@ class EpgGridView @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? =
     init {
         isFocusable = true
         isFocusableInTouchMode = true
+        // the selection is drawn by the grid itself; no grey focus box over the whole view
+        if (android.os.Build.VERSION.SDK_INT >= 26) defaultFocusHighlightEnabled = false
     }
 
     private fun now() = System.currentTimeMillis() / 1000
