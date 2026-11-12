@@ -24,6 +24,9 @@ shot 05_menu
 key KEYCODE_DPAD_DOWN                # subtitles row
 key KEYCODE_DPAD_RIGHT               # off -> Finnish
 shot 06_menu_finnish
+key KEYCODE_DPAD_RIGHT               # Swedish: subtitling type 0x20 in test.ts -> (hard of hearing)
+shot 06a_menu_swedish_hoh
+key KEYCODE_DPAD_LEFT
 key KEYCODE_DPAD_DOWN                # audio decoding row + audio track diagnostics
 shot 06b_audio_decoding
 key KEYCODE_DPAD_UP

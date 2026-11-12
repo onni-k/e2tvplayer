@@ -20,9 +20,11 @@ object Shots {
     var current: Activity? = null
     var busy = false
         private set
+    /** the dialog last opened in the list view: a separate window, so it is drawn on the picture by hand */
+    var dialog: android.app.Dialog? = null
 
     fun resumed(a: Activity) { current = a }
-    fun destroyed(a: Activity) { if (current === a) current = null }
+    fun destroyed(a: Activity) { if (current === a) { current = null; dialog = null } }
 
     fun start() {
         if (busy) return
@@ -63,7 +65,17 @@ object Shots {
             val root = a.window.decorView
             if (root.width <= 0 || root.height <= 0) { busy = false; return }
             val bmp = Bitmap.createBitmap(root.width, root.height, Bitmap.Config.ARGB_8888)
-            root.draw(Canvas(bmp))
+            val c = Canvas(bmp)
+            root.draw(c)
+            dialog?.takeIf { it.isShowing && it.ownerActivity.let { o -> o == null || o === a } }?.window?.decorView?.let { d ->
+                val at = IntArray(2)
+                val base = IntArray(2)
+                d.getLocationOnScreen(at)
+                root.getLocationOnScreen(base)
+                c.drawColor(0x99000000.toInt())
+                c.translate((at[0] - base[0]).toFloat(), (at[1] - base[1]).toFloat())
+                d.draw(c)
+            }
             upload(bmp, linkedMapOf("platform" to "googletv", "novideo" to "1", "title" to "list"))
         }
     }

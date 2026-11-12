@@ -2,6 +2,10 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 0.1.024
+* FIX: Google TV: hard-of-hearing DVB subtitles are recognised (label and automatic choice)
+* FIX: Google TV: screenshots of the lists include an open dialog (e.g. Settings)
+
 ## 0.1.023
 * NEW: Automatic audio and subtitle choice with a 1st and 2nd preference, hard-of-hearing subtitles
   (Samsung: TOOLS in the lists; Google TV: Settings). "As last time" keeps the old behaviour

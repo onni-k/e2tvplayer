@@ -351,7 +351,7 @@ class MainActivity : Activity() {
                 .setTitle(r.title)
                 .setItems(arrayOf(T("Resume from ") + Fmt.time(pos / 1000), T("From the start"))) { _, w ->
                     if (w == 1) playMovie(r, fromStart = true) else start()
-                }.show()
+                }.show().also { Shots.dialog = it }
         } else start()
     }
 
@@ -364,7 +364,7 @@ class MainActivity : Activity() {
                     1 -> confirmDelete(r)
                     2 -> toggleSort()
                 }
-            }.show()
+            }.show().also { Shots.dialog = it }
     }
 
     private fun confirmDelete(r: Row) {
@@ -386,7 +386,7 @@ class MainActivity : Activity() {
                         toast(T("Recording deleted"))
                     } else toast(T("Delete failed: ") + res.optString("message"))
                 }, fail = { setBusy(false); toast(T("Delete failed: ") + it) })
-            }.show()
+            }.show().also { Shots.dialog = it }
     }
 
     // ---------------------------------------------------------------- channels
@@ -636,7 +636,7 @@ class MainActivity : Activity() {
             .setPositiveButton(T("Watch channel")) { _, _ -> watchFromEpg(row) }
             .setNeutralButton(if (rec) T("Delete timer") else T("Record")) { _, _ -> toggleTimer(row, ev) }
             .setNegativeButton(T("Close"), null)
-            .show()
+            .show().also { Shots.dialog = it }
     }
 
     // ---------------------------------------------------------------- settings
@@ -680,7 +680,7 @@ class MainActivity : Activity() {
             .setNeutralButton(T("Find box")) { _, _ -> findBox(first = false) }
             .setNegativeButton(T("Cancel"), null)
             .setOnDismissListener { if (I18n.pref() != langAtOpen && I18n.cur() != langCur) recreate() }
-            .show()
+            .show().also { Shots.dialog = it }
     }
 
     /** audio and subtitle preference rows (Prefs); a mode change shows or hides the choice rows */
@@ -738,7 +738,7 @@ class MainActivity : Activity() {
                 found.size > 1 -> AlertDialog.Builder(this, R.style.E2Dialog)
                     .setTitle(T("Choose a box"))
                     .setItems(found.toTypedArray()) { _, w -> setHost(found[w]) }
-                    .show()
+                    .show().also { Shots.dialog = it }
                 else -> {
                     crumb.text = ""
                     AlertDialog.Builder(this, R.style.E2Dialog)
@@ -746,7 +746,7 @@ class MainActivity : Activity() {
                         .setMessage(T("No box with the E2TVPlayer plugin was found on the network. Enter the address manually."))
                         .setPositiveButton(T("Enter address")) { _, _ -> settings() }
                         .setNegativeButton(if (first) T("Close") else T("Cancel"), null)
-                        .show()
+                        .show().also { Shots.dialog = it }
                 }
             }
         }
@@ -822,7 +822,7 @@ class MainActivity : Activity() {
             .setTitle(T("Quit E2TVPlayer?"))
             .setPositiveButton(T("Yes")) { _, _ -> finish() }
             .setNegativeButton(T("No"), null)
-            .show()
+            .show().also { Shots.dialog = it }
     }
 
     // ---------------------------------------------------------------- list

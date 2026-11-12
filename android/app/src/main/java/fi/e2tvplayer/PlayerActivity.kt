@@ -33,7 +33,12 @@ import androidx.media3.exoplayer.audio.DefaultAudioSink
 import android.content.Context
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.common.util.TimestampAdjuster
 import androidx.media3.extractor.DefaultExtractorsFactory
+import androidx.media3.extractor.Extractor
+import androidx.media3.extractor.ExtractorsFactory
+import androidx.media3.extractor.ts.TsPayloadReader
+import android.util.SparseArray
 import androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory
 import androidx.media3.extractor.ts.TsExtractor
 import androidx.media3.ui.PlayerView
@@ -133,6 +138,31 @@ class PlayerActivity : Activity() {
     /** "pcm": the app decodes audio (FFmpeg) and outputs PCM; "tv": Dolby passthrough to the TV / the device decoders */
     private fun audioMode(): String = Box.prefs.getString("audioMode", "pcm") ?: "pcm"
 
+    /**
+     * DVB subtitle entries of the stream (language, subtitling type) in PMT order. Media3 drops the
+     * type, and types 0x20-0x25 are the hard-of-hearing subtitles (EN 300 468, component type 3).
+     */
+    private val dvbSubs: MutableList<Pair<String, Int>> = java.util.Collections.synchronizedList(ArrayList())
+
+    /** the n-th DVB subtitle track of a language is the n-th entry of that language in the PMT */
+    private fun hoh(group: Tracks.Group, track: Int): Boolean {
+        val f = group.getTrackFormat(track)
+        if ((f.roleFlags and C.ROLE_FLAG_DESCRIBES_MUSIC_AND_SOUND) != 0) return true
+        if (f.sampleMimeType != MimeTypes.APPLICATION_DVBSUBS) return false
+        val lang = Prefs.iso2(f.language)
+        var n = 0
+        loop@ for (g in player.currentTracks.groups) {
+            if (g.type != C.TRACK_TYPE_TEXT) continue
+            for (t in 0 until g.length) {
+                if (g === group && t == track) break@loop
+                val o = g.getTrackFormat(t)
+                if (o.sampleMimeType == MimeTypes.APPLICATION_DVBSUBS && Prefs.iso2(o.language) == lang) n++
+            }
+        }
+        val same = synchronized(dvbSubs) { dvbSubs.filter { Prefs.iso2(it.first) == lang } }
+        return same.getOrNull(n)?.second?.let { it in 0x20..0x25 } ?: false
+    }
+
     private fun buildPlayer() {
         val http = DefaultHttpDataSource.Factory()
             .setUserAgent("E2TVPlayer")
@@ -142,7 +172,24 @@ class PlayerActivity : Activity() {
         val extractors = DefaultExtractorsFactory()
             .setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES)
             .setTsExtractorTimestampSearchBytes(1500 * TsExtractor.TS_PACKET_SIZE)
-        val sources = DefaultMediaSourceFactory(DefaultDataSource.Factory(this, http), extractors)
+        val ts = object : TsPayloadReader.Factory {
+            val def = DefaultTsPayloadReaderFactory(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES)
+            override fun createInitialPayloadReaders(): SparseArray<TsPayloadReader> {
+                dvbSubs.clear()   // a new stream
+                return def.createInitialPayloadReaders()
+            }
+            override fun createPayloadReader(streamType: Int, esInfo: TsPayloadReader.EsInfo): TsPayloadReader? {
+                if (streamType == TsExtractor.TS_STREAM_TYPE_DVBSUBS) {
+                    for (d in esInfo.dvbSubtitleInfos) dvbSubs.add(d.language to d.type)
+                }
+                return def.createPayloadReader(streamType, esInfo)
+            }
+        }
+        val tsFirst = ExtractorsFactory {
+            arrayOf<Extractor>(TsExtractor(TsExtractor.MODE_SINGLE_PMT, TimestampAdjuster(0), ts, 1500 * TsExtractor.TS_PACKET_SIZE)) +
+                extractors.createExtractors()
+        }
+        val sources = DefaultMediaSourceFactory(DefaultDataSource.Factory(this, http), tsFirst)
         val pcm = audioMode() == "pcm"
         val renderers = object : DefaultRenderersFactory(this) {
             override fun buildAudioSink(context: Context, enableFloatOutput: Boolean, enableAudioTrackPlaybackParams: Boolean): AudioSink {
@@ -252,10 +299,7 @@ class PlayerActivity : Activity() {
             }
         }
         if (Prefs.get("subMode") == "auto") {
-            val j = Prefs.pickSub(text.map { (g, i) ->
-                val f = g.getTrackFormat(i)
-                Prefs.Track(f.language, hoh = (f.roleFlags and C.ROLE_FLAG_DESCRIBES_MUSIC_AND_SOUND) != 0)
-            })
+            val j = Prefs.pickSub(text.map { (g, i) -> Prefs.Track(g.getTrackFormat(i).language, hoh = hoh(g, i)) })
             if (j < 0) {
                 b.clearOverridesOfType(C.TRACK_TYPE_TEXT).setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
             } else {
@@ -264,7 +308,7 @@ class PlayerActivity : Activity() {
             }
             changed = true
         }
-        android.util.Log.i("E2TVPlayer", "auto tracks: audio ${Prefs.get("audioMode")} subtitles ${Prefs.get("subMode")}")
+        android.util.Log.i("E2TVPlayer", "auto tracks: audio ${Prefs.get("audioMode")} subtitles ${Prefs.get("subMode")} dvb $dvbSubs")
         if (changed) player.trackSelectionParameters = b.build()
     }
 
@@ -488,9 +532,9 @@ class PlayerActivity : Activity() {
         else -> ""
     }
 
-    private fun label(f: Format, type: Int): String {
+    private fun label(f: Format, type: Int, hoh: Boolean = false): String {
         var s = f.label?.takeIf { it.isNotEmpty() } ?: Fmt.lang(f.language)
-        if (type == C.TRACK_TYPE_TEXT && (f.roleFlags and C.ROLE_FLAG_DESCRIBES_MUSIC_AND_SOUND) != 0) s += T(" (hard of hearing)")
+        if (type == C.TRACK_TYPE_TEXT && hoh) s += T(" (hard of hearing)")
         if (type == C.TRACK_TYPE_AUDIO) {
             if ((f.roleFlags and C.ROLE_FLAG_DESCRIBES_VIDEO) != 0) s += T(" (audio description)")
             val c = codec(f)
@@ -523,7 +567,7 @@ class PlayerActivity : Activity() {
             for (t in 0 until g.length) {
                 if (!g.isTrackSupported(t)) continue
                 val f = g.getTrackFormat(t)
-                out.add(Opt(label(f, type), g, t, f.language ?: ""))
+                out.add(Opt(label(f, type, type == C.TRACK_TYPE_TEXT && hoh(g, t)), g, t, f.language ?: ""))
             }
         }
         return out
