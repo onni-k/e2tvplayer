@@ -44,7 +44,8 @@ key KEYCODE_DPAD_DOWN
 key KEYCODE_DPAD_DOWN
 key KEYCODE_DPAD_DOWN
 key KEYCODE_DPAD_DOWN
-key KEYCODE_DPAD_DOWN                # address, language, audio, 1st, 2nd -> subtitles
+key KEYCODE_DPAD_DOWN
+key KEYCODE_DPAD_DOWN                # (nothing focused), address, language, audio, 1st, 2nd -> subtitles
 key KEYCODE_DPAD_RIGHT               # subtitles: automatic -> as last time (the choice rows hide)
 shot 07a2_subtitles_as_last_time 1
 key KEYCODE_BACK                     # again from the start: the stored language turns subtitles on
