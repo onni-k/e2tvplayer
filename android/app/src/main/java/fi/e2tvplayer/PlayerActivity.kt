@@ -223,6 +223,49 @@ class PlayerActivity : Activity() {
             .setPreferredTextLanguage(if (subLang.isEmpty()) null else subLang)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, subLang.isEmpty())
             .build()
+        autoTracks = false
+    }
+
+    /** set once the automatic audio/subtitle choice (Prefs) has been made for the current stream */
+    private var autoTracks = false
+
+    private fun applyAutoTracks(t: Tracks) {
+        if (autoTracks) return
+        val audio = ArrayList<Pair<Tracks.Group, Int>>()
+        val text = ArrayList<Pair<Tracks.Group, Int>>()
+        for (g in t.groups) for (i in 0 until g.length) {
+            if (!g.isTrackSupported(i)) continue
+            if (g.type == C.TRACK_TYPE_AUDIO) audio.add(g to i) else if (g.type == C.TRACK_TYPE_TEXT) text.add(g to i)
+        }
+        if (audio.isEmpty()) return
+        autoTracks = true
+        val b = player.trackSelectionParameters.buildUpon()
+        var changed = false
+        if (Prefs.get("audioMode") == "auto") {
+            val j = Prefs.pickAudio(audio.map { (g, i) ->
+                val f = g.getTrackFormat(i)
+                Prefs.Track(f.language, ad = (f.roleFlags and C.ROLE_FLAG_DESCRIBES_VIDEO) != 0)
+            })
+            if (j >= 0) {
+                b.setOverrideForType(TrackSelectionOverride(audio[j].first.mediaTrackGroup, audio[j].second))
+                changed = true
+            }
+        }
+        if (Prefs.get("subMode") == "auto") {
+            val j = Prefs.pickSub(text.map { (g, i) ->
+                val f = g.getTrackFormat(i)
+                Prefs.Track(f.language, hoh = (f.roleFlags and C.ROLE_FLAG_DESCRIBES_MUSIC_AND_SOUND) != 0)
+            })
+            if (j < 0) {
+                b.clearOverridesOfType(C.TRACK_TYPE_TEXT).setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+            } else {
+                b.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+                    .setOverrideForType(TrackSelectionOverride(text[j].first.mediaTrackGroup, text[j].second))
+            }
+            changed = true
+        }
+        android.util.Log.i("E2TVPlayer", "auto tracks: audio ${Prefs.get("audioMode")} subtitles ${Prefs.get("subMode")}")
+        if (changed) player.trackSelectionParameters = b.build()
     }
 
     private fun playChannel(i: Int) {
@@ -270,6 +313,7 @@ class PlayerActivity : Activity() {
         override fun onIsPlayingChanged(isPlaying: Boolean) = updateOsd()
 
         override fun onTracksChanged(t: Tracks) {
+            applyAutoTracks(t)
             if (tracks.visibility == View.VISIBLE) renderTracks()
         }
 

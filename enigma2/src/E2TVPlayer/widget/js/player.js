@@ -329,21 +329,51 @@ var Player = {
 			diag.push((types[t] === 1 ? T('audio') : T('subtitles')) + '=' + (raw === null ? T('not supported') : raw));
 			list = [];
 			for (i = 0; i < n && i < 16; i++) {
-				var lang = U.langName(Player.call('GetStreamLanguageInfo', types[t], i));
+				var rawLang = Player.call('GetStreamLanguageInfo', types[t], i);
+				var lang = U.langName(rawLang), code = U.langCode(rawLang), ad = false;
 				/* the TV does not always know the language of a TS audio track: the box knows it from the PMT */
 				var ba = types[t] === Player.AUDIO && Subs.audio && Subs.audio.length === n ? Subs.audio[i] : null;
 				if (ba) {
+					if (ba.lang) { code = ba.lang; }
+					ad = /audio description/.test(ba.codec || '');
 					if (!lang || lang.indexOf(T('track ')) === 0) { lang = ba.lang ? U.langName(ba.lang) : ''; }
 					if (ba.codec) { lang = (lang || (T('track ') + (i + 1))) + ' · ' + ba.codec; }
 				}
-				list.push({ index: i, label: lang || (T('track ') + (i + 1)) });
+				list.push({ index: i, label: lang || (T('track ') + (i + 1)), code: code, ad: ad });
 			}
 			if (types[t] === Player.AUDIO) { Player.audio = list; } else { Player.subs = list; }
 		}
 		Player.diag = T('TV reports: ') + diag.join(', ');
 		if (Player.audioSel >= Player.audio.length) { Player.audioSel = 0; }
 		if (Player.subSel >= Player.subs.length) { Player.subSel = -1; }
+		Player.applyAudioPref();
 		if (U.$('tracks').style.display === 'block') { Player.renderTracks(); }
+	},
+
+	/* once per playback: the audio track by the language preferences (or the one chosen last time).
+	   Waits for the box's track list when the TV's own one has no languages. */
+	audioAuto: false,
+	applyAudioPref: function () {
+		var a = Player.audio, i, j = -1;
+		if (Player.audioAuto || a.length < 2) { return; }
+		var known = false;
+		for (i = 0; i < a.length; i++) { if (a[i].code) { known = true; } }
+		if (!known) { return; }
+		Player.audioAuto = true;
+		if (Prefs.get('audioMode') === 'auto') { j = Prefs.pickAudio(a); }
+		else {
+			var last = Store.get('lastAudio', '');
+			for (i = 0; i < a.length && last; i++) { if (Prefs.iso2(a[i].code) === last && !a[i].ad) { j = i; break; } }
+		}
+		if (j >= 0 && j !== Player.audioSel) {
+			Player.audioSel = j;
+			Player.call('SetStreamID', Player.AUDIO, a[j].index);
+		}
+	},
+
+	PREF_LABELS: {
+		audioMode: N('Audio'), audio1: N('  1st choice'), audio2: N('  2nd choice'),
+		subMode: N('Subtitles'), sub1: N('  1st choice'), sub2: N('  2nd choice')
 	},
 
 	tracksOpen: function () { return U.$('tracks').style.display === 'block'; },
@@ -378,7 +408,14 @@ var Player = {
 
 	/* Menu rows: during playback audio, subtitles, (timing), language, screenshot; in the lists language and screenshot */
 	rowIds: function () {
-		if (!Player.active) { return ['lang', 'shot']; }
+		if (!Player.active) {
+			var r = ['lang', 'p:audioMode'];
+			if (Prefs.get('audioMode') === 'auto') { r.push('p:audio1', 'p:audio2'); }
+			r.push('p:subMode');
+			if (Prefs.get('subMode') === 'auto') { r.push('p:sub1', 'p:sub2'); }
+			r.push('shot');
+			return r;
+		}
 		return Subs.key ? ['audio', 'sub', 'timing', 'lang', 'shot'] : ['audio', 'sub', 'lang', 'shot'];
 	},
 	trackRows: function () { return Player.rowIds().length; },
@@ -430,6 +467,10 @@ var Player = {
 				rows.push(row(r, T('Timing'), (off > 0 ? '+' : '') + I18n.num(off, 1) + ' s' +
 					(off === 0 ? '' : (off > 0 ? T('  (earlier)') : T('  (later)'))), true));
 			}
+			else if (ids[r].indexOf('p:') === 0) {
+				var pk = ids[r].substring(2);
+				rows.push(row(r, T(Player.PREF_LABELS[pk]), Prefs.name(Prefs.get(pk)), true));
+			}
 			else if (ids[r] === 'lang') { rows.push(row(r, T('Language'), I18n.label(I18n.pref()) + (I18n.pending ? T('  (restarts)') : ''), true)); }
 			else if (ids[r] === 'shot') { rows.push(row(r, T('Screenshot'), Shot.busy ? T('wait…') : T('OK: take a picture in 10 s'), false)); }
 		}
@@ -446,11 +487,17 @@ var Player = {
 			Player.renderTracks();
 			return;
 		}
+		if (id.indexOf('p:') === 0) {
+			Prefs.cycle(id.substring(2), d);
+			Player.renderTracks();
+			return;
+		}
 		if (id === 'audio') {
 			var n = Player.audio.length;
 			if (n < 2) { return; }
 			Player.audioSel = (Player.audioSel + d + n) % n;
 			Player.call('SetStreamID', Player.AUDIO, Player.audio[Player.audioSel].index);
+			if (Player.audio[Player.audioSel].code) { Store.set('lastAudio', Prefs.iso2(Player.audio[Player.audioSel].code)); }
 		} else if (id === 'sub') {
 			var opts = Player.subOptions(), m = opts.length;
 			if (m < 2) { return; }
@@ -492,6 +539,7 @@ var Player = {
 		U.show('tracks', false);
 		U.show('subs', false);
 		Player.audio = []; Player.subs = []; Player.audioSel = 0; Player.subSel = -1; Player.diag = '';
+		Player.audioAuto = false;
 	},
 
 	/* --- keys during playback --- */

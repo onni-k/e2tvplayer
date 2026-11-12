@@ -191,7 +191,23 @@ msgstr ""
 msgid "TV reports: "
 msgstr ""
 
-#: web/player.js android/PlayerActivity.kt
+#: web/player.js android/PlayerActivity.kt android/Prefs.kt
+msgid "Audio"
+msgstr ""
+
+#: web/player.js android/Prefs.kt
+msgid "  1st choice"
+msgstr ""
+
+#: web/player.js android/Prefs.kt
+msgid "  2nd choice"
+msgstr ""
+
+#: web/player.js android/PlayerActivity.kt android/Prefs.kt
+msgid "Subtitles"
+msgstr ""
+
+#: web/player.js web/util.js android/PlayerActivity.kt android/Prefs.kt
 msgid "off"
 msgstr ""
 
@@ -267,14 +283,6 @@ msgstr ""
 msgid "not available"
 msgstr ""
 
-#: web/player.js android/PlayerActivity.kt
-msgid "Audio"
-msgstr ""
-
-#: web/player.js android/PlayerActivity.kt
-msgid "Subtitles"
-msgstr ""
-
 #: web/player.js
 msgid "Timing"
 msgstr ""
@@ -347,7 +355,7 @@ msgstr ""
 msgid "chosen"
 msgstr ""
 
-#: web/util.js android/I18n.kt
+#: web/util.js android/I18n.kt android/Prefs.kt
 msgid "automatic"
 msgstr ""
 
@@ -375,7 +383,19 @@ msgstr ""
 msgid "Loading&hellip;"
 msgstr ""
 
-#: web/util.js android/PlayerActivity.kt
+#: web/util.js android/Prefs.kt
+msgid "as last time"
+msgstr ""
+
+#: web/util.js android/Box.kt android/Prefs.kt
+msgid "original"
+msgstr ""
+
+#: web/util.js android/Prefs.kt
+msgid "no selection"
+msgstr ""
+
+#: web/util.js android/PlayerActivity.kt android/Prefs.kt
 msgid " (hard of hearing)"
 msgstr ""
 
@@ -431,15 +451,15 @@ msgstr ""
 msgid "Year"
 msgstr ""
 
-#: web/util.js android/Box.kt
+#: web/util.js android/Box.kt android/Prefs.kt
 msgid "Finnish"
 msgstr ""
 
-#: web/util.js android/Box.kt
+#: web/util.js android/Box.kt android/Prefs.kt
 msgid "Swedish"
 msgstr ""
 
-#: web/util.js android/Box.kt
+#: web/util.js android/Box.kt android/Prefs.kt
 msgid "English"
 msgstr ""
 
@@ -447,11 +467,11 @@ msgstr ""
 msgid "Dutch"
 msgstr ""
 
-#: web/util.js android/Box.kt
+#: web/util.js android/Box.kt android/Prefs.kt
 msgid "German"
 msgstr ""
 
-#: web/util.js android/Box.kt
+#: web/util.js android/Box.kt android/Prefs.kt
 msgid "French"
 msgstr ""
 
@@ -481,10 +501,6 @@ msgstr ""
 
 #: web/util.js android/Box.kt
 msgid "Sami"
-msgstr ""
-
-#: web/util.js android/Box.kt
-msgid "original"
 msgstr ""
 
 #: web/util.js android/Box.kt

@@ -672,14 +672,50 @@ class MainActivity : Activity() {
             } else false
         }
         box.addView(lang)
+        box.addView(prefRows())
         AlertDialog.Builder(this, R.style.E2Dialog)
             .setTitle(T("Settings – E2TVPlayer ") + BuildConfigCompat.version(this))
-            .setView(box)
+            .setView(android.widget.ScrollView(this).apply { addView(box) })
             .setPositiveButton(T("Save")) { _, _ -> setHost(edit.text.toString()) }
             .setNeutralButton(T("Find box")) { _, _ -> findBox(first = false) }
             .setNegativeButton(T("Cancel"), null)
             .setOnDismissListener { if (I18n.pref() != langAtOpen && I18n.cur() != langCur) recreate() }
             .show()
+    }
+
+    /** audio and subtitle preference rows (Prefs); a mode change shows or hides the choice rows */
+    private fun prefRows(): LinearLayout {
+        val wrap = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        fun text(k: String) = Prefs.label(k) + ":  ◀ " + Prefs.name(Prefs.get(k)) + " ▶"
+        fun build(focus: String?) {
+            wrap.removeAllViews()
+            for (k in Prefs.rows()) {
+                val row = TextView(this).apply {
+                    this.text = text(k)
+                    setTextColor(0xFFC9D1D9.toInt())
+                    setPadding(0, if (k.endsWith("Mode")) 16 else 4, 0, 4)
+                    isFocusable = true
+                    isClickable = true
+                    setBackgroundResource(android.R.drawable.list_selector_background)
+                    tag = "pref_$k"
+                }
+                val change = { d: Int ->
+                    Prefs.cycle(k, d)
+                    if (k.endsWith("Mode")) build(k) else row.text = text(k)
+                }
+                row.setOnClickListener { change(1) }
+                row.setOnKeyListener { _, c, e ->
+                    if (e.action == KeyEvent.ACTION_DOWN && (c == KeyEvent.KEYCODE_DPAD_LEFT || c == KeyEvent.KEYCODE_DPAD_RIGHT)) {
+                        change(if (c == KeyEvent.KEYCODE_DPAD_LEFT) -1 else 1)
+                        true
+                    } else false
+                }
+                wrap.addView(row)
+                if (k == focus) row.post { row.requestFocus() }
+            }
+        }
+        build(null)
+        return wrap
     }
 
     private fun setHost(h: String) {

@@ -22,7 +22,7 @@ try:
 except ImportError:  # pragma: no cover - for testing only
 	resource = None
 
-VERSION = "0.1.022"
+VERSION = "0.1.023"
 APP_ID = "E2Tallenteet"   # the TV's internal id is kept: an update replaces the old app
 APP_TITLE = "E2TVPlayer"
 MOUNT = "e2tvplayer"

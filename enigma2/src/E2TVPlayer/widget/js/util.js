@@ -11,6 +11,8 @@ var I18N_DATA = {
    "  (earlier)": "  (aiemmin)",
    "  (later)": "  (myöhemmin)",
    "  (restarts)": "  (käynnistyy uudelleen)",
+   "  1st choice": "  1. valinta",
+   "  2nd choice": "  2. valinta",
    "  · A–Z": "  · A–Ö",
    "  · newest first": "  · uusin ensin",
    " (hard of hearing)": " (kuulovammaiset)",
@@ -183,6 +185,7 @@ var I18N_DATA = {
    "Writer": "Käsikirjoitus",
    "Year": "Vuosi",
    "Yes": "Kyllä",
+   "as last time": "kuten viimeksi",
    "audio": "ääni",
    "audio description": "kuvailutulkkaus",
    "automatic": "automaattinen",
@@ -191,6 +194,7 @@ var I18N_DATA = {
    "default": "oletus",
    "error": "virhe",
    "in use": "käytössä",
+   "no selection": "ei valintaa",
    "not available": "ei tarjolla",
    "not supported": "ei tukea",
    "off": "pois",
@@ -214,6 +218,8 @@ var I18N_DATA = {
    "  (earlier)": "  (tidigare)",
    "  (later)": "  (senare)",
    "  (restarts)": "  (startar om)",
+   "  1st choice": "  1:a val",
+   "  2nd choice": "  2:a val",
    "  · A–Z": "  · A–Ö",
    "  · newest first": "  · nyaste först",
    " (hard of hearing)": " (hörselskadade)",
@@ -386,6 +392,7 @@ var I18N_DATA = {
    "Writer": "Manus",
    "Year": "År",
    "Yes": "Ja",
+   "as last time": "som förra gången",
    "audio": "ljud",
    "audio description": "syntolkning",
    "automatic": "automatiskt",
@@ -394,6 +401,7 @@ var I18N_DATA = {
    "default": "standard",
    "error": "fel",
    "in use": "används",
+   "no selection": "inget val",
    "not available": "inte tillgänglig",
    "not supported": "stöds inte",
    "off": "av",
@@ -637,6 +645,84 @@ var I18n = {
 		}
 	}
 };
+/* Audio and subtitle language preferences. Mode 'auto' picks the 1st choice, then the 2nd;
+   mode 'last' keeps the track chosen last time (the behaviour before 0.1.023).
+   Audio 'orig' is the original-language track (DVB code qaa etc.); audio description tracks
+   are never picked automatically. Subtitle codes ending in '-hoh' are the hard-of-hearing ones. */
+var Prefs = {
+	AUDIO: ['orig', 'fi', 'sv', 'en', 'de', 'fr'],
+	SUBS: ['fi', 'fi-hoh', 'sv', 'sv-hoh', 'en', 'en-hoh'],
+	ORIG: { qaa: 1, mis: 1, mul: 1, org: 1, und: 1 },
+	KEYS: ['audioMode', 'audio1', 'audio2', 'subMode', 'sub1', 'sub2'],
+	/* defaults follow the app language: Finnish -> audio original, then Finnish; subtitles Finnish */
+	def: function (k) {
+		var L = I18n.cur();
+		switch (k) {
+			case 'audioMode': case 'subMode': return 'auto';
+			case 'audio1': return 'orig';
+			case 'audio2': return L;
+			case 'sub1': return L === 'en' ? 'off' : L;
+		}
+		return 'none';
+	},
+	get: function (k) { return Store.get('p_' + k, '') || Prefs.def(k); },
+	choices: function (k) {
+		if (k === 'audioMode' || k === 'subMode') { return ['auto', 'last']; }
+		if (k === 'audio1') { return Prefs.AUDIO; }
+		if (k === 'audio2') { return Prefs.AUDIO.concat(['none']); }
+		if (k === 'sub1') { return Prefs.SUBS.concat(['off']); }
+		return Prefs.SUBS.concat(['none']);
+	},
+	cycle: function (k, d) {
+		var c = Prefs.choices(k), v = Prefs.get(k), i = 0, j;
+		for (j = 0; j < c.length; j++) { if (c[j] === v) { i = j; } }
+		Store.set('p_' + k, c[(i + d + c.length) % c.length]);
+	},
+	name: function (code) {
+		if (code === 'auto') { return T('automatic'); }
+		if (code === 'last') { return T('as last time'); }
+		if (code === 'orig') { return T('original'); }
+		if (code === 'off') { return T('off'); }
+		if (code === 'none') { return T('no selection'); }
+		var hoh = code.indexOf('-hoh') > 0, c = code.split('-')[0], k, n = c;
+		for (k in ISO3) { if (ISO3.hasOwnProperty(k) && ISO3[k] === c && U.LANGS[k]) { n = T(U.LANGS[k]); break; } }
+		return n + (hoh ? T(' (hard of hearing)') : '');
+	},
+	iso2: function (code) {
+		var l = String(code || '').toLowerCase();
+		if (ISO3[l.substring(0, 3)]) { return ISO3[l.substring(0, 3)]; }
+		if (/^[a-z]{2}(-|_|$)/.test(l)) { return l.substring(0, 2); }
+		return l;
+	},
+	matchAudio: function (p, t) {
+		if (t.ad) { return false; }
+		if (p === 'orig') { return !!Prefs.ORIG[String(t.code || '').toLowerCase().substring(0, 3)]; }
+		return Prefs.iso2(t.code) === p;
+	},
+	/* tracks [{code, ad}] -> index of the preferred track, -1 = leave the default */
+	pickAudio: function (tracks) {
+		var ps = [Prefs.get('audio1'), Prefs.get('audio2')], i, j;
+		for (i = 0; i < ps.length; i++) {
+			if (ps[i] === 'none') { continue; }
+			for (j = 0; j < tracks.length; j++) { if (Prefs.matchAudio(ps[i], tracks[j])) { return j; } }
+		}
+		return -1;
+	},
+	/* tracks [{code, hoh}] -> index of the preferred track, -1 = subtitles off */
+	pickSub: function (tracks) {
+		var ps = [Prefs.get('sub1'), Prefs.get('sub2')], i, j;
+		for (i = 0; i < ps.length; i++) {
+			if (ps[i] === 'off') { return -1; }
+			if (ps[i] === 'none') { continue; }
+			var want = ps[i].split('-')[0], hoh = ps[i].indexOf('-hoh') > 0;
+			for (j = 0; j < tracks.length; j++) {
+				if (Prefs.iso2(tracks[j].code) === want && !!tracks[j].hoh === hoh) { return j; }
+			}
+		}
+		return -1;
+	}
+};
+
 /* suffixes of the subtitle names sent by the box (TL) */
 var SUB_SUFFIXES = [N(' (hard of hearing)')];
 /* N(): marks a text for translation without translating it yet */
@@ -827,7 +913,8 @@ U.LANGS = {
 	rus: N('Russian'), dan: N('Danish'), nor: N('Norwegian'), est: N('Estonian'), sme: N('Sami'), smi: N('Sami'),
 	qaa: N('original'), mis: N('other'), und: N('unknown'), nar: N('audio description'), qad: N('audio description')
 };
-U.langName = function (v) {
+/* the TV's language value (a string, or three ASCII bytes as a number) -> 'fin', '' if unknown */
+U.langCode = function (v) {
 	var code = '';
 	if (v === null || v === undefined || v === '') { return ''; }
 	if (typeof v === 'number' || /^\d+$/.test(String(v))) {
@@ -838,12 +925,15 @@ U.langName = function (v) {
 				code = String.fromCharCode(n & 255, (n >> 8) & 255, (n >> 16) & 255).replace(/[^a-zA-Z]/g, '');
 			}
 		}
-		if (code.length !== 3) { return T('track ') + v; }
-	} else {
-		code = String(v).replace(/^\s+|\s+$/g, '');
+		return code.length === 3 ? code.toLowerCase() : '';
 	}
-	var key = code.toLowerCase();
-	return U.LANGS[key] ? T(U.LANGS[key]) + ' (' + key + ')' : code;
+	return String(v).replace(/^\s+|\s+$/g, '').toLowerCase();
+};
+U.langName = function (v) {
+	if (v === null || v === undefined || v === '') { return ''; }
+	var key = U.langCode(v);
+	if (!key) { return T('track ') + v; }
+	return U.LANGS[key] ? T(U.LANGS[key]) + ' (' + key + ')' : String(v).replace(/^\s+|\s+$/g, '');
 };
 
 /* Screen size. Some TVs show the app in 960x540 mode although config.xml asks for

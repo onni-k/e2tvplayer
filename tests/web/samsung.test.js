@@ -84,6 +84,14 @@ key(K.KEY_CH_DOWN); check(calls.some(c=>c.includes('sref=1%3A0%3A19%3A12')),'cha
 key(K.KEY_RETURN); key(K.KEY_RETURN); check(txt('crumb')==='Channels','back to bouquets'); key(K.KEY_RETURN);
 check(txt('crumb').startsWith('Recordings'),'back to recordings');
 // programme guide: yellow cycles recordings -> channels -> guide -> recordings
+// TOOLS in the lists: language and the audio/subtitle preferences
+key(K.KEY_TOOLS);
+check(txt('tr-rows').includes('Audio◀ automatic ▶') && txt('tr-rows').includes('1st choice◀ original ▶') && txt('tr-rows').includes('2nd choice◀ English ▶'),'TOOLS in the list: audio preferences: '+txt('tr-rows'));
+key(K.KEY_DOWN); key(K.KEY_RIGHT);
+check(txt('tr-rows').includes('Audio◀ as last time ▶') && !txt('tr-rows').includes('original'),'audio: as last time hides the choices');
+key(K.KEY_LEFT); key(K.KEY_DOWN); key(K.KEY_DOWN); key(K.KEY_DOWN); key(K.KEY_DOWN); key(K.KEY_RIGHT);
+check(w.Store.get('p_sub1')==='fi','subtitles 1st choice changed: '+w.Store.get('p_sub1'));
+w.Store.set('p_sub1',''); key(K.KEY_RETURN);
 key(K.KEY_YELLOW); key(K.KEY_YELLOW);
 check(w.App.view==='epg' && $('epg').style.display==='block' && $('browser').style.display==='none','guide opened with the yellow key');
 check(txt('crumb')==='Programme guide › Suosikit' && $('epg-grid').querySelectorAll('.epg-ch').length===2,'guide: bouquet and channels: '+txt('crumb'));
@@ -131,8 +139,8 @@ key(K.KEY_ENTER); if(w.Dialog.isOpen) key(K.KEY_ENTER); w.Player.onInfo(); w.Pla
 key(K.KEY_INFO); check($('info').style.display==='block' && txt('i-desc').includes('Cast'),'INFO panel: '+txt('i-meta'));
 key(K.KEY_RETURN); check(w.Player.active && $('info').style.display==='none','RETURN closes INFO, playback continues');
 key(K.KEY_TOOLS); check($('tracks').style.display==='block','TOOLS opens the track menu');
-check(txt('tr-rows').includes('Finnish (fin)') && txt('tr-diag').includes('audio=2'),'tracks: '+txt('tr-rows')+' | '+txt('tr-diag'));
-key(K.KEY_RIGHT);check(calls.includes('SID 1,1') && txt('tr-rows').includes('original'),'audio track changed');
+check(calls.includes('SID 1,1') && txt('tr-rows').includes('original (qaa)') && txt('tr-diag').includes('audio=2'),'audio preference: original picked automatically: '+txt('tr-rows')+' | '+txt('tr-diag'));
+key(K.KEY_RIGHT);check(calls.includes('SID 1,0') && txt('tr-rows').includes('Finnish (fin)'),'audio track changed by hand');
 key(K.KEY_DOWN); key(K.KEY_RIGHT); check(calls.includes('SID 5,0'),'subtitles on');
 w.Player.onSubtitle('Hello<br>world'); check($('subs').style.display==='block' && $('subs').innerHTML.includes('<br>'),'text subtitle drawn');
 key(K.KEY_RIGHT); check(calls.includes('SID 5,-1') && $('subs').style.display==='none','subtitles off');

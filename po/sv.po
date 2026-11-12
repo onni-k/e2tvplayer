@@ -193,7 +193,23 @@ msgstr "spår "
 msgid "TV reports: "
 msgstr "TV:n rapporterar: "
 
-#: web/player.js android/PlayerActivity.kt
+#: web/player.js android/PlayerActivity.kt android/Prefs.kt
+msgid "Audio"
+msgstr "Ljud"
+
+#: web/player.js android/Prefs.kt
+msgid "  1st choice"
+msgstr "  1:a val"
+
+#: web/player.js android/Prefs.kt
+msgid "  2nd choice"
+msgstr "  2:a val"
+
+#: web/player.js android/PlayerActivity.kt android/Prefs.kt
+msgid "Subtitles"
+msgstr "Textning"
+
+#: web/player.js web/util.js android/PlayerActivity.kt android/Prefs.kt
 msgid "off"
 msgstr "av"
 
@@ -269,14 +285,6 @@ msgstr "standard"
 msgid "not available"
 msgstr "inte tillgänglig"
 
-#: web/player.js android/PlayerActivity.kt
-msgid "Audio"
-msgstr "Ljud"
-
-#: web/player.js android/PlayerActivity.kt
-msgid "Subtitles"
-msgstr "Textning"
-
 #: web/player.js
 msgid "Timing"
 msgstr "Tidsjustering"
@@ -349,7 +357,7 @@ msgstr "används"
 msgid "chosen"
 msgstr "valt"
 
-#: web/util.js android/I18n.kt
+#: web/util.js android/I18n.kt android/Prefs.kt
 msgid "automatic"
 msgstr "automatiskt"
 
@@ -377,7 +385,19 @@ msgstr "▲▼ rad &nbsp; ◀▶ ändra &nbsp; OK/RETURN stäng"
 msgid "Loading&hellip;"
 msgstr "Laddar&hellip;"
 
-#: web/util.js android/PlayerActivity.kt
+#: web/util.js android/Prefs.kt
+msgid "as last time"
+msgstr "som förra gången"
+
+#: web/util.js android/Box.kt android/Prefs.kt
+msgid "original"
+msgstr "original"
+
+#: web/util.js android/Prefs.kt
+msgid "no selection"
+msgstr "inget val"
+
+#: web/util.js android/PlayerActivity.kt android/Prefs.kt
 msgid " (hard of hearing)"
 msgstr " (hörselskadade)"
 
@@ -433,15 +453,15 @@ msgstr "Land"
 msgid "Year"
 msgstr "År"
 
-#: web/util.js android/Box.kt
+#: web/util.js android/Box.kt android/Prefs.kt
 msgid "Finnish"
 msgstr "finska"
 
-#: web/util.js android/Box.kt
+#: web/util.js android/Box.kt android/Prefs.kt
 msgid "Swedish"
 msgstr "svenska"
 
-#: web/util.js android/Box.kt
+#: web/util.js android/Box.kt android/Prefs.kt
 msgid "English"
 msgstr "engelska"
 
@@ -449,11 +469,11 @@ msgstr "engelska"
 msgid "Dutch"
 msgstr "nederländska"
 
-#: web/util.js android/Box.kt
+#: web/util.js android/Box.kt android/Prefs.kt
 msgid "German"
 msgstr "tyska"
 
-#: web/util.js android/Box.kt
+#: web/util.js android/Box.kt android/Prefs.kt
 msgid "French"
 msgstr "franska"
 
@@ -484,10 +504,6 @@ msgstr "estniska"
 #: web/util.js android/Box.kt
 msgid "Sami"
 msgstr "samiska"
-
-#: web/util.js android/Box.kt
-msgid "original"
-msgstr "original"
 
 #: web/util.js android/Box.kt
 msgid "other"

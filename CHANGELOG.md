@@ -2,6 +2,10 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 0.1.023
+* NEW: Automatic audio and subtitle choice with a 1st and 2nd preference, hard-of-hearing subtitles
+  (Samsung: TOOLS in the lists; Google TV: Settings). "As last time" keeps the old behaviour
+
 ## 0.1.022
 * NEW: Timers from the programme guide (red key, or the details dialog)
 * FIX: Live INFO showed no programme when the channel was opened from the guide

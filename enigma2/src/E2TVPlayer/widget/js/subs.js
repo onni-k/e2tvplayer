@@ -72,7 +72,7 @@ var Subs = {
 			Subs.status = r.status || '';
 			Subs.error = r.error || '';
 			Subs.teletext = r.teletext || 0;
-			if (r.audio) { Subs.audio = r.audio; if (Player.tracksOpen && Player.tracksOpen()) { Player.readStreams(); } }
+			if (r.audio) { Subs.audio = r.audio; if (Player.active && (!Player.audioAuto || Player.tracksOpen())) { Player.readStreams(); } }
 			Subs.dw = r.dw || 720;
 			Subs.dh = r.dh || 576;
 			if (r.gen && r.gen !== Subs.liveGen) { Subs.liveGen = r.gen; Subs.cues = []; Subs.hide(); }
@@ -113,7 +113,7 @@ var Subs = {
 			Subs.progress = Number(r.progress) || 0;
 			Subs.error = r.error || '';
 			Subs.teletext = r.teletext || 0;
-			if (r.audio) { Subs.audio = r.audio; if (Player.tracksOpen && Player.tracksOpen()) { Player.readStreams(); } }
+			if (r.audio) { Subs.audio = r.audio; if (Player.active && (!Player.audioAuto || Player.tracksOpen())) { Player.readStreams(); } }
 			Subs.dw = r.dw || 720;
 			Subs.dh = r.dh || 576;
 			var hadTracks = Subs.tracks.length > 0;
@@ -136,9 +136,18 @@ var Subs = {
 		});
 	},
 
-	/* chooses the same subtitles as last time automatically */
+	/* chooses the subtitles: by the language preferences, or the same as last time */
 	autoSelect: function () {
 		var pref = Store.get('subPref', ''), i;
+		if (Prefs.get('subMode') === 'auto') {
+			var list = [];
+			for (i = 0; i < Subs.tracks.length; i++) {
+				list.push({ code: Subs.tracks[i].lang, hoh: / \(hard of hearing\)$/.test(Subs.tracks[i].label || '') });
+			}
+			i = Prefs.pickSub(list);
+			if (i >= 0) { Subs.select(Subs.tracks[i].key, true); }
+			return;
+		}
 		if (!pref) { return; }
 		for (i = 0; i < Subs.tracks.length; i++) {
 			if (Subs.tracks[i].label === pref) { Subs.select(Subs.tracks[i].key, true); return; }

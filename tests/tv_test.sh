@@ -37,7 +37,17 @@ shot 06d_language_row
 key KEYCODE_BACK
 key KEYCODE_MEDIA_PLAY
 shot 07_subtitles 2
-key KEYCODE_BACK                     # back to the list and again from the start: the stored language turns subtitles on
+key KEYCODE_BACK                     # back to the list
+key KEYCODE_PROG_BLUE                # settings: audio and subtitle preferences (English: subtitles off)
+shot 07a_settings_prefs 2
+key KEYCODE_DPAD_DOWN
+key KEYCODE_DPAD_DOWN
+key KEYCODE_DPAD_DOWN
+key KEYCODE_DPAD_DOWN
+key KEYCODE_DPAD_DOWN                # address, language, audio, 1st, 2nd -> subtitles
+key KEYCODE_DPAD_RIGHT               # subtitles: automatic -> as last time (the choice rows hide)
+shot 07a2_subtitles_as_last_time 1
+key KEYCODE_BACK                     # again from the start: the stored language turns subtitles on
 key KEYCODE_DPAD_CENTER
 shot 07b_subtitles_start 5
 shot 07c_subtitles_10s 4

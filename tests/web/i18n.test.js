@@ -82,6 +82,27 @@ ok(w.eval("I18n.sys()") === 'fi' && !w.document.getElementById('pluginObjectTV')
 w = load('fi-FI', null, 'fin');
 ok(w.eval("I18n.sys()") === 'fi', 'string code fin -> Finnish');
 
+// audio and subtitle preferences
+w = load('fi-FI');
+ok(w.eval("Prefs.get('audio1')+','+Prefs.get('audio2')+','+Prefs.get('sub1')+','+Prefs.get('sub2')") === 'orig,fi,fi,none', 'Finnish defaults: audio original then Finnish, subtitles Finnish');
+const A = "[{code:'fin'},{code:'qaa'},{code:'fin',ad:true}]";
+ok(w.eval("Prefs.pickAudio(" + A + ")") === 1, 'audio: the original track first');
+ok(w.eval("Prefs.pickAudio([{code:'fin'},{code:'swe'}])") === 0, 'audio: no original -> Finnish');
+ok(w.eval("Prefs.pickAudio([{code:'fin',ad:true},{code:'swe'}])") === -1, 'audio: audio description is never picked, otherwise the default stays');
+const S = "[{code:'swe'},{code:'fin',hoh:true},{code:'fin'}]";
+ok(w.eval("Prefs.pickSub(" + S + ")") === 2, 'subtitles: Finnish (not the hard-of-hearing one)');
+w.eval("Prefs.cycle('sub1', 1)");
+ok(w.eval("Prefs.get('sub1')") === 'fi-hoh' && w.eval("Prefs.pickSub(" + S + ")") === 1, 'subtitles: Finnish hard of hearing can be chosen');
+w.eval("Store.set('p_sub1','en'); Store.set('p_sub2','sv')");
+ok(w.eval("Prefs.pickSub(" + S + ")") === 0, 'subtitles: 1st missing -> 2nd choice');
+w.eval("Store.set('p_sub2','none')");
+ok(w.eval("Prefs.pickSub(" + S + ")") === -1, 'subtitles: neither -> off');
+w.eval("Store.set('p_sub1','off')");
+ok(w.eval("Prefs.pickSub(" + S + ")") === -1, 'subtitles: 1st choice off');
+ok(w.eval("Prefs.name('fi-hoh')") === 'suomi (kuulovammaiset)' && w.eval("Prefs.name('orig')") === 'alkuperäinen', 'names in Finnish: ' + w.eval("Prefs.name('fi-hoh')"));
+w = load('en-GB');
+ok(w.eval("Prefs.get('audio2')+','+Prefs.get('sub1')") === 'en,off', 'English defaults: audio original then English, subtitles off');
+
 // the delayed extra probe (Orsay) and its crash guard
 w = load('en-US', null, undefined, 6);
 let more = null; w.I18n.probeMore(r => { more = r; });
