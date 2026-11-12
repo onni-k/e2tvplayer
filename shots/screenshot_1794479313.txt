@@ -1,0 +1,2 @@
+/e2tvplayer/screenshot?platform=googletv&novideo=1&pos=24.07&title=Test%20recording&file=%2Fmedia%2Fhdd%2Fmovie%2F20261103%202000%20-%20Test%20Channel%20HD%20-%20Test%20recording.ts
+image/png

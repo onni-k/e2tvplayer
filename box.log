@@ -1,0 +1,50 @@
+fake box on :80 and :8001
+[box] "GET /e2tvplayer/info HTTP/1.1" 200 -
+[box] "GET /e2tvplayer/info HTTP/1.1" 200 -
+[box] "GET /api/statusinfo HTTP/1.1" 200 -
+[box] "GET /api/movielist HTTP/1.1" 200 -
+[box] "GET /file?file=%2Fmedia%2Fhdd%2Fmovie%2F20261103%202000%20-%20Test%20Channel%20HD%20-%20Test%20recording.ts HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 54856)
+[box] "GET /file?file=%2Fmedia%2Fhdd%2Fmovie%2F20261103%202000%20-%20Test%20Channel%20HD%20-%20Test%20recording.ts HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 438, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 404, in handle_one_request
+    self.raw_requestline = self.rfile.readline(65537)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socket.py", line 707, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [Errno 104] Connection reset by peer
+----------------------------------------
+[box] "GET /file?file=%2Fmedia%2Fhdd%2Fmovie%2F20261103%202000%20-%20Test%20Channel%20HD%20-%20Test%20recording.ts HTTP/1.1" 200 -
+[box] "GET /api/statusinfo HTTP/1.1" 200 -
+[box] "GET /file?file=%2Fmedia%2Fhdd%2Fmovie%2F20261103%202000%20-%20Test%20Channel%20HD%20-%20Test%20recording.ts HTTP/1.1" 200 -
+[box] "GET /file?file=%2Fmedia%2Fhdd%2Fmovie%2F20261103%202000%20-%20Test%20Channel%20HD%20-%20Test%20recording.ts HTTP/1.1" 206 -
+[box] "GET /file?file=%2Fmedia%2Fhdd%2Fmovie%2F20261103%202000%20-%20Test%20Channel%20HD%20-%20Test%20recording.ts HTTP/1.1" 200 -
+[box] "POST /e2tvplayer/screenshot?platform=googletv&novideo=1&pos=24.07&title=Test%20recording&file=%2Fmedia%2Fhdd%2Fmovie%2F20261103%202000%20-%20Test%20Channel%20HD%20-%20Test%20recording.ts HTTP/1.1" 200 -
+[box] "GET /file?file=%2Fmedia%2Fhdd%2Fmovie%2F20261103%202000%20-%20Test%20Channel%20HD%20-%20Test%20recording.ts HTTP/1.1" 206 -
+[box] "GET /api/statusinfo HTTP/1.1" 200 -
+[box] "POST /e2tvplayer/screenshot?platform=googletv&novideo=1&title=list HTTP/1.1" 200 -
+[box] "GET /api/getservices HTTP/1.1" 200 -
+[box] "GET /api/getservices?sRef=1%3A7%3A1%3A0%3A0%3A0%3A0%3A0%3A0%3A0%3AFROM%20BOUQUET%20%22userbouquet.fav.tv%22%20ORDER%20BY%20bouquet HTTP/1.1" 200 -
+[box] "GET /api/epgnow?bRef=1%3A7%3A1%3A0%3A0%3A0%3A0%3A0%3A0%3A0%3AFROM%20BOUQUET%20%22userbouquet.fav.tv%22%20ORDER%20BY%20bouquet HTTP/1.1" 200 -
+[box] "GET /api/epgservicenow?sRef=1%3A0%3A19%3A1%3A4%3A2D%3AFFFF0000%3A0%3A0%3A0%3A HTTP/1.1" 200 -
+[box] "GET /api/epgservicenext?sRef=1%3A0%3A19%3A1%3A4%3A2D%3AFFFF0000%3A0%3A0%3A0%3A HTTP/1.1" 200 -
+[8001] "GET /1:0:19:1:4:2D:FFFF0000:0:0:0: HTTP/1.1" 200 -
+[box] "GET /api/epgservicenext?sRef=1%3A0%3A19%3A2%3A4%3A2D%3AFFFF0000%3A0%3A0%3A0%3A HTTP/1.1" 200 -
+[box] "GET /api/epgservicenow?sRef=1%3A0%3A19%3A2%3A4%3A2D%3AFFFF0000%3A0%3A0%3A0%3A HTTP/1.1" 200 -
+[8001] "GET /1:0:19:2:4:2D:FFFF0000:0:0:0: HTTP/1.1" 200 -
+[box] "GET /api/statusinfo HTTP/1.1" 200 -
+[box] "GET /api/timerlist HTTP/1.1" 200 -
+[box] "GET /api/epgservice?sRef=1%3A0%3A19%3A2%3A4%3A2D%3AFFFF0000%3A0%3A0%3A0%3A HTTP/1.1" 200 -
+[box] "GET /api/epgservice?sRef=1%3A0%3A19%3A1%3A4%3A2D%3AFFFF0000%3A0%3A0%3A0%3A HTTP/1.1" 200 -
+[box] "GET /api/timeraddbyeventid?sRef=1%3A0%3A19%3A2%3A4%3A2D%3AFFFF0000%3A0%3A0%3A0%3A&eventid=202&justplay=0 HTTP/1.1" 200 -
+[box] "GET /api/timerlist HTTP/1.1" 200 -
