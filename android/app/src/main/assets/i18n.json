@@ -14,6 +14,7 @@
    "<br/><font color='#4FA3FF'>Watched up to ": "<br/><font color='#4FA3FF'>Katsottu ",
    "<font color='#FF5A5A'><b>● RECORDING</b></font> &nbsp; ": "<font color='#FF5A5A'><b>● TALLENTAA</b></font> &nbsp; ",
    "<font color='#FF5A5A'>No connection to the box</font> · ": "<font color='#FF5A5A'>Ei yhteyttä boksiin</font> · ",
+   "Allow E2TVPlayer to install apps (Settings → Apps → Security & restrictions → Unknown sources), then choose Update again.": "Salli E2TVPlayerin asentaa sovelluksia (Asetukset → Sovellukset → Tietoturva ja rajoitukset → Tuntemattomat lähteet) ja valitse sitten Päivitä uudelleen.",
    "App language": "Sovelluksen kieli",
    "Audio": "Ääni",
    "Audio and subtitles": "Ääni ja tekstitys",
@@ -43,6 +44,7 @@
    "Delete the recording?": "Poistetaanko tallenne?",
    "Delete timer": "Poista ajastus",
    "Director": "Ohjaaja",
+   "Downloading the update…": "Ladataan päivitystä…",
    "Duration ": "Kesto ",
    "Dutch": "hollanti",
    "English": "englanti",
@@ -60,6 +62,7 @@
    "IP address of the Enigma2 box (e.g. 192.168.1.10). OpenWebif must be enabled on port 80.": "Enigma2-boksin IP-osoite (esim. 192.168.1.10). OpenWebifin pitää olla käytössä portissa 80.",
    "Italian": "italia",
    "Language": "Kieli",
+   "Later": "Myöhemmin",
    "MB": "Mt",
    "Music": "Musiikki",
    "Narrator": "Kertoja",
@@ -78,6 +81,7 @@
    "OK watch   ·   ▲ up to tabs   ·   BACK back": "OK katso   ·   ▲ ylös välilehtiin   ·   BACK takaisin",
    "OK watch / info   ·   red: timer   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels": "OK katso / tiedot   ·   punainen: ajastus   ·   ◀▶ ohjelma   ·   ▲▼ kanava   ·   ◀◀▶▶ ±2 h   ·   BACK kanavat",
    "OK: take a picture in 10 s": "OK: ota kuva 10 s päästä",
+   "Open settings": "Avaa asetukset",
    "OpenWebif requires a login – turn it off in the box settings": "OpenWebif vaatii kirjautumisen – ota se pois boksin asetuksista",
    "Parent folder": "Ylempi kansio",
    "Picture saved on the box: ": "Kuva tallennettu boksiin: ",
@@ -113,6 +117,10 @@
    "Timer added": "Ajastus lisätty",
    "Timer deleted": "Ajastus poistettu",
    "Timer set": "Ajastettu",
+   "Update": "Päivitä",
+   "Update available": "Päivitys saatavilla",
+   "Update failed: ": "Päivitys epäonnistui: ",
+   "Version {v} of E2TVPlayer is on the box (installed: {i}).": "Boksilla on E2TVPlayerin versio {v} (asennettu: {i}).",
    "Watch channel": "Katso kanavaa",
    "Writer": "Käsikirjoitus",
    "Yes": "Kyllä",
@@ -134,7 +142,8 @@
    "▲▼ channel   ·   OK programme info   ·   long OK: audio and subtitles   ·   BACK stop": "▲▼ kanava   ·   OK ohjelmatiedot   ·   pitkä OK: ääni ja tekstitys   ·   BACK lopeta",
    "▲▼ row   ◀▶ change   OK/BACK close": "▲▼ rivi   ◀▶ vaihda   OK/BACK sulje",
    "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK pause and info   ·   long OK: audio and subtitles   ·   BACK stop": "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK tauko ja tiedot   ·   pitkä OK: ääni ja tekstitys   ·   BACK lopeta",
-   "❚❚ Paused": "❚❚ Tauko"
+   "❚❚ Paused": "❚❚ Tauko",
+   "⬆ Update to version {v} (OK)": "⬆ Päivitä versioon {v} (OK)"
   }
  },
  "sv": {
@@ -152,6 +161,7 @@
    "<br/><font color='#4FA3FF'>Watched up to ": "<br/><font color='#4FA3FF'>Sedd till ",
    "<font color='#FF5A5A'><b>● RECORDING</b></font> &nbsp; ": "<font color='#FF5A5A'><b>● SPELAR IN</b></font> &nbsp; ",
    "<font color='#FF5A5A'>No connection to the box</font> · ": "<font color='#FF5A5A'>Ingen anslutning till boxen</font> · ",
+   "Allow E2TVPlayer to install apps (Settings → Apps → Security & restrictions → Unknown sources), then choose Update again.": "Tillåt E2TVPlayer att installera appar (Inställningar → Appar → Säkerhet och begränsningar → Okända källor) och välj sedan Uppdatera igen.",
    "App language": "Appens språk",
    "Audio": "Ljud",
    "Audio and subtitles": "Ljud och textning",
@@ -181,6 +191,7 @@
    "Delete the recording?": "Radera inspelningen?",
    "Delete timer": "Ta bort timer",
    "Director": "Regi",
+   "Downloading the update…": "Hämtar uppdateringen…",
    "Duration ": "Längd ",
    "Dutch": "nederländska",
    "English": "engelska",
@@ -198,6 +209,7 @@
    "IP address of the Enigma2 box (e.g. 192.168.1.10). OpenWebif must be enabled on port 80.": "Enigma2-boxens IP-adress (t.ex. 192.168.1.10). OpenWebif måste vara aktiverat på port 80.",
    "Italian": "italienska",
    "Language": "Språk",
+   "Later": "Senare",
    "MB": "MB",
    "Music": "Musik",
    "Narrator": "Berättare",
@@ -216,6 +228,7 @@
    "OK watch   ·   ▲ up to tabs   ·   BACK back": "OK titta   ·   ▲ upp till flikarna   ·   BACK tillbaka",
    "OK watch / info   ·   red: timer   ·   ◀▶ programme   ·   ▲▼ channel   ·   ◀◀▶▶ ±2 h   ·   BACK channels": "OK titta / info   ·   röd: timer   ·   ◀▶ program   ·   ▲▼ kanal   ·   ◀◀▶▶ ±2 h   ·   BACK kanaler",
    "OK: take a picture in 10 s": "OK: ta en bild om 10 s",
+   "Open settings": "Öppna inställningar",
    "OpenWebif requires a login – turn it off in the box settings": "OpenWebif kräver inloggning – stäng av den i boxens inställningar",
    "Parent folder": "Överordnad mapp",
    "Picture saved on the box: ": "Bilden sparades på boxen: ",
@@ -251,6 +264,10 @@
    "Timer added": "Timer tillagd",
    "Timer deleted": "Timer borttagen",
    "Timer set": "Timer inställd",
+   "Update": "Uppdatera",
+   "Update available": "Uppdatering tillgänglig",
+   "Update failed: ": "Uppdateringen misslyckades: ",
+   "Version {v} of E2TVPlayer is on the box (installed: {i}).": "Boxen har E2TVPlayer version {v} (installerad: {i}).",
    "Watch channel": "Titta på kanalen",
    "Writer": "Manus",
    "Yes": "Ja",
@@ -272,7 +289,8 @@
    "▲▼ channel   ·   OK programme info   ·   long OK: audio and subtitles   ·   BACK stop": "▲▼ kanal   ·   OK programinfo   ·   långt OK: ljud och textning   ·   BACK stopp",
    "▲▼ row   ◀▶ change   OK/BACK close": "▲▼ rad   ◀▶ ändra   OK/BACK stäng",
    "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK pause and info   ·   long OK: audio and subtitles   ·   BACK stop": "◀▶ 15 s   ·   ▲▼ 5 min   ·   OK paus och info   ·   långt OK: ljud och textning   ·   BACK stopp",
-   "❚❚ Paused": "❚❚ Paus"
+   "❚❚ Paused": "❚❚ Paus",
+   "⬆ Update to version {v} (OK)": "⬆ Uppdatera till version {v} (OK)"
   }
  }
 }

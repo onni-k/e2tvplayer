@@ -19,6 +19,7 @@ w.document.getElementById('pluginTVMW').SetMediaSource=()=>{};
 let timers=[];
 const now=Math.floor(Date.now()/1000);
 const R={
+ '/e2tvplayer/info':{app:'E2TVPlayer',version:'0.1.026',apk:true},
  '/api/deviceinfo':{brand:'Vu+',model:'Uno 4K SE',boxtype:'vuuno4kse'},
  '/api/statusinfo':{currservice_station:'Yle TV1',currservice_name:'News',isRecording:'true',inStandby:'false'},
  '/api/movielist':q=>q.dirname&&q.dirname.indexOf('Series')>0?{directory:'/media/hdd/movie/Series/',bookmarks:[],movies:[{filename:'/media/hdd/movie/Series/a.ts',eventname:'Series episode 1',servicename:'MTV3',recordingtime:now-9000,length:'45:00',filesize:2e9,serviceref:'1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/Series/a.ts'}]}:
@@ -50,6 +51,11 @@ const check=(c,m)=>{if(!c){console.log('FAIL',m);process.exitCode=1}else console
 {const h=urls.find(u=>u.includes('/e2tvplayer/log?'));check(h&&decodeURIComponent(h).includes('start platform=orsay')&&decodeURIComponent(h).includes('nav=en-US'),'start-up entry in the box log: '+(h?decodeURIComponent(h).slice(0,120):'-'));}
 check($('list').querySelectorAll('.row').length===3,'root: folder + 2 recordings (.Trash hidden)');
 check(txt('nowbar').includes('RECORDING') && txt('nowbar').includes('Vu+ Uno 4K SE 192.168.1.10'),'status bar with the box name: '+txt('nowbar'));
+check(!w.App.update,'no update notice for a dev build');
+check(w.U.newer('0.1.026','0.1.025') && w.U.newer('0.2','0.1.99') && !w.U.newer('0.1.025','0.1.025') && !w.U.newer('0.1.024','0.1.025') && !w.U.newer('ci','0.1.0'),'version comparison');
+w.BOX_PLUGIN_VERSION='0.1.025'; w.App.checkUpdate();
+check(txt('toast').includes('New version 0.1.026 on the box: update with User App Sync') && txt('nowbar').includes('New version 0.1.026'),'Orsay: newer box version announced: '+txt('nowbar'));
+w.App.update=''; w.BOX_PLUGIN_VERSION='dev'; w.App.refreshStatus();
 check(txt('crumb').includes('(2)'),'path: '+txt('crumb'));
 key(K.KEY_DOWN); check(txt('d-title')==='Movie <b>','details + escaped title');
 check(txt('d-desc').includes('Long description'),'description');

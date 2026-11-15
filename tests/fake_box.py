@@ -20,7 +20,7 @@ NOW = int(time.time())
 LOG = []
 
 API = {
-    "/e2tvplayer/info": {"app": "E2TVPlayer", "version": "ci", "apk": True},
+    "/e2tvplayer/info": {"app": "E2TVPlayer", "version": "ci", "apk": True, "apkVersion": "9.9.9"},   # offers an update
     "/api/deviceinfo": {"brand": "Vu+", "model": "Uno 4K SE", "boxtype": "vuuno4kse"},
     "/api/statusinfo": {"currservice_station": "Test Channel HD", "currservice_name": "Evening News", "isRecording": "true", "inStandby": "false"},
     "/api/movielist": {"directory": "/media/hdd/movie/", "bookmarks": ["Series"], "movies": [

@@ -28,6 +28,10 @@ msgid "Connection failed: "
 msgstr ""
 
 #: web/main.js
+msgid "New version {v} on the box: update with User App Sync"
+msgstr ""
+
+#: web/main.js
 msgid "Box address missing"
 msgstr ""
 
@@ -611,7 +615,7 @@ msgstr ""
 msgid "Delete the recording?"
 msgstr ""
 
-#: web/views.js android/MainActivity.kt
+#: web/views.js android/MainActivity.kt android/Update.kt
 msgid "Cancel"
 msgstr ""
 
@@ -908,6 +912,10 @@ msgid "App language"
 msgstr ""
 
 #: android/MainActivity.kt
+msgid "⬆ Update to version {v} (OK)"
+msgstr ""
+
+#: android/MainActivity.kt
 msgid "Settings – E2TVPlayer "
 msgstr ""
 
@@ -989,6 +997,38 @@ msgstr ""
 
 #: android/Shots.kt
 msgid "Saving the picture failed: "
+msgstr ""
+
+#: android/Update.kt
+msgid "Update available"
+msgstr ""
+
+#: android/Update.kt
+msgid "Version {v} of E2TVPlayer is on the box (installed: {i})."
+msgstr ""
+
+#: android/Update.kt
+msgid "Update"
+msgstr ""
+
+#: android/Update.kt
+msgid "Later"
+msgstr ""
+
+#: android/Update.kt
+msgid "Allow E2TVPlayer to install apps (Settings → Apps → Security & restrictions → Unknown sources), then choose Update again."
+msgstr ""
+
+#: android/Update.kt
+msgid "Open settings"
+msgstr ""
+
+#: android/Update.kt
+msgid "Downloading the update…"
+msgstr ""
+
+#: android/Update.kt
+msgid "Update failed: "
 msgstr ""
 
 #: box/info.py

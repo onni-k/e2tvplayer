@@ -124,6 +124,7 @@ var I18N_DATA = {
    "Music": "Musiikki",
    "Narrator": "Kertoja",
    "Network connection lost": "Verkkoyhteys katkesi",
+   "New version {v} on the box: update with User App Sync": "Uusi versio {v} boksilla: päivitä User App Syncillä",
    "Next ": "Seuraavaksi ",
    "No": "Ei",
    "No bouquets": "Ei kanavanippuja",
@@ -331,6 +332,7 @@ var I18N_DATA = {
    "Music": "Musik",
    "Narrator": "Berättare",
    "Network connection lost": "Nätverksanslutningen bröts",
+   "New version {v} on the box: update with User App Sync": "Ny version {v} på boxen: uppdatera med User App Sync",
    "Next ": "Nästa ",
    "No": "Nej",
    "No bouquets": "Inga kanalgrupper",
@@ -789,6 +791,17 @@ var U = {
 	show: function (id, on) { var e = U.$(id); if (e) { e.style.display = on ? 'block' : 'none'; } },
 
 	_toastTimer: null,
+	/* true when version a (e.g. 0.1.026) is newer than b; 'dev' and other non-numbers never are */
+	newer: function (a, b) {
+		var re = /^\d+(\.\d+)*$/, x, y, i;
+		if (!re.test(String(a)) || !re.test(String(b))) { return false; }
+		x = String(a).split('.'); y = String(b).split('.');
+		for (i = 0; i < Math.max(x.length, y.length); i++) {
+			if (Number(x[i] || 0) !== Number(y[i] || 0)) { return Number(x[i] || 0) > Number(y[i] || 0); }
+		}
+		return false;
+	},
+
 	toast: function (msg, ms) {
 		var t = U.$('toast');
 		t.innerHTML = U.esc(msg);

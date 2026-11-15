@@ -30,6 +30,10 @@ msgid "Connection failed: "
 msgstr "Anslutningen misslyckades: "
 
 #: web/main.js
+msgid "New version {v} on the box: update with User App Sync"
+msgstr "Ny version {v} på boxen: uppdatera med User App Sync"
+
+#: web/main.js
 msgid "Box address missing"
 msgstr "Boxens adress saknas"
 
@@ -613,7 +617,7 @@ msgstr "Från början"
 msgid "Delete the recording?"
 msgstr "Radera inspelningen?"
 
-#: web/views.js android/MainActivity.kt
+#: web/views.js android/MainActivity.kt android/Update.kt
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -910,6 +914,10 @@ msgid "App language"
 msgstr "Appens språk"
 
 #: android/MainActivity.kt
+msgid "⬆ Update to version {v} (OK)"
+msgstr "⬆ Uppdatera till version {v} (OK)"
+
+#: android/MainActivity.kt
 msgid "Settings – E2TVPlayer "
 msgstr "Inställningar – E2TVPlayer "
 
@@ -992,6 +1000,38 @@ msgstr "Det gick inte att spara bilden ("
 #: android/Shots.kt
 msgid "Saving the picture failed: "
 msgstr "Det gick inte att spara bilden: "
+
+#: android/Update.kt
+msgid "Update available"
+msgstr "Uppdatering tillgänglig"
+
+#: android/Update.kt
+msgid "Version {v} of E2TVPlayer is on the box (installed: {i})."
+msgstr "Boxen har E2TVPlayer version {v} (installerad: {i})."
+
+#: android/Update.kt
+msgid "Update"
+msgstr "Uppdatera"
+
+#: android/Update.kt
+msgid "Later"
+msgstr "Senare"
+
+#: android/Update.kt
+msgid "Allow E2TVPlayer to install apps (Settings → Apps → Security & restrictions → Unknown sources), then choose Update again."
+msgstr "Tillåt E2TVPlayer att installera appar (Inställningar → Appar → Säkerhet och begränsningar → Okända källor) och välj sedan Uppdatera igen."
+
+#: android/Update.kt
+msgid "Open settings"
+msgstr "Öppna inställningar"
+
+#: android/Update.kt
+msgid "Downloading the update…"
+msgstr "Hämtar uppdateringen…"
+
+#: android/Update.kt
+msgid "Update failed: "
+msgstr "Uppdateringen misslyckades: "
 
 #: box/info.py
 msgid "The plugin is not registered in OpenWebif yet. Restart the GUI (OpenWebif reads its plugins at start-up)."

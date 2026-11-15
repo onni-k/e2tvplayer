@@ -60,12 +60,30 @@ var App = {
 		}, 3000);
 	},
 
+	/* Orsay keeps the app it got from User App Sync, so a newer box plugin is announced.
+	   Tizen loads its code from the box and is always up to date. */
+	update: '',
+	checkUpdate: function () {
+		if (!Api.host || document.documentElement.className.indexOf('tizen') >= 0) { return; }
+		var mine = typeof BOX_PLUGIN_VERSION !== 'undefined' ? BOX_PLUGIN_VERSION : '';
+		Api.get('/e2tvplayer/info', null, function (r) {
+			if (!r || !U.newer(r.version, mine)) { return; }
+			App.update = r.version;
+			U.toast(App.updateText(), 10000);
+			App.refreshStatus();
+		}, function () { }, 8000);
+	},
+	updateText: function () {
+		return T('New version {v} on the box: update with User App Sync').replace('{v}', App.update);
+	},
+
 	onLoad: function () {
 		I18n.applyStatic();
 		Store.load();
 		Screen.apply();
 		Api.init();
 		App.hello();
+		App.checkUpdate();
 		Browser.init();
 		Player.init();
 
@@ -237,6 +255,7 @@ var App = {
 			}
 			var rec = s.isRecording === true || s.isRecording === 'true';
 			U.$('nowbar').innerHTML = (rec ? T('<span class="rec">● RECORDING</span> &nbsp; ') : '') +
+				(App.update ? '<span style="color:#FFD34D">' + U.esc(App.updateText()) + '</span> &nbsp;·&nbsp; ' : '') +
 				U.esc(App.boxName ? App.boxName + ' ' : T('Box ')) + U.esc(Api.host) + (parts.length ? ' &nbsp;·&nbsp; ' + parts.join(' — ') : '');
 		}, function (err) {
 			U.$('nowbar').innerHTML = T('<span class="rec">No connection to the box</span> &nbsp; ') + U.esc(err);

@@ -108,6 +108,7 @@ class MainActivity : Activity() {
         tabSet.text = T("Settings")
         langCur = I18n.cur()
         Box.hello(BuildConfigCompat.version(this))
+        if (!Update.onStatus(this, intent)) Update.check(this)
         findViewById<TextView>(R.id.title).text =
             Html.fromHtml("E2<font color='#4FA3FF'>TV</font>Player")
 
@@ -140,6 +141,11 @@ class MainActivity : Activity() {
     }
 
     private var langCur = ""
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Update.onStatus(this, intent)
+    }
 
     override fun onResume() {
         super.onResume()
@@ -684,6 +690,17 @@ class MainActivity : Activity() {
         }
         box.addView(lang)
         box.addView(prefRows())
+        if (Update.available.isNotEmpty()) {
+            box.addView(TextView(this).apply {
+                text = T("⬆ Update to version {v} (OK)").replace("{v}", Update.available)
+                setTextColor(0xFFFFD34D.toInt())
+                setPadding(0, 20, 0, 4)
+                isFocusable = true
+                isClickable = true
+                setBackgroundResource(android.R.drawable.list_selector_background)
+                setOnClickListener { Update.install(this@MainActivity) }
+            })
+        }
         AlertDialog.Builder(this, R.style.E2Dialog)
             .setTitle(T("Settings – E2TVPlayer ") + BuildConfigCompat.version(this))
             .setView(android.widget.ScrollView(this).apply { addView(box) })
@@ -736,6 +753,7 @@ class MainActivity : Activity() {
         root = null; dir = null; movieData = null; remember.clear()
         bouquets = emptyList(); bouquet = null; services = emptyList()
         refreshStatus()
+        Update.check(this)
         if (mode == "movies") showMovies() else showChannels()
     }
 

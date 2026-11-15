@@ -13,7 +13,9 @@ adb logcat -c
 adb install -r "$APK" || exit 1
 adb shell am start -W -n fi.e2tvplayer/.MainActivity
 shot 01_search 2
-shot 02_list 14                      # box discovery on the local network
+shot 02_update_offer 14              # box discovery on the local network; fake box has a newer APK
+key KEYCODE_BACK                     # not now
+shot 02_list 1
 key KEYCODE_DPAD_DOWN                # Series -> Test recording
 shot 03_details
 key KEYCODE_DPAD_CENTER              # play

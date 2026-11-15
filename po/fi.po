@@ -30,6 +30,10 @@ msgid "Connection failed: "
 msgstr "Yhteys epäonnistui: "
 
 #: web/main.js
+msgid "New version {v} on the box: update with User App Sync"
+msgstr "Uusi versio {v} boksilla: päivitä User App Syncillä"
+
+#: web/main.js
 msgid "Box address missing"
 msgstr "Boksin osoite puuttuu"
 
@@ -613,7 +617,7 @@ msgstr "Alusta"
 msgid "Delete the recording?"
 msgstr "Poistetaanko tallenne?"
 
-#: web/views.js android/MainActivity.kt
+#: web/views.js android/MainActivity.kt android/Update.kt
 msgid "Cancel"
 msgstr "Peruuta"
 
@@ -910,6 +914,10 @@ msgid "App language"
 msgstr "Sovelluksen kieli"
 
 #: android/MainActivity.kt
+msgid "⬆ Update to version {v} (OK)"
+msgstr "⬆ Päivitä versioon {v} (OK)"
+
+#: android/MainActivity.kt
 msgid "Settings – E2TVPlayer "
 msgstr "Asetukset – E2TVPlayer "
 
@@ -992,6 +1000,38 @@ msgstr "Kuvan tallennus epäonnistui ("
 #: android/Shots.kt
 msgid "Saving the picture failed: "
 msgstr "Kuvan tallennus epäonnistui: "
+
+#: android/Update.kt
+msgid "Update available"
+msgstr "Päivitys saatavilla"
+
+#: android/Update.kt
+msgid "Version {v} of E2TVPlayer is on the box (installed: {i})."
+msgstr "Boksilla on E2TVPlayerin versio {v} (asennettu: {i})."
+
+#: android/Update.kt
+msgid "Update"
+msgstr "Päivitä"
+
+#: android/Update.kt
+msgid "Later"
+msgstr "Myöhemmin"
+
+#: android/Update.kt
+msgid "Allow E2TVPlayer to install apps (Settings → Apps → Security & restrictions → Unknown sources), then choose Update again."
+msgstr "Salli E2TVPlayerin asentaa sovelluksia (Asetukset → Sovellukset → Tietoturva ja rajoitukset → Tuntemattomat lähteet) ja valitse sitten Päivitä uudelleen."
+
+#: android/Update.kt
+msgid "Open settings"
+msgstr "Avaa asetukset"
+
+#: android/Update.kt
+msgid "Downloading the update…"
+msgstr "Ladataan päivitystä…"
+
+#: android/Update.kt
+msgid "Update failed: "
+msgstr "Päivitys epäonnistui: "
 
 #: box/info.py
 msgid "The plugin is not registered in OpenWebif yet. Restart the GUI (OpenWebif reads its plugins at start-up)."
