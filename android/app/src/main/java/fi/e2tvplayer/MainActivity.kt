@@ -169,7 +169,18 @@ class MainActivity : Activity() {
         if (Box.host.isNotEmpty()) refreshStatus()
     }
 
+    private var boxName = ""
+    private var boxNameHost = ""
+
     private fun refreshStatus() {
+        if (boxNameHost != Box.host) {
+            boxNameHost = Box.host
+            boxName = ""
+            Box.get("/api/deviceinfo", timeoutMs = 8000, ok = { d ->
+                val n = (d.optString("brand") + " " + d.optString("model").ifEmpty { d.optString("boxtype") }).trim()
+                if (n.isNotEmpty() && n != boxName) { boxName = n; refreshStatus() }
+            }, fail = { })
+        }
         Box.get("/api/statusinfo", timeoutMs = 8000, ok = { s ->
             val parts = ArrayList<String>()
             val standby = s.optString("inStandby") == "true" || s.optBoolean("inStandby", false)
@@ -179,7 +190,7 @@ class MainActivity : Activity() {
             }
             val rec = s.optString("isRecording") == "true" || s.optBoolean("isRecording", false)
             val html = (if (rec) T("<font color='#FF5A5A'><b>● RECORDING</b></font> &nbsp; ") else "") +
-                T("Box ") + Html.escapeHtml(Box.host) + (if (parts.isEmpty()) "" else " · " + Html.escapeHtml(parts.joinToString(" — ")))
+                Html.escapeHtml(if (boxName.isNotEmpty()) "$boxName " else T("Box ")) + Html.escapeHtml(Box.host) + (if (parts.isEmpty()) "" else " · " + Html.escapeHtml(parts.joinToString(" — ")))
             nowbar.text = Html.fromHtml(html)
         }, fail = { err -> nowbar.text = Html.fromHtml(T("<font color='#FF5A5A'>No connection to the box</font> · ") + Html.escapeHtml(err)) })
     }

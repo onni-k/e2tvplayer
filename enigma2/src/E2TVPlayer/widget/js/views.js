@@ -434,6 +434,27 @@ Views.channels = {
 		if (it) { Player.active = false; C.play(it); }
 	},
 
+	/* channel number during live playback: the digits collect for a moment and the channel changes
+	   when no more come, or at once when the number can no longer grow */
+	num: '',
+	numTimer: null,
+	digit: function (d) {
+		var C = Views.channels;
+		if (C.mode !== 'services' || !C.services || !C.services.length) { return; }
+		if (C.numTimer) { clearTimeout(C.numTimer); }
+		C.num = (C.num + d).replace(/^0+/, '').slice(-4);
+		if (!C.num) { C.numTimer = null; return; }
+		var n = Number(C.num), s = C.services[n - 1];
+		U.toast(C.num + ' ' + (s ? s.servicename : '–'), 2500);
+		C.numTimer = setTimeout(C.numGo, n * 10 > C.services.length ? 700 : 2000);
+	},
+	numGo: function () {
+		var C = Views.channels, n = Number(C.num);
+		C.num = ''; C.numTimer = null;
+		if (!Player.active || !C.services || n < 1 || n > C.services.length) { return; }
+		if (n - 1 !== Browser.list.index) { C.zap(n - 1 - Browser.list.index); }
+	},
+
 	onKey: function (k) {
 		var C = Views.channels, it = Browser.list.current();
 		if (Browser.navKey(k)) { return true; }

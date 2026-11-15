@@ -312,6 +312,23 @@ class PlayerActivity : Activity() {
         if (changed) player.trackSelectionParameters = b.build()
     }
 
+    /** channel number: the digits collect for a moment, or the channel changes at once when the number cannot grow */
+    private var num = ""
+    private val numGo = Runnable {
+        val n = num.toIntOrNull() ?: 0
+        num = ""
+        if (n in 1..refs.size && n - 1 != index && !isFinishing) playChannel(n - 1)
+    }
+
+    private fun digit(d: Int) {
+        ui.removeCallbacks(numGo)
+        num = (num + d).trimStart('0').takeLast(4)
+        if (num.isEmpty()) return
+        val n = num.toInt()
+        toast(num + "  " + (names.getOrNull(n - 1) ?: "–"))
+        ui.postDelayed(numGo, if (n * 10 > refs.size) 700L else 2000L)
+    }
+
     private fun playChannel(i: Int) {
         if (refs.isEmpty()) { finish(); return }
         index = (i + refs.size) % refs.size
@@ -793,6 +810,7 @@ class PlayerActivity : Activity() {
                 KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_CHANNEL_UP -> { if (first) playChannel(index - 1); return true }
                 KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_CHANNEL_DOWN -> { if (first) playChannel(index + 1); return true }
                 KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT -> { showOsd(); return true }
+                in KeyEvent.KEYCODE_0..KeyEvent.KEYCODE_9 -> { if (first) digit(k - KeyEvent.KEYCODE_0); return true }
             }
         } else {
             when (k) {

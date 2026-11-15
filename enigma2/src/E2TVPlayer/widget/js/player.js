@@ -571,6 +571,9 @@ var Player = {
 			if (k === tvKey.KEY_CH_UP || k === tvKey.KEY_UP) { Views.channels.zap(-1); return true; }
 			if (k === tvKey.KEY_CH_DOWN || k === tvKey.KEY_DOWN) { Views.channels.zap(1); return true; }
 			if (k === tvKey.KEY_ENTER) { Player.showInfo(); return true; }
+			for (var d = 0; d <= 9; d++) {
+				if (k === tvKey['KEY_' + d]) { Views.channels.digit(String(d)); return true; }
+			}
 			return false;
 		}
 		switch (k) {

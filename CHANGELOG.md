@@ -2,6 +2,10 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 0.1.025
+* NEW: Live TV: change the channel with the number keys (number in the bouquet)
+* UPD: The status line shows the box name (brand and model) before the IP address
+
 ## 0.1.024
 * FIX: Google TV: hard-of-hearing DVB subtitles are recognised (label and automatic choice)
 * FIX: Google TV: screenshots of the lists include an open dialog (e.g. Settings)

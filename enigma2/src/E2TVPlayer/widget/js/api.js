@@ -107,6 +107,7 @@ var Api = {
 		}
 	},
 
+	deviceInfo: function (ok, fail) { Api.get('/api/deviceinfo', null, ok, fail, 8000); },
 	status: function (ok, fail) { Api.get('/api/statusinfo', null, ok, fail, 8000); },
 
 	movies: function (dir, ok, fail) { Api.get('/api/movielist', dir ? { dirname: dir } : null, ok, fail, 30000); },

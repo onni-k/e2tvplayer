@@ -21,6 +21,7 @@ LOG = []
 
 API = {
     "/e2tvplayer/info": {"app": "E2TVPlayer", "version": "ci", "apk": True},
+    "/api/deviceinfo": {"brand": "Vu+", "model": "Uno 4K SE", "boxtype": "vuuno4kse"},
     "/api/statusinfo": {"currservice_station": "Test Channel HD", "currservice_name": "Evening News", "isRecording": "true", "inStandby": "false"},
     "/api/movielist": {"directory": "/media/hdd/movie/", "bookmarks": ["Series"], "movies": [
         {"filename": REC, "eventname": "Test recording", "servicename": "Test Channel HD", "recordingtime": NOW - 3600,

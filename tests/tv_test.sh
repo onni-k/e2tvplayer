@@ -88,6 +88,10 @@ shot 14_live_menu
 key KEYCODE_BACK
 key KEYCODE_DPAD_DOWN                # channel +1
 shot 15_zap 6
+key KEYCODE_1                        # number key: channel 1 (shown first, changes after a moment)
+shot 15b_number_key 0
+sleep 3
+shot 15c_number_zap 3
 key KEYCODE_BACK
 shot 16_channel_list 2
 key KEYCODE_PROG_YELLOW              # yellow: channels -> programme guide

@@ -19,6 +19,7 @@ w.document.getElementById('pluginTVMW').SetMediaSource=()=>{};
 let timers=[];
 const now=Math.floor(Date.now()/1000);
 const R={
+ '/api/deviceinfo':{brand:'Vu+',model:'Uno 4K SE',boxtype:'vuuno4kse'},
  '/api/statusinfo':{currservice_station:'Yle TV1',currservice_name:'News',isRecording:'true',inStandby:'false'},
  '/api/movielist':q=>q.dirname&&q.dirname.indexOf('Series')>0?{directory:'/media/hdd/movie/Series/',bookmarks:[],movies:[{filename:'/media/hdd/movie/Series/a.ts',eventname:'Series episode 1',servicename:'MTV3',recordingtime:now-9000,length:'45:00',filesize:2e9,serviceref:'1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/Series/a.ts'}]}:
    {directory:'/media/hdd/movie/',bookmarks:['Series','.Trash'],movies:[
@@ -48,7 +49,7 @@ const K=w.tvKey; const txt=id=>$(id).textContent.replace(/\s+/g,' ').trim();
 const check=(c,m)=>{if(!c){console.log('FAIL',m);process.exitCode=1}else console.log('ok  ',m)};
 {const h=urls.find(u=>u.includes('/e2tvplayer/log?'));check(h&&decodeURIComponent(h).includes('start platform=orsay')&&decodeURIComponent(h).includes('nav=en-US'),'start-up entry in the box log: '+(h?decodeURIComponent(h).slice(0,120):'-'));}
 check($('list').querySelectorAll('.row').length===3,'root: folder + 2 recordings (.Trash hidden)');
-check(txt('nowbar').includes('RECORDING'),'status bar: '+txt('nowbar'));
+check(txt('nowbar').includes('RECORDING') && txt('nowbar').includes('Vu+ Uno 4K SE 192.168.1.10'),'status bar with the box name: '+txt('nowbar'));
 check(txt('crumb').includes('(2)'),'path: '+txt('crumb'));
 key(K.KEY_DOWN); check(txt('d-title')==='Movie <b>','details + escaped title');
 check(txt('d-desc').includes('Long description'),'description');
@@ -81,6 +82,12 @@ key(K.KEY_ENTER); check($('list').querySelectorAll('.row').length===2,'marker fi
 check(txt('list').includes('News'),'EPG now: '+txt('list'));
 key(K.KEY_ENTER); check(calls.some(c=>/^Init http:\/\/192\.168\.1\.10\/e2tvplayer\/live\?id=tv\d+&sref=1%3A0%3A19%3A11%3A1%3A20F6%3AEEEE0000%3A0%3A0%3A0%3A$/.test(c)),'live stream');
 key(K.KEY_CH_DOWN); check(calls.some(c=>c.includes('sref=1%3A0%3A19%3A12')),'channel change');
+{ const n0=calls.length; key(K.KEY_1);
+  check(txt('toast').includes('1 Yle TV1') && w.Views.channels.numTimer,'number key shows the channel: '+txt('toast'));
+  w.clearTimeout(w.Views.channels.numTimer); w.Views.channels.numGo();
+  check(calls.slice(n0).some(c=>c.includes('sref=1%3A0%3A19%3A11')),'number key changes the channel');
+  key(K.KEY_9); check(txt('toast').includes('9 –'),'no channel 9'); w.clearTimeout(w.Views.channels.numTimer); w.Views.channels.numGo();
+  check(!calls.slice(n0).some(c=>c.includes('sref=1%3A0%3A19%3A12')),'no change for a missing number'); }
 key(K.KEY_RETURN); key(K.KEY_RETURN); check(txt('crumb')==='Channels','back to bouquets'); key(K.KEY_RETURN);
 check(txt('crumb').startsWith('Recordings'),'back to recordings');
 // programme guide: yellow cycles recordings -> channels -> guide -> recordings

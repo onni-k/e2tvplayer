@@ -214,8 +214,19 @@ var App = {
 		U.$('clock').innerHTML = U.pad(d.getHours()) + ':' + U.pad(d.getMinutes());
 	},
 
+	boxName: '',
+	boxNameHost: '',
+
 	refreshStatus: function () {
 		if (Player.active) { return; }
+		if (App.boxNameHost !== Api.host) {
+			App.boxNameHost = Api.host;
+			App.boxName = '';
+			Api.deviceInfo(function (d) {
+				var n = ((d.brand || '') + ' ' + (d.model || d.boxtype || '')).replace(/^\s+|\s+$/g, '');
+				if (n && n !== App.boxName) { App.boxName = n; App.refreshStatus(); }
+			}, function () { });
+		}
 		Api.status(function (s) {
 			var parts = [];
 			var standby = s.inStandby === true || s.inStandby === 'true';
@@ -226,7 +237,7 @@ var App = {
 			}
 			var rec = s.isRecording === true || s.isRecording === 'true';
 			U.$('nowbar').innerHTML = (rec ? T('<span class="rec">● RECORDING</span> &nbsp; ') : '') +
-				T('Box ') + U.esc(Api.host) + (parts.length ? ' &nbsp;·&nbsp; ' + parts.join(' — ') : '');
+				U.esc(App.boxName ? App.boxName + ' ' : T('Box ')) + U.esc(Api.host) + (parts.length ? ' &nbsp;·&nbsp; ' + parts.join(' — ') : '');
 		}, function (err) {
 			U.$('nowbar').innerHTML = T('<span class="rec">No connection to the box</span> &nbsp; ') + U.esc(err);
 		});
