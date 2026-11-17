@@ -28,7 +28,10 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms)); let fail=0; const check=(c,m)=
   w.App.onLoad(); await sleep(400);
   check(w.document.body.style.zoom==='1.5','scaling 1920 -> zoom '+w.document.body.style.zoom);
   check(reg.includes('ColorF0Red') && reg.includes('MediaPlayPause') && reg.includes('Tools'),'keys registered ('+reg.length+')');
-  check(w.Api.host==='192.168.68.103' && txt('list').includes('Movie'),'box found on the local network: '+w.Api.host);
+  check(w.Api.host==='192.168.68.103' && w.App.view==='epg','box found on the local network, the guide opens: '+w.Api.host+' '+w.App.view);
+  w.Dialog.close();   // this fake box has no channel list for the guide
+  w.App.go('movies'); await sleep(50);
+  check(txt('list').includes('Movie'),'recordings');
   check(urls.filter(u=>u.includes('/e2tvplayer/info')).length===254,'searched the whole /24 network');
   key(13); await sleep(100);
   check(calls.includes('open http://192.168.68.103/file?file=%2Fmedia%2Fhdd%2Fmovie%2Fa.ts') && calls.includes('play') && calls.includes('rect 0,0,1920,1080'),'AVPlay opened the recording full screen');

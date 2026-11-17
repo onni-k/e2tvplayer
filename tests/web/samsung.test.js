@@ -44,12 +44,12 @@ w.XMLHttpRequest.prototype.send=function(){const x=this;const url=new URL(x.u);c
 w.eval(`var BOX_DEFAULT_HOST="192.168.1.10";var BOX_PLUGIN_VERSION="test";`);
 for(const f of ['util','api','listview','player','subs','views','main']) w.eval(fs.readFileSync(W+'js/'+f+'.js','utf8'));
 w.App.onLoad();
-check(w.App.view==='epg' && $('epg').style.display!=='none','start view: the guide');
-w.App.go('movies');
 const $=id=>w.document.getElementById(id);
 const key=c=>w.App.keyDown({keyCode:c});
 const K=w.tvKey; const txt=id=>$(id).textContent.replace(/\s+/g,' ').trim();
 const check=(c,m)=>{if(!c){console.log('FAIL',m);process.exitCode=1}else console.log('ok  ',m)};
+check(w.App.view==='epg' && $('epg').style.display!=='none','start view: the guide');
+w.App.go('movies');
 {const h=urls.find(u=>u.includes('/e2tvplayer/log?'));check(h&&decodeURIComponent(h).includes('start platform=orsay')&&decodeURIComponent(h).includes('nav=en-US'),'start-up entry in the box log: '+(h?decodeURIComponent(h).slice(0,120):'-'));}
 check($('list').querySelectorAll('.row').length===3,'root: folder + 2 recordings (.Trash hidden)');
 check(txt('nowbar').includes('RECORDING') && txt('nowbar').includes('Vu+ Uno 4K SE 192.168.1.10'),'status bar with the box name: '+txt('nowbar'));
