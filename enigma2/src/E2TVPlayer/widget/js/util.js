@@ -108,6 +108,7 @@ var I18N_DATA = {
    "From the start": "Alusta",
    "German": "saksa",
    "Guests": "Vieraat",
+   "Guide": "Ohjelmaopas",
    "Installed from the box: ": "Asennettu boksista: ",
    "Invalid response from the box": "Virheellinen vastaus boksilta",
    "Italian": "italia",
@@ -166,6 +167,7 @@ var I18N_DATA = {
    "Sort: by name": "Järjestys: nimen mukaan",
    "Sort: newest first": "Järjestys: uusin ensin",
    "Spanish": "espanja",
+   "Start view": "Aloitusnäkymä",
    "Subtitles": "Tekstitys",
    "Subtitles not available (direct playback)": "Tekstitykset eivät ole käytössä (suora toisto)",
    "Sun Mon Tue Wed Thu Fri Sat": "su ma ti ke to pe la",
@@ -209,7 +211,7 @@ var I18N_DATA = {
    "wait…": "odota…",
    "▲ next channel": "▲ seuraava kanava",
    "▲ previous channel": "▲ edellinen kanava",
-   "▲▼ in live TV": "▲▼ live-tilassa",
+   "▲▼ and CH+/− in live TV": "▲▼ ja CH+/− live-tilassa",
    "▲▼ row &nbsp; ◀▶ change &nbsp; OK/RETURN close": "▲▼ rivi &nbsp; ◀▶ vaihda &nbsp; OK/RETURN sulje",
    "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK pause &nbsp; INFO info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop": "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK tauko &nbsp; INFO tiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta",
    "◀◀▶▶ ±2 h": "◀◀▶▶ ±2 h",
@@ -319,6 +321,7 @@ var I18N_DATA = {
    "From the start": "Från början",
    "German": "tyska",
    "Guests": "Gäster",
+   "Guide": "Programguide",
    "Installed from the box: ": "Installerad från boxen: ",
    "Invalid response from the box": "Ogiltigt svar från boxen",
    "Italian": "italienska",
@@ -377,6 +380,7 @@ var I18N_DATA = {
    "Sort: by name": "Sortering: efter namn",
    "Sort: newest first": "Sortering: nyaste först",
    "Spanish": "spanska",
+   "Start view": "Startvy",
    "Subtitles": "Textning",
    "Subtitles not available (direct playback)": "Textning inte tillgänglig (direkt uppspelning)",
    "Sun Mon Tue Wed Thu Fri Sat": "sön mån tis ons tor fre lör",
@@ -420,7 +424,7 @@ var I18N_DATA = {
    "wait…": "vänta…",
    "▲ next channel": "▲ nästa kanal",
    "▲ previous channel": "▲ föregående kanal",
-   "▲▼ in live TV": "▲▼ i live-tv",
+   "▲▼ and CH+/− in live TV": "▲▼ och CH+/− i live-tv",
    "▲▼ row &nbsp; ◀▶ change &nbsp; OK/RETURN close": "▲▼ rad &nbsp; ◀▶ ändra &nbsp; OK/RETURN stäng",
    "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK pause &nbsp; INFO info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop": "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK paus &nbsp; INFO info &nbsp; TOOLS ljud/textning &nbsp; RETURN stopp",
    "◀◀▶▶ ±2 h": "◀◀▶▶ ±2 h",
@@ -661,7 +665,7 @@ var Prefs = {
 	AUDIO: ['orig', 'fi', 'sv', 'en', 'de', 'fr'],
 	SUBS: ['fi', 'fi-hoh', 'sv', 'sv-hoh', 'en', 'en-hoh'],
 	ORIG: { qaa: 1, mis: 1, mul: 1, org: 1, und: 1 },
-	KEYS: ['audioMode', 'audio1', 'audio2', 'subMode', 'sub1', 'sub2', 'liveArrows'],
+	KEYS: ['audioMode', 'audio1', 'audio2', 'subMode', 'sub1', 'sub2', 'liveArrows', 'startView'],
 	/* defaults follow the app language: Finnish -> audio original, then Finnish; subtitles Finnish */
 	def: function (k) {
 		var L = I18n.cur();
@@ -670,14 +674,16 @@ var Prefs = {
 			case 'audio1': return 'orig';
 			case 'audio2': return L;
 			case 'sub1': return L === 'en' ? 'off' : L;
-			case 'liveArrows': return 'normal';
+			case 'liveArrows': return 'reverse';
+			case 'startView': return 'epg';
 		}
 		return 'none';
 	},
 	get: function (k) { return Store.get('p_' + k, '') || Prefs.def(k); },
 	choices: function (k) {
 		if (k === 'audioMode' || k === 'subMode') { return ['auto', 'last']; }
-		if (k === 'liveArrows') { return ['normal', 'reverse']; }
+		if (k === 'liveArrows') { return ['reverse', 'normal']; }
+		if (k === 'startView') { return ['epg', 'movies', 'channels']; }
 		if (k === 'audio1') { return Prefs.AUDIO; }
 		if (k === 'audio2') { return Prefs.AUDIO.concat(['none']); }
 		if (k === 'sub1') { return Prefs.SUBS.concat(['off']); }
@@ -696,6 +702,9 @@ var Prefs = {
 		if (code === 'none') { return T('no selection'); }
 		if (code === 'normal') { return T('▲ previous channel'); }
 		if (code === 'reverse') { return T('▲ next channel'); }
+		if (code === 'epg') { return T('Guide'); }
+		if (code === 'movies') { return T('Recordings'); }
+		if (code === 'channels') { return T('Channels'); }
 		var hoh = code.indexOf('-hoh') > 0, c = code.split('-')[0], k, n = c;
 		for (k in ISO3) { if (ISO3.hasOwnProperty(k) && ISO3[k] === c && U.LANGS[k]) { n = T(U.LANGS[k]); break; } }
 		return n + (hoh ? T(' (hard of hearing)') : '');

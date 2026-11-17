@@ -214,8 +214,12 @@ msgid "Subtitles"
 msgstr "Textning"
 
 #: web/player.js android/Prefs.kt
-msgid "▲▼ in live TV"
-msgstr "▲▼ i live-tv"
+msgid "▲▼ and CH+/− in live TV"
+msgstr "▲▼ och CH+/− i live-tv"
+
+#: web/player.js android/Prefs.kt
+msgid "Start view"
+msgstr "Startvy"
 
 #: web/player.js web/util.js android/PlayerActivity.kt android/Prefs.kt
 msgid "off"
@@ -413,6 +417,18 @@ msgstr "▲ föregående kanal"
 msgid "▲ next channel"
 msgstr "▲ nästa kanal"
 
+#: web/util.js android/MainActivity.kt android/Prefs.kt
+msgid "Guide"
+msgstr "Programguide"
+
+#: web/util.js web/views.js android/MainActivity.kt android/Prefs.kt
+msgid "Recordings"
+msgstr "Inspelningar"
+
+#: web/util.js web/views.js android/MainActivity.kt android/Prefs.kt
+msgid "Channels"
+msgstr "Kanaler"
+
 #: web/util.js android/PlayerActivity.kt android/Prefs.kt
 msgid " (hard of hearing)"
 msgstr " (hörselskadade)"
@@ -593,10 +609,6 @@ msgstr "<span style=\"color:#4fa3ff\">Sedd till "
 msgid "</span>"
 msgstr "</span>"
 
-#: web/views.js android/MainActivity.kt
-msgid "Recordings"
-msgstr "Inspelningar"
-
 #: web/views.js
 msgid "  · A–Z"
 msgstr "  · A–Ö"
@@ -676,10 +688,6 @@ msgstr "<span class=\"k k-ret\">RETURN</span>Tillbaka"
 #: web/views.js
 msgid "Loading bouquets…"
 msgstr "Laddar kanalgrupper…"
-
-#: web/views.js android/MainActivity.kt
-msgid "Channels"
-msgstr "Kanaler"
 
 #: web/views.js android/MainActivity.kt
 msgid "Bouquet"
@@ -852,10 +860,6 @@ msgstr "MB"
 #: android/Box.kt
 msgid "kB"
 msgstr "kB"
-
-#: android/MainActivity.kt
-msgid "Guide"
-msgstr "Programguide"
 
 #: android/MainActivity.kt
 msgid "in standby"

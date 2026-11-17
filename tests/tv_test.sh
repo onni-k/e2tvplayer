@@ -15,7 +15,9 @@ adb shell am start -W -n fi.e2tvplayer/.MainActivity
 shot 01_search 2
 shot 02_update_offer 14              # box discovery on the local network; fake box has a newer APK
 key KEYCODE_BACK                     # not now
-shot 02_list 1
+shot 02_start_guide 4                # start view: the guide
+key KEYCODE_PROG_YELLOW              # guide -> recordings
+shot 02_list 2
 key KEYCODE_DPAD_DOWN                # Series -> Test recording
 shot 03_details
 key KEYCODE_DPAD_CENTER              # play
@@ -88,7 +90,7 @@ key KEYCODE_DPAD_CENTER
 longok
 shot 14_live_menu
 key KEYCODE_BACK
-key KEYCODE_DPAD_DOWN                # channel +1
+key KEYCODE_DPAD_UP                  # channel +1 (▲ = next channel by default)
 shot 15_zap 6
 key KEYCODE_1                        # number key: channel 1 (shown first, changes after a moment)
 shot 15b_number_key 0

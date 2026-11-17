@@ -807,10 +807,10 @@ class PlayerActivity : Activity() {
         if (!down) return super.dispatchKeyEvent(e)
         if (live) {
             when (k) {
-                KeyEvent.KEYCODE_CHANNEL_UP -> { if (first) playChannel(index - 1); return true }
-                KeyEvent.KEYCODE_CHANNEL_DOWN -> { if (first) playChannel(index + 1); return true }
-                KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN -> {
-                    val d = (if (k == KeyEvent.KEYCODE_DPAD_UP) -1 else 1) * (if (Prefs.get("liveArrows") == "reverse") -1 else 1)
+                // "reverse" (default): up and CH+ go to the next channel number, as on a TV
+                KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_CHANNEL_UP, KeyEvent.KEYCODE_CHANNEL_DOWN -> {
+                    val up = k == KeyEvent.KEYCODE_DPAD_UP || k == KeyEvent.KEYCODE_CHANNEL_UP
+                    val d = (if (up) -1 else 1) * (if (Prefs.get("liveArrows") == "reverse") -1 else 1)
                     if (first) playChannel(index + d)
                     return true
                 }

@@ -2,6 +2,10 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 0.1.028
+* UPD: CH+/CH− follow the "▲▼ and CH+/− in live TV" setting; ▲ and CH+ go to the next channel by default
+* NEW: Setting "Start view"; the programme guide is the first view by default
+
 ## 0.1.027
 * NEW: Setting "▲▼ in live TV": the up arrow can go to the next channel (default: previous, as in the guide)
 

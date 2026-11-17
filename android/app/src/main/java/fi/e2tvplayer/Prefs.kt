@@ -22,13 +22,15 @@ object Prefs {
         r.add("audioMode"); if (get("audioMode") == "auto") { r.add("audio1"); r.add("audio2") }
         r.add("subMode"); if (get("subMode") == "auto") { r.add("sub1"); r.add("sub2") }
         r.add("liveArrows")
+        r.add("startView")
         return r
     }
 
     fun label(k: String): String = when (k) {
         "audioMode" -> T("Audio")
         "subMode" -> T("Subtitles")
-        "liveArrows" -> T("▲▼ in live TV")
+        "liveArrows" -> T("▲▼ and CH+/− in live TV")
+        "startView" -> T("Start view")
         "audio1", "sub1" -> "      " + T("  1st choice").trim()
         else -> "      " + T("  2nd choice").trim()
     }
@@ -41,7 +43,8 @@ object Prefs {
             "audio1" -> "orig"
             "audio2" -> l
             "sub1" -> if (l == "en") "off" else l
-            "liveArrows" -> "normal"
+            "liveArrows" -> "reverse"
+            "startView" -> "epg"
             else -> "none"
         }
     }
@@ -50,7 +53,8 @@ object Prefs {
 
     private fun choices(k: String): List<String> = when (k) {
         "audioMode", "subMode" -> listOf("auto", "last")
-        "liveArrows" -> listOf("normal", "reverse")
+        "liveArrows" -> listOf("reverse", "normal")
+        "startView" -> listOf("epg", "movies", "channels")
         "audio1" -> AUDIO
         "audio2" -> AUDIO + "none"
         "sub1" -> SUBS + "off"
@@ -71,6 +75,9 @@ object Prefs {
         "none" -> T("no selection")
         "normal" -> T("▲ previous channel")
         "reverse" -> T("▲ next channel")
+        "epg" -> T("Guide")
+        "movies" -> T("Recordings")
+        "channels" -> T("Channels")
         else -> {
             val c = code.substringBefore('-')
             (NAMES[c]?.let { T(it) } ?: c) + (if (code.endsWith("-hoh")) T(" (hard of hearing)") else "")

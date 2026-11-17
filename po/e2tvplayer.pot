@@ -212,7 +212,11 @@ msgid "Subtitles"
 msgstr ""
 
 #: web/player.js android/Prefs.kt
-msgid "▲▼ in live TV"
+msgid "▲▼ and CH+/− in live TV"
+msgstr ""
+
+#: web/player.js android/Prefs.kt
+msgid "Start view"
 msgstr ""
 
 #: web/player.js web/util.js android/PlayerActivity.kt android/Prefs.kt
@@ -411,6 +415,18 @@ msgstr ""
 msgid "▲ next channel"
 msgstr ""
 
+#: web/util.js android/MainActivity.kt android/Prefs.kt
+msgid "Guide"
+msgstr ""
+
+#: web/util.js web/views.js android/MainActivity.kt android/Prefs.kt
+msgid "Recordings"
+msgstr ""
+
+#: web/util.js web/views.js android/MainActivity.kt android/Prefs.kt
+msgid "Channels"
+msgstr ""
+
 #: web/util.js android/PlayerActivity.kt android/Prefs.kt
 msgid " (hard of hearing)"
 msgstr ""
@@ -591,10 +607,6 @@ msgstr ""
 msgid "</span>"
 msgstr ""
 
-#: web/views.js android/MainActivity.kt
-msgid "Recordings"
-msgstr ""
-
 #: web/views.js
 msgid "  · A–Z"
 msgstr ""
@@ -673,10 +685,6 @@ msgstr ""
 
 #: web/views.js
 msgid "Loading bouquets…"
-msgstr ""
-
-#: web/views.js android/MainActivity.kt
-msgid "Channels"
 msgstr ""
 
 #: web/views.js android/MainActivity.kt
@@ -849,10 +857,6 @@ msgstr ""
 
 #: android/Box.kt
 msgid "kB"
-msgstr ""
-
-#: android/MainActivity.kt
-msgid "Guide"
 msgstr ""
 
 #: android/MainActivity.kt

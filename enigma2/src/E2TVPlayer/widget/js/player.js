@@ -374,7 +374,8 @@ var Player = {
 	PREF_LABELS: {
 		audioMode: N('Audio'), audio1: N('  1st choice'), audio2: N('  2nd choice'),
 		subMode: N('Subtitles'), sub1: N('  1st choice'), sub2: N('  2nd choice'),
-		liveArrows: N('▲▼ in live TV')
+		liveArrows: N('▲▼ and CH+/− in live TV'),
+		startView: N('Start view')
 	},
 
 	tracksOpen: function () { return U.$('tracks').style.display === 'block'; },
@@ -414,7 +415,7 @@ var Player = {
 			if (Prefs.get('audioMode') === 'auto') { r.push('p:audio1', 'p:audio2'); }
 			r.push('p:subMode');
 			if (Prefs.get('subMode') === 'auto') { r.push('p:sub1', 'p:sub2'); }
-			r.push('p:liveArrows', 'shot');
+			r.push('p:liveArrows', 'p:startView', 'shot');
 			return r;
 		}
 		return Subs.key ? ['audio', 'sub', 'timing', 'lang', 'shot'] : ['audio', 'sub', 'lang', 'shot'];
@@ -569,10 +570,9 @@ var Player = {
 		if (Player.infoOpen() && k === tvKey.KEY_RETURN) { Player.hideInfo(); return true; }
 		if (k === tvKey.KEY_RETURN || k === tvKey.KEY_STOP) { Player.stop(); return true; }
 		if (it && it.live) {
-			if (k === tvKey.KEY_CH_UP) { Views.channels.zap(-1); return true; }
-			if (k === tvKey.KEY_CH_DOWN) { Views.channels.zap(1); return true; }
-			if (k === tvKey.KEY_UP || k === tvKey.KEY_DOWN) {
-				Views.channels.zap((k === tvKey.KEY_UP ? -1 : 1) * (Prefs.get('liveArrows') === 'reverse' ? -1 : 1));
+			/* 'reverse' (default): up and CH+ go to the next channel number, as on a TV */
+			if (k === tvKey.KEY_UP || k === tvKey.KEY_DOWN || k === tvKey.KEY_CH_UP || k === tvKey.KEY_CH_DOWN) {
+				Views.channels.zap((k === tvKey.KEY_UP || k === tvKey.KEY_CH_UP ? -1 : 1) * (Prefs.get('liveArrows') === 'reverse' ? -1 : 1));
 				return true;
 			}
 			if (k === tvKey.KEY_ENTER) { Player.showInfo(); return true; }

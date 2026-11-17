@@ -132,7 +132,7 @@ class MainActivity : Activity() {
         if (Box.host.isEmpty()) {
             findBox(first = true)
         } else {
-            showMovies()
+            showStart()
         }
     }
 
@@ -721,7 +721,7 @@ class MainActivity : Activity() {
                 val row = TextView(this).apply {
                     this.text = text(k)
                     setTextColor(0xFFC9D1D9.toInt())
-                    setPadding(0, if (k.endsWith("Mode") || k == "liveArrows") 16 else 4, 0, 4)
+                    setPadding(0, if (k.endsWith("Mode") || k == "liveArrows" || k == "startView") 16 else 4, 0, 4)
                     isFocusable = true
                     isClickable = true
                     setBackgroundResource(android.R.drawable.list_selector_background)
@@ -754,7 +754,15 @@ class MainActivity : Activity() {
         bouquets = emptyList(); bouquet = null; services = emptyList()
         refreshStatus()
         Update.check(this)
-        if (mode == "movies") showMovies() else showChannels()
+        if (!started) showStart() else if (mode == "movies") showMovies() else showChannels()
+    }
+
+    private var started = false
+
+    /** the first view: Settings → Start view (the guide by default) */
+    private fun showStart() {
+        started = true
+        when (Prefs.get("startView")) { "movies" -> showMovies(); "channels" -> showChannels(); else -> showEpg() }
     }
 
     private fun findBox(first: Boolean) {

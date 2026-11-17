@@ -116,7 +116,7 @@ var App = {
 		}
 		App.refreshStatus();
 		App.statusTimer = setInterval(App.refreshStatus, 30000);
-		App.go('movies');
+		App.go(Prefs.get('startView'));
 	},
 
 	/* Searches the local network for a box with E2TVPlayer (Tizen: the TV's own IP is known) */
@@ -130,7 +130,7 @@ var App = {
 				Views.movies.reset();
 				App.refreshStatus();
 				if (!App.statusTimer) { App.statusTimer = setInterval(App.refreshStatus, 30000); }
-				App.go('movies');
+				App.go(Prefs.get('startView'));
 			};
 			if (found.length === 1) {
 				U.toast(T('Box found: ') + found[0]);

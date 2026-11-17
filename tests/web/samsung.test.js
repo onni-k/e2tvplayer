@@ -44,6 +44,8 @@ w.XMLHttpRequest.prototype.send=function(){const x=this;const url=new URL(x.u);c
 w.eval(`var BOX_DEFAULT_HOST="192.168.1.10";var BOX_PLUGIN_VERSION="test";`);
 for(const f of ['util','api','listview','player','subs','views','main']) w.eval(fs.readFileSync(W+'js/'+f+'.js','utf8'));
 w.App.onLoad();
+check(w.App.view==='epg' && $('epg').style.display!=='none','start view: the guide');
+w.App.go('movies');
 const $=id=>w.document.getElementById(id);
 const key=c=>w.App.keyDown({keyCode:c});
 const K=w.tvKey; const txt=id=>$(id).textContent.replace(/\s+/g,' ').trim();
@@ -94,11 +96,13 @@ key(K.KEY_CH_DOWN); check(calls.some(c=>c.includes('sref=1%3A0%3A19%3A12')),'cha
   check(calls.slice(n0).some(c=>c.includes('sref=1%3A0%3A19%3A11')),'number key changes the channel');
   key(K.KEY_9); check(txt('toast').includes('9 –'),'no channel 9'); w.clearTimeout(w.Views.channels.numTimer); w.Views.channels.numGo();
   check(!calls.slice(n0).some(c=>c.includes('sref=1%3A0%3A19%3A12')),'no change for a missing number'); }
-{ w.Store.set('p_liveArrows','reverse'); const n0=calls.length; key(K.KEY_UP);
-  check(calls.slice(n0).some(c=>c.includes('sref=1%3A0%3A19%3A12')),'reversed arrows: up = next channel');
-  const n1=calls.length; key(K.KEY_DOWN);
-  check(calls.slice(n1).some(c=>c.includes('sref=1%3A0%3A19%3A11')),'reversed arrows: down = previous channel');
-  w.Store.set('p_liveArrows',''); }
+{ const z=w.Views.channels.zap, d=[]; w.Views.channels.zap=x=>{d.push(x)};
+  key(K.KEY_UP); key(K.KEY_CH_UP); key(K.KEY_DOWN); key(K.KEY_CH_DOWN);
+  check(d.join()==='1,1,-1,-1','default: up and CH+ = next channel: '+d.join());
+  w.Store.set('p_liveArrows','normal'); d.length=0;
+  key(K.KEY_UP); key(K.KEY_CH_UP); key(K.KEY_DOWN); key(K.KEY_CH_DOWN);
+  check(d.join()==='-1,-1,1,1','normal: up and CH+ = previous channel: '+d.join());
+  w.Store.set('p_liveArrows',''); w.Views.channels.zap=z; }
 key(K.KEY_RETURN); key(K.KEY_RETURN); check(txt('crumb')==='Channels','back to bouquets'); key(K.KEY_RETURN);
 check(txt('crumb').startsWith('Recordings'),'back to recordings');
 // programme guide: yellow cycles recordings -> channels -> guide -> recordings
@@ -109,7 +113,7 @@ key(K.KEY_DOWN); key(K.KEY_RIGHT);
 check(txt('tr-rows').includes('Audio◀ as last time ▶') && !txt('tr-rows').includes('original'),'audio: as last time hides the choices');
 key(K.KEY_LEFT); key(K.KEY_DOWN); key(K.KEY_DOWN); key(K.KEY_DOWN); key(K.KEY_DOWN); key(K.KEY_RIGHT);
 check(w.Store.get('p_sub1')==='fi','subtitles 1st choice changed: '+w.Store.get('p_sub1'));
-check(txt('tr-rows').includes('▲▼ in live TV◀ ▲ previous channel ▶'),'TOOLS: live arrow keys row: '+txt('tr-rows'));
+check(txt('tr-rows').includes('▲▼ and CH+/− in live TV◀ ▲ next channel ▶') && txt('tr-rows').includes('Start view◀ Guide ▶'),'TOOLS: live arrow keys row: '+txt('tr-rows'));
 w.Store.set('p_sub1',''); key(K.KEY_RETURN);
 key(K.KEY_YELLOW); key(K.KEY_YELLOW);
 check(w.App.view==='epg' && $('epg').style.display==='block' && $('browser').style.display==='none','guide opened with the yellow key');

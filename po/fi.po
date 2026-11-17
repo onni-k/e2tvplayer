@@ -214,8 +214,12 @@ msgid "Subtitles"
 msgstr "Tekstitys"
 
 #: web/player.js android/Prefs.kt
-msgid "▲▼ in live TV"
-msgstr "▲▼ live-tilassa"
+msgid "▲▼ and CH+/− in live TV"
+msgstr "▲▼ ja CH+/− live-tilassa"
+
+#: web/player.js android/Prefs.kt
+msgid "Start view"
+msgstr "Aloitusnäkymä"
 
 #: web/player.js web/util.js android/PlayerActivity.kt android/Prefs.kt
 msgid "off"
@@ -413,6 +417,18 @@ msgstr "▲ edellinen kanava"
 msgid "▲ next channel"
 msgstr "▲ seuraava kanava"
 
+#: web/util.js android/MainActivity.kt android/Prefs.kt
+msgid "Guide"
+msgstr "Ohjelmaopas"
+
+#: web/util.js web/views.js android/MainActivity.kt android/Prefs.kt
+msgid "Recordings"
+msgstr "Tallenteet"
+
+#: web/util.js web/views.js android/MainActivity.kt android/Prefs.kt
+msgid "Channels"
+msgstr "Kanavat"
+
 #: web/util.js android/PlayerActivity.kt android/Prefs.kt
 msgid " (hard of hearing)"
 msgstr " (kuulovammaiset)"
@@ -593,10 +609,6 @@ msgstr "<span style=\"color:#4fa3ff\">Katsottu "
 msgid "</span>"
 msgstr " asti</span>"
 
-#: web/views.js android/MainActivity.kt
-msgid "Recordings"
-msgstr "Tallenteet"
-
 #: web/views.js
 msgid "  · A–Z"
 msgstr "  · A–Ö"
@@ -676,10 +688,6 @@ msgstr "<span class=\"k k-ret\">RETURN</span>Takaisin"
 #: web/views.js
 msgid "Loading bouquets…"
 msgstr "Haetaan kanavanippuja…"
-
-#: web/views.js android/MainActivity.kt
-msgid "Channels"
-msgstr "Kanavat"
 
 #: web/views.js android/MainActivity.kt
 msgid "Bouquet"
@@ -852,10 +860,6 @@ msgstr "Mt"
 #: android/Box.kt
 msgid "kB"
 msgstr "kt"
-
-#: android/MainActivity.kt
-msgid "Guide"
-msgstr "Ohjelmaopas"
 
 #: android/MainActivity.kt
 msgid "in standby"
