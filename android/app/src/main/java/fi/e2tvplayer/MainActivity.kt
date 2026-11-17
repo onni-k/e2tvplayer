@@ -721,7 +721,7 @@ class MainActivity : Activity() {
                 val row = TextView(this).apply {
                     this.text = text(k)
                     setTextColor(0xFFC9D1D9.toInt())
-                    setPadding(0, if (k.endsWith("Mode")) 16 else 4, 0, 4)
+                    setPadding(0, if (k.endsWith("Mode") || k == "liveArrows") 16 else 4, 0, 4)
                     isFocusable = true
                     isClickable = true
                     setBackgroundResource(android.R.drawable.list_selector_background)

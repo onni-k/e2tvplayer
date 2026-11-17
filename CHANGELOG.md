@@ -2,6 +2,9 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 0.1.027
+* NEW: Setting "▲▼ in live TV": the up arrow can go to the next channel (default: previous, as in the guide)
+
 ## 0.1.026
 * NEW: Google TV: offers to update itself when the box has a newer APK (also in Settings)
 * NEW: Samsung Orsay: tells when the box has a newer version (update with User App Sync)

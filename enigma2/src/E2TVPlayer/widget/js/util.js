@@ -207,6 +207,9 @@ var I18N_DATA = {
    "video frame": "videokuva",
    "view": "näkymä",
    "wait…": "odota…",
+   "▲ next channel": "▲ seuraava kanava",
+   "▲ previous channel": "▲ edellinen kanava",
+   "▲▼ in live TV": "▲▼ live-tilassa",
    "▲▼ row &nbsp; ◀▶ change &nbsp; OK/RETURN close": "▲▼ rivi &nbsp; ◀▶ vaihda &nbsp; OK/RETURN sulje",
    "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK pause &nbsp; INFO info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop": "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK tauko &nbsp; INFO tiedot &nbsp; TOOLS ääni/tekstitys &nbsp; RETURN lopeta",
    "◀◀▶▶ ±2 h": "◀◀▶▶ ±2 h",
@@ -415,6 +418,9 @@ var I18N_DATA = {
    "video frame": "videobild",
    "view": "vy",
    "wait…": "vänta…",
+   "▲ next channel": "▲ nästa kanal",
+   "▲ previous channel": "▲ föregående kanal",
+   "▲▼ in live TV": "▲▼ i live-tv",
    "▲▼ row &nbsp; ◀▶ change &nbsp; OK/RETURN close": "▲▼ rad &nbsp; ◀▶ ändra &nbsp; OK/RETURN stäng",
    "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK pause &nbsp; INFO info &nbsp; TOOLS audio/subtitles &nbsp; RETURN stop": "◀▶ 15 s &nbsp; ▲▼ 5 min &nbsp; ◀◀▶▶ 1 min &nbsp; OK paus &nbsp; INFO info &nbsp; TOOLS ljud/textning &nbsp; RETURN stopp",
    "◀◀▶▶ ±2 h": "◀◀▶▶ ±2 h",
@@ -655,7 +661,7 @@ var Prefs = {
 	AUDIO: ['orig', 'fi', 'sv', 'en', 'de', 'fr'],
 	SUBS: ['fi', 'fi-hoh', 'sv', 'sv-hoh', 'en', 'en-hoh'],
 	ORIG: { qaa: 1, mis: 1, mul: 1, org: 1, und: 1 },
-	KEYS: ['audioMode', 'audio1', 'audio2', 'subMode', 'sub1', 'sub2'],
+	KEYS: ['audioMode', 'audio1', 'audio2', 'subMode', 'sub1', 'sub2', 'liveArrows'],
 	/* defaults follow the app language: Finnish -> audio original, then Finnish; subtitles Finnish */
 	def: function (k) {
 		var L = I18n.cur();
@@ -664,12 +670,14 @@ var Prefs = {
 			case 'audio1': return 'orig';
 			case 'audio2': return L;
 			case 'sub1': return L === 'en' ? 'off' : L;
+			case 'liveArrows': return 'normal';
 		}
 		return 'none';
 	},
 	get: function (k) { return Store.get('p_' + k, '') || Prefs.def(k); },
 	choices: function (k) {
 		if (k === 'audioMode' || k === 'subMode') { return ['auto', 'last']; }
+		if (k === 'liveArrows') { return ['normal', 'reverse']; }
 		if (k === 'audio1') { return Prefs.AUDIO; }
 		if (k === 'audio2') { return Prefs.AUDIO.concat(['none']); }
 		if (k === 'sub1') { return Prefs.SUBS.concat(['off']); }
@@ -686,6 +694,8 @@ var Prefs = {
 		if (code === 'orig') { return T('original'); }
 		if (code === 'off') { return T('off'); }
 		if (code === 'none') { return T('no selection'); }
+		if (code === 'normal') { return T('▲ previous channel'); }
+		if (code === 'reverse') { return T('▲ next channel'); }
 		var hoh = code.indexOf('-hoh') > 0, c = code.split('-')[0], k, n = c;
 		for (k in ISO3) { if (ISO3.hasOwnProperty(k) && ISO3[k] === c && U.LANGS[k]) { n = T(U.LANGS[k]); break; } }
 		return n + (hoh ? T(' (hard of hearing)') : '');

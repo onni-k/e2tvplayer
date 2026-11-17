@@ -211,6 +211,10 @@ msgstr ""
 msgid "Subtitles"
 msgstr ""
 
+#: web/player.js android/Prefs.kt
+msgid "▲▼ in live TV"
+msgstr ""
+
 #: web/player.js web/util.js android/PlayerActivity.kt android/Prefs.kt
 msgid "off"
 msgstr ""
@@ -397,6 +401,14 @@ msgstr ""
 
 #: web/util.js android/Prefs.kt
 msgid "no selection"
+msgstr ""
+
+#: web/util.js android/Prefs.kt
+msgid "▲ previous channel"
+msgstr ""
+
+#: web/util.js android/Prefs.kt
+msgid "▲ next channel"
 msgstr ""
 
 #: web/util.js android/PlayerActivity.kt android/Prefs.kt

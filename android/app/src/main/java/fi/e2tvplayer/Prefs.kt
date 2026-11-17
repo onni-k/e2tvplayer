@@ -21,12 +21,14 @@ object Prefs {
         val r = ArrayList<String>()
         r.add("audioMode"); if (get("audioMode") == "auto") { r.add("audio1"); r.add("audio2") }
         r.add("subMode"); if (get("subMode") == "auto") { r.add("sub1"); r.add("sub2") }
+        r.add("liveArrows")
         return r
     }
 
     fun label(k: String): String = when (k) {
         "audioMode" -> T("Audio")
         "subMode" -> T("Subtitles")
+        "liveArrows" -> T("▲▼ in live TV")
         "audio1", "sub1" -> "      " + T("  1st choice").trim()
         else -> "      " + T("  2nd choice").trim()
     }
@@ -39,6 +41,7 @@ object Prefs {
             "audio1" -> "orig"
             "audio2" -> l
             "sub1" -> if (l == "en") "off" else l
+            "liveArrows" -> "normal"
             else -> "none"
         }
     }
@@ -47,6 +50,7 @@ object Prefs {
 
     private fun choices(k: String): List<String> = when (k) {
         "audioMode", "subMode" -> listOf("auto", "last")
+        "liveArrows" -> listOf("normal", "reverse")
         "audio1" -> AUDIO
         "audio2" -> AUDIO + "none"
         "sub1" -> SUBS + "off"
@@ -65,6 +69,8 @@ object Prefs {
         "orig" -> T("original")
         "off" -> T("off")
         "none" -> T("no selection")
+        "normal" -> T("▲ previous channel")
+        "reverse" -> T("▲ next channel")
         else -> {
             val c = code.substringBefore('-')
             (NAMES[c]?.let { T(it) } ?: c) + (if (code.endsWith("-hoh")) T(" (hard of hearing)") else "")

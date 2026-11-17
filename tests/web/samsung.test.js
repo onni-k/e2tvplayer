@@ -94,6 +94,11 @@ key(K.KEY_CH_DOWN); check(calls.some(c=>c.includes('sref=1%3A0%3A19%3A12')),'cha
   check(calls.slice(n0).some(c=>c.includes('sref=1%3A0%3A19%3A11')),'number key changes the channel');
   key(K.KEY_9); check(txt('toast').includes('9 –'),'no channel 9'); w.clearTimeout(w.Views.channels.numTimer); w.Views.channels.numGo();
   check(!calls.slice(n0).some(c=>c.includes('sref=1%3A0%3A19%3A12')),'no change for a missing number'); }
+{ w.Store.set('p_liveArrows','reverse'); const n0=calls.length; key(K.KEY_UP);
+  check(calls.slice(n0).some(c=>c.includes('sref=1%3A0%3A19%3A12')),'reversed arrows: up = next channel');
+  const n1=calls.length; key(K.KEY_DOWN);
+  check(calls.slice(n1).some(c=>c.includes('sref=1%3A0%3A19%3A11')),'reversed arrows: down = previous channel');
+  w.Store.set('p_liveArrows',''); }
 key(K.KEY_RETURN); key(K.KEY_RETURN); check(txt('crumb')==='Channels','back to bouquets'); key(K.KEY_RETURN);
 check(txt('crumb').startsWith('Recordings'),'back to recordings');
 // programme guide: yellow cycles recordings -> channels -> guide -> recordings
@@ -104,6 +109,7 @@ key(K.KEY_DOWN); key(K.KEY_RIGHT);
 check(txt('tr-rows').includes('Audio◀ as last time ▶') && !txt('tr-rows').includes('original'),'audio: as last time hides the choices');
 key(K.KEY_LEFT); key(K.KEY_DOWN); key(K.KEY_DOWN); key(K.KEY_DOWN); key(K.KEY_DOWN); key(K.KEY_RIGHT);
 check(w.Store.get('p_sub1')==='fi','subtitles 1st choice changed: '+w.Store.get('p_sub1'));
+check(txt('tr-rows').includes('▲▼ in live TV◀ ▲ previous channel ▶'),'TOOLS: live arrow keys row: '+txt('tr-rows'));
 w.Store.set('p_sub1',''); key(K.KEY_RETURN);
 key(K.KEY_YELLOW); key(K.KEY_YELLOW);
 check(w.App.view==='epg' && $('epg').style.display==='block' && $('browser').style.display==='none','guide opened with the yellow key');

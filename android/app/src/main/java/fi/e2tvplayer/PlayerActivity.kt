@@ -807,8 +807,13 @@ class PlayerActivity : Activity() {
         if (!down) return super.dispatchKeyEvent(e)
         if (live) {
             when (k) {
-                KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_CHANNEL_UP -> { if (first) playChannel(index - 1); return true }
-                KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_CHANNEL_DOWN -> { if (first) playChannel(index + 1); return true }
+                KeyEvent.KEYCODE_CHANNEL_UP -> { if (first) playChannel(index - 1); return true }
+                KeyEvent.KEYCODE_CHANNEL_DOWN -> { if (first) playChannel(index + 1); return true }
+                KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN -> {
+                    val d = (if (k == KeyEvent.KEYCODE_DPAD_UP) -1 else 1) * (if (Prefs.get("liveArrows") == "reverse") -1 else 1)
+                    if (first) playChannel(index + d)
+                    return true
+                }
                 KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT -> { showOsd(); return true }
                 in KeyEvent.KEYCODE_0..KeyEvent.KEYCODE_9 -> { if (first) digit(k - KeyEvent.KEYCODE_0); return true }
             }
