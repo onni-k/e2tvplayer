@@ -120,6 +120,10 @@ body.playing #app { display: none; }
 .tr-row .lbl { display: inline-block; width: 150px; color: #9fb3c8; }
 .tr-row.sel .lbl { color: #d6e6ff; }
 .tr-row .val { color: #ffffff; }
+#tracks.compact { padding: 18px 30px; }
+#tracks.compact #tr-rows { margin-top: 8px; }
+#tracks.compact .tr-row { height: 44px; line-height: 44px; margin-bottom: 4px; }
+.tr-more { height: 16px; line-height: 16px; font-size: 14px; text-align: center; color: #8b98a8; }
 #tr-diag { margin-top: 12px; font-size: 15px; color: #6d7a89; line-height: 22px; }
 .tr-keys { margin-top: 14px; font-size: 17px; color: #8b98a8; }
 

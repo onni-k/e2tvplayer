@@ -2,6 +2,10 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 1.0.1
+* FIX: Samsung: the TOOLS settings in the lists no longer run off the screen; 6 rows are shown
+  at a time and the window follows the selection (▲/▼ mark the hidden rows)
+
 ## 1.0.0 (1.0 beta)
 * First public release (GitHub release v1.0.0-beta with the box .ipk, the APK and the Tizen .wgt)
 

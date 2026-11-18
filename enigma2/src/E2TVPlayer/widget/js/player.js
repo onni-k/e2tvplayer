@@ -450,6 +450,8 @@ var Player = {
 		return T('Subtitles not available (direct playback)');
 	},
 
+	TRACK_WINDOW: 6,
+
 	renderTracks: function () {
 		var rows = [], a = Player.audio;
 		var opts = Player.subOptions(), cur = Player.subCurrent(opts);
@@ -460,8 +462,17 @@ var Player = {
 			return '<div class="tr-row' + (Player.trackRow === i ? ' sel' : '') + '"><span class="lbl">' + label + '</span><span class="val">' +
 				(arrows ? '◀ ' : '') + U.esc(val) + (arrows ? ' ▶' : '') + '</span></div>';
 		};
-		var ids = Player.rowIds(), r;
-		for (r = 0; r < ids.length; r++) {
+		/* the list-mode settings have more rows than fit on a 540 px screen: show a window of
+		   TRACK_WINDOW rows that follows the selection, with ▲/▼ for the hidden ones */
+		var ids = Player.rowIds(), r, first = 0, last = ids.length, many = ids.length > Player.TRACK_WINDOW;
+		if (many) {
+			first = Math.max(0, Math.min(Player.trackRow - 2, ids.length - Player.TRACK_WINDOW));
+			last = first + Player.TRACK_WINDOW;
+		}
+		var box = U.$('tracks');
+		box.className = many ? 'compact' : '';
+		box.style.top = many ? '24px' : '';
+		for (r = first; r < last; r++) {
 			if (ids[r] === 'audio') { rows.push(row(r, T('Audio'), aval, a.length > 1)); }
 			else if (ids[r] === 'sub') { rows.push(row(r, T('Subtitles'), sval, opts.length > 1)); }
 			else if (ids[r] === 'timing') {
@@ -475,6 +486,10 @@ var Player = {
 			}
 			else if (ids[r] === 'lang') { rows.push(row(r, T('Language'), I18n.label(I18n.pref()) + (I18n.pending ? T('  (restarts)') : ''), true)); }
 			else if (ids[r] === 'shot') { rows.push(row(r, T('Screenshot'), Shot.busy ? T('wait…') : T('OK: take a picture in 10 s'), false)); }
+		}
+		if (many) {
+			rows.unshift('<div class="tr-more">' + (first > 0 ? '▲' : '&nbsp;') + '</div>');
+			rows.push('<div class="tr-more">' + (last < ids.length ? '▼' : '&nbsp;') + '</div>');
 		}
 		U.$('tr-rows').innerHTML = rows.join('');
 		U.$('tr-diag').innerHTML = (Player.active ? U.esc(Player.boxStatus()) + '<br/>' + U.esc(Player.diag) + '<br/>' : '') +
