@@ -9,7 +9,7 @@ Watch the recordings and live TV of an Enigma2 box (OpenViX etc.), with subtitle
 | Samsung Tizen (2015–) | `enigma2/src/E2TVPlayer/tizen/` | The same HTML/JS app on the Tizen player (AVPlay). The box builds the package `/e2tvplayer/E2TVPlayer.wgt` on the fly, with its address included. |
 | Google TV / Android TV | `android/` | Kotlin + Media3 ExoPlayer. Plays TS recordings and live channels; DVB subtitles and audio tracks straight from the stream. |
 
-GitHub Actions builds the APK and the box `.ipk` package (with the APK included) on every push. A `v*` tag makes a release.
+GitHub Actions builds the APK and the box `.ipk` package (with the APK included) on every push. A `v*` tag makes a release with these files ([Releases](https://github.com/onni-k/e2tvplayer/releases)).
 
 ## Languages
 

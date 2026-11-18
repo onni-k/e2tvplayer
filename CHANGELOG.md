@@ -2,6 +2,9 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 1.0.0 (1.0 beta)
+* First public release (GitHub release v1.0.0-beta with the box .ipk, the APK and the Tizen .wgt)
+
 ## 0.1.028
 * UPD: CH+/CH− follow the "▲▼ and CH+/− in live TV" setting; ▲ and CH+ go to the next channel by default
 * NEW: Setting "Start view"; the programme guide is the first view by default

@@ -92,7 +92,8 @@ GitHub Actions (`.github/workflows/build.yml`) on every push to `main`:
 4. Results (`dist/`, `shots/`) are force-pushed to the `builds` branch:
    `git fetch -f origin builds:refs/remotes/origin/builds`.
 
-A `v*` tag makes a release. GitHub downloads sometimes fail with 5xx; re-run the failed jobs.
+A `v*` tag makes a release (notes from `docs/releases/<tag>.md`, else the newest CHANGELOG
+section; a tag with `-`, e.g. `v1.1.0-beta`, is a pre-release). GitHub downloads sometimes fail with 5xx; re-run the failed jobs.
 
 Local builds: `sh enigma2/build_ipk.sh` (box package), `cd android && ./gradlew assembleRelease`.
 The Android signing key `android/e2tvplayer.keystore` is in the repository on purpose, so that

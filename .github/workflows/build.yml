@@ -40,10 +40,24 @@ jobs:
           name: e2tvplayer
           path: dist/*
 
+      - name: Release notes
+        id: notes
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          # v1.0.0-beta -> "E2TVPlayer 1.0 beta", v1.0.1 -> "E2TVPlayer 1.0.1"
+          echo "name=E2TVPlayer $(echo "${GITHUB_REF_NAME#v}" | sed 's/\.0-/-/; s/-/ /')" >> "$GITHUB_OUTPUT"
+          # docs/releases/<tag>.md if written, otherwise the newest CHANGELOG section
+          f="docs/releases/${GITHUB_REF_NAME}.md"
+          if [ -f "$f" ]; then cp "$f" release-notes.md
+          else awk '/^## /{n++} n==1' CHANGELOG.md > release-notes.md; fi
+
       - name: Release (tag v*)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v3
         with:
+          name: ${{ steps.notes.outputs.name }}
+          body_path: release-notes.md
+          prerelease: ${{ contains(github.ref_name, '-') }}
           files: |
             dist/*.apk
             dist/*.ipk
