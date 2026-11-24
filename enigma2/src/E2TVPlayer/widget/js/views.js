@@ -7,16 +7,43 @@ var Dialog = {
 	index: 0,
 	onCancel: null,
 
-	open: function (title, text, buttons, index, onCancel) {
+	/* text is plain; html (already escaped) is used when given */
+	open: function (title, text, buttons, index, onCancel, html) {
 		Dialog.buttons = buttons && buttons.length ? buttons : [{ label: 'OK' }];
 		Dialog.index = index || 0;
 		Dialog.onCancel = onCancel || null;
 		U.$('dlg-title').innerHTML = U.esc(title);
-		U.$('dlg-text').innerHTML = U.esc(text);
+		var t = U.$('dlg-text');
+		t.innerHTML = html || U.esc(text);
+		t.style.maxHeight = Dialog.TEXT_MAX + 'px';
+		t.style.overflow = 'hidden';
+		t.scrollTop = 0;
 		Dialog.render();
 		Dialog.isOpen = true;
 		U.show('dialog', true);
+		Dialog.bar();
 	},
+
+	TEXT_MAX: 290,      /* 10 lines; a longer text scrolls with ▲▼ */
+
+	/* scroll bar of a long text, created here because older Tizen packages have their own index.html */
+	bar: function () {
+		var t = U.$('dlg-text'), b = U.$('dlg-bar'), d = U.$('dialog');
+		if (!b) {
+			b = document.createElement('div');
+			b.id = 'dlg-bar';
+			b.style.cssText = 'position:absolute;right:10px;width:6px;border-radius:3px;background:#4fa3ff;display:none';
+			d.appendChild(b);
+		}
+		var over = t.scrollHeight - t.clientHeight;
+		if (over <= 0 || !t.clientHeight) { b.style.display = 'none'; return; }
+		var h = Math.max(20, Math.round(t.clientHeight * t.clientHeight / t.scrollHeight));
+		b.style.height = h + 'px';
+		b.style.top = (t.offsetTop + Math.round((t.clientHeight - h) * t.scrollTop / over)) + 'px';
+		b.style.display = 'block';
+	},
+
+	scrolls: function () { var t = U.$('dlg-text'); return t.scrollHeight > t.clientHeight + 1; },
 
 	alert: function (title, text, fn) { Dialog.open(title, text, [{ label: 'OK', fn: fn }], 0, fn); },
 
@@ -32,6 +59,11 @@ var Dialog = {
 
 	onKey: function (k) {
 		var n = Dialog.buttons.length;
+		if ((k === tvKey.KEY_UP || k === tvKey.KEY_DOWN) && Dialog.scrolls()) {
+			U.$('dlg-text').scrollTop += (k === tvKey.KEY_UP ? -1 : 1) * 58;
+			Dialog.bar();
+			return true;
+		}
 		if (k === tvKey.KEY_LEFT || k === tvKey.KEY_UP) { Dialog.index = (Dialog.index - 1 + n) % n; Dialog.render(); }
 		else if (k === tvKey.KEY_RIGHT || k === tvKey.KEY_DOWN) { Dialog.index = (Dialog.index + 1) % n; Dialog.render(); }
 		else if (k === tvKey.KEY_ENTER) {
@@ -407,18 +439,30 @@ Views.channels = {
 		Browser.setItems(items, index, T('No channels in this bouquet'));
 	},
 
-	useProxy: true,      /* live through the box relay (subtitles); off if the relay does not work */
+	/* live goes through the box relay (subtitles). A failed relay falls back to direct playback
+	   for that channel only: a short network break must not cost the subtitles until a restart.
+	   After 3 failures in a row the relay is skipped for 5 minutes. */
+	useProxy: true,
+	relayFails: 0,
+	relayOffUntil: 0,
+	relayFailed: function () {
+		var C = Views.channels;
+		C.relayFails++;
+		if (C.relayFails >= 3) { C.relayOffUntil = new Date().getTime() + 300000; C.relayFails = 0; }
+	},
+	relayOk: function () { Views.channels.relayFails = 0; },
 
 	play: function (it) {
 		var ev = (Views.channels.now || {})[it.s.servicereference];
-		var id = 'tv' + new Date().getTime();
+		var C = Views.channels, id = 'tv' + new Date().getTime();
+		var relay = C.useProxy && new Date().getTime() >= C.relayOffUntil;
 		Player.onStopped = function () { Views.channels.renderServices(Browser.list.index); };
 		Player.play({
 			title: it.s.servicename,
 			sub: ev && ev.title ? ev.title : '',
-			url: Views.channels.useProxy ? Api.liveUrl(id, it.s.servicereference) : Api.streamUrl(it.s.servicereference),
+			url: relay ? Api.liveUrl(id, it.s.servicereference) : Api.streamUrl(it.s.servicereference),
 			directUrl: Api.streamUrl(it.s.servicereference),
-			liveId: Views.channels.useProxy ? id : null,
+			liveId: relay ? id : null,
 			sref: it.s.servicereference,
 			live: true,
 			length: 0
@@ -873,13 +917,12 @@ Views.epg = {
 		if (!s) { return; }
 		if (!ev) { E.watch(); return; }
 		var now = E.now(), rec = E.timerOf(s.servicereference, ev);
-		Dialog.open(ev.title, U.esc(E.hm(ev.b) + '–' + E.hm(ev.e) + ' · ' + s.servicename) +
+		var html = U.esc(E.hm(ev.b) + '–' + E.hm(ev.e) + ' · ' + s.servicename) +
 			(rec ? ' &nbsp; <span class="rec">● ' + U.esc(T('Timer set')) + '</span>' : '') + '<br/><br/>' +
-			U.esc(ev.sub && ev.desc && ev.desc.indexOf(ev.sub) < 0 ? ev.sub + ' – ' + ev.desc : (ev.desc || ev.sub)),
-			[{ label: T('Watch channel'), fn: function () { E.watch(); } },
-				{ label: rec ? T('Delete timer') : T('Record'), fn: function () { E.toggleTimer(); } },
-				{ label: T('Close'), fn: function () { } }],
-			ev.b <= now ? 0 : 1);
+			U.esc(ev.sub && ev.desc && ev.desc.indexOf(ev.sub) < 0 ? ev.sub + ' – ' + ev.desc : (ev.desc || ev.sub));
+		Dialog.open(ev.title, '', [{ label: T('Watch channel'), fn: function () { E.watch(); } },
+			{ label: rec ? T('Delete timer') : T('Record'), fn: function () { E.toggleTimer(); } },
+			{ label: T('Close'), fn: function () { } }], ev.b <= now ? 0 : 1, null, html);
 	},
 
 	/* ---- timers ---- */

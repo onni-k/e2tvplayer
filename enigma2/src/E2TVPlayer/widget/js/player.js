@@ -99,7 +99,7 @@ var Player = {
 		/* live through the box relay failed: try once directly from the stream server */
 		if (it && it.live && it.liveId && it.directUrl && !it.retried && Player.pos < 1) {
 			Player.active = false;
-			Views.channels.useProxy = false;
+			Views.channels.relayFailed();
 			U.toast(T('Relay failed – playing directly (no subtitles)'), 4000);
 			it.retried = true;
 			it.url = it.directUrl;

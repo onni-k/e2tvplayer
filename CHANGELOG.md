@@ -2,6 +2,12 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 1.0.3
+* FIX: Samsung: a short break in the connection no longer turns live subtitles off until a
+  restart; the next channel (or opening it again) uses the box relay again
+* FIX: Samsung: the guide info (OK) showed "<br/>" in the text; a long text scrolls with ▲▼
+* UPD: Samsung: lower key help at the bottom, three lines of programme info fit in the guide
+
 ## 1.0.2
 * FIX: Samsung: a long label in TOOLS wrapped onto the next row; rows stay on one line and the
   live arrow setting is now called "Live TV ▲▼ CH+/−"

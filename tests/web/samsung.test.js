@@ -127,13 +127,17 @@ key(K.KEY_RIGHT); check(txt('epg-i-title')==='Weather','guide: right = next prog
 key(K.KEY_RED); check(calls.concat(urls).some(u=>u.includes('/api/timeraddbyeventid')&&u.includes('eventid=102')),'guide: red adds a timer for the event');
 check($('epg-grid').querySelector('.epg-ev.sel.rec') && txt('epg-i-meta').includes('Timer set'),'guide: timer marked: '+txt('epg-i-meta'));
 key(K.KEY_RED); check(calls.concat(urls).some(u=>u.includes('/api/timerdelete')) && !$('epg-grid').querySelector('.epg-ev.rec'),'guide: red again deletes the timer');
-key(K.KEY_ENTER); check(w.Dialog.isOpen && txt('dlg-title')==='Weather','guide: OK on a coming programme shows its info');
+key(K.KEY_ENTER); check(w.Dialog.isOpen && txt('dlg-title')==='Weather' && !txt('dlg-text').includes('<br') && $('dlg-text').querySelectorAll('br').length===2,'guide: OK on a coming programme shows its info, line breaks as breaks: '+txt('dlg-text'));
 key(K.KEY_RETURN); key(K.KEY_LEFT); check(txt('epg-i-title')==='News','guide: left = previous');
 key(K.KEY_DOWN); check(txt('epg-i-title')==='Sports' && txt('epg-i-meta').startsWith('Yle TV2'),'guide: down = next channel');
 key(K.KEY_FF); check(w.Views.epg.t0>=w.Views.epg.floor30(now)+7200,'guide: FF = +2 h');
 key(K.KEY_RW); key(K.KEY_RW); check(w.Views.epg.t0===w.Views.epg.floor30(now),'guide: RW stops at now');
 w.Views.channels.now={}; w.Views.channels.next={}; w.Views.channels.bouquet=null;  // as if the bouquet was never opened in the channel list
 key(K.KEY_UP); key(K.KEY_ENTER); check(w.Player.active && calls.some(c=>c.includes('live?')&&c.includes('sref=1%3A0%3A19%3A11')),'guide: OK on the running programme plays the channel');
+{ const n0=calls.length; w.Player.pos=0; w.Player.fail('net');
+  check(calls.slice(n0).some(c=>c.startsWith('Init ')&&c.includes(':8001/')),'relay failed: direct playback');
+  const n1=calls.length; w.Views.channels.zap(1);
+  check(calls.slice(n1).some(c=>c.startsWith('Init ')&&c.includes('/e2tvplayer/live?')),'after a relay failure the next channel tries the relay again'); w.Views.channels.zap(-1); }
 key(K.KEY_INFO); check(txt('i-title')==='News' && txt('i-meta').includes('remaining'),'guide -> live: INFO shows the running programme: '+txt('i-title'));
 key(K.KEY_INFO);
 key(K.KEY_RETURN); check(!w.Player.active && w.App.view==='epg' && $('epg').style.display==='block','guide: back to the guide after playback');

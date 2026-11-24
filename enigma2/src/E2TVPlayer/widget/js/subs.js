@@ -69,6 +69,7 @@ var Subs = {
 		var last = Subs.cues.length ? Subs.cues[Subs.cues.length - 1].n : 0;
 		Api.liveSubs(id, key, last, function (r) {
 			if (gen !== Subs.gen || id !== Subs.liveId) { return; }
+			Views.channels.relayOk();
 			Subs.status = r.status || '';
 			Subs.error = r.error || '';
 			Subs.teletext = r.teletext || 0;
