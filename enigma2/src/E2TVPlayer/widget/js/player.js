@@ -374,7 +374,7 @@ var Player = {
 	PREF_LABELS: {
 		audioMode: N('Audio'), audio1: N('  1st choice'), audio2: N('  2nd choice'),
 		subMode: N('Subtitles'), sub1: N('  1st choice'), sub2: N('  2nd choice'),
-		liveArrows: N('▲▼ and CH+/− in live TV'),
+		liveArrows: N('Live TV ▲▼ CH+/−'),
 		startView: N('Start view')
 	},
 

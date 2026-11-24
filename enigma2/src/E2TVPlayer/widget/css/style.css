@@ -115,9 +115,10 @@ body.playing #app { display: none; }
 }
 .tr-head { font-size: 28px; color: #ffffff; }
 #tr-rows { margin-top: 18px; }
-.tr-row { height: 56px; line-height: 56px; padding: 0 16px; margin-bottom: 6px; border-radius: 6px; background: #1e2836; font-size: 22px; }
+.tr-row { height: 56px; line-height: 56px; white-space: nowrap; overflow: hidden; padding: 0 16px; margin-bottom: 6px; border-radius: 6px; background: #1e2836; font-size: 22px; }
 .tr-row.sel { background: #2a5c99; }
-.tr-row .lbl { display: inline-block; width: 150px; color: #9fb3c8; }
+/* a long label (e.g. "▲▼ ja CH+/− live-tilassa") pushes its value right instead of wrapping onto the next row */
+.tr-row .lbl { display: inline-block; min-width: 150px; padding-right: 12px; color: #9fb3c8; }
 .tr-row.sel .lbl { color: #d6e6ff; }
 .tr-row .val { color: #ffffff; }
 #tracks.compact { padding: 18px 30px; }

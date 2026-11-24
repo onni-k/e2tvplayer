@@ -212,7 +212,7 @@ msgid "Subtitles"
 msgstr ""
 
 #: web/player.js android/Prefs.kt
-msgid "▲▼ and CH+/− in live TV"
+msgid "Live TV ▲▼ CH+/−"
 msgstr ""
 
 #: web/player.js android/Prefs.kt

@@ -29,7 +29,7 @@ object Prefs {
     fun label(k: String): String = when (k) {
         "audioMode" -> T("Audio")
         "subMode" -> T("Subtitles")
-        "liveArrows" -> T("▲▼ and CH+/− in live TV")
+        "liveArrows" -> T("Live TV ▲▼ CH+/−")
         "startView" -> T("Start view")
         "audio1", "sub1" -> "      " + T("  1st choice").trim()
         else -> "      " + T("  2nd choice").trim()

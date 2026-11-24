@@ -2,6 +2,10 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 1.0.2
+* FIX: Samsung: a long label in TOOLS wrapped onto the next row; rows stay on one line and the
+  live arrow setting is now called "Live TV ▲▼ CH+/−"
+
 ## 1.0.1
 * FIX: Samsung: the TOOLS settings in the lists no longer run off the screen; 6 rows are shown
   at a time and the window follows the selection (▲/▼ mark the hidden rows)
