@@ -1,0 +1,46 @@
+11-24 17:42:57.475   496   676 D AudioTrack: createTrack_l(31225): AUDIO_OUTPUT_FLAG_FAST denied by server; frameCount 0 -> 4512
+11-24 17:43:12.737  2682  3607 W dex2oat32: Verification of androidx.media3.common.Player$PositionInfo androidx.media3.exoplayer.ExoPlayerImpl.getPreviousPositionInfo(int, androidx.media3.exoplayer.PlaybackInfo, int) took 150.953ms (1026.81 bytecodes/s) (2848B approximate peak alloc)
+11-24 17:43:45.781  4194  4194 I ExoPlayerImpl: Init 80256f2 [AndroidXMedia3/1.3.1] [generic_x86_64_arm64, sdk_gphone_x86_64, Google, 30]
+11-24 17:43:45.791  4194  4194 I DefaultRenderersFactory: Loaded FfmpegAudioRenderer.
+11-24 17:43:46.119  4194  4194 I E2TVPlayer: auto tracks: audio auto subtitles auto dvb [(fin, 16), (swe, 32)]
+11-24 17:43:46.230  4194  4194 I E2TVPlayer: audio decoder: ffmpegLavc60.3.100-eac3 (mode pcm)
+11-24 17:43:46.230  4194  4194 I E2TVPlayer: audio format: audio/eac3 fi 1ch
+11-24 17:44:10.483  4194  4194 I E2TVPlayer: audio decoder: ffmpegLavc60.3.100-aac (mode pcm)
+11-24 17:44:10.484  4194  4194 I E2TVPlayer: audio format: audio/mp4a-latm sv 1ch
+11-24 17:44:19.663  4194  5512 D AudioTrack: getTimestamp_l(17): device stall time corrected using current time 126324544854
+11-24 17:44:23.716  4194  4194 I ExoPlayerImpl: Release 80256f2 [AndroidXMedia3/1.3.1] [generic_x86_64_arm64, sdk_gphone_x86_64, Google, 30] [media3.common, media3.ui, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.decoder.ffmpeg]
+11-24 17:44:40.077  4194  4194 I ExoPlayerImpl: Init 5d0a883 [AndroidXMedia3/1.3.1] [generic_x86_64_arm64, sdk_gphone_x86_64, Google, 30]
+11-24 17:44:40.078  4194  4194 I DefaultRenderersFactory: Loaded FfmpegAudioRenderer.
+11-24 17:44:40.278  4194  4194 I E2TVPlayer: auto tracks: audio auto subtitles last dvb [(fin, 16), (swe, 32)]
+11-24 17:44:40.299  4194  4194 I E2TVPlayer: audio decoder: ffmpegLavc60.3.100-aac (mode pcm)
+11-24 17:44:40.299  4194  4194 I E2TVPlayer: audio format: audio/mp4a-latm sv 1ch
+11-24 17:45:04.896  4194  6288 I E2TVPlayer: screenshot: Picture saved on the box: screenshot_1795542305
+11-24 17:45:08.877  4194  6185 D AudioTrack: getTimestamp_l(19): device stall time corrected using current time 175538958802
+11-24 17:45:19.271  4194  4194 I ExoPlayerImpl: Release 5d0a883 [AndroidXMedia3/1.3.1] [generic_x86_64_arm64, sdk_gphone_x86_64, Google, 30] [media3.common, media3.ui, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.decoder.ffmpeg]
+11-24 17:45:28.182  4194  6392 I E2TVPlayer: screenshot: Picture saved on the box: screenshot_1795542328
+11-24 17:45:42.248  4194  4194 I ExoPlayerImpl: Init 71cfc5b [AndroidXMedia3/1.3.1] [generic_x86_64_arm64, sdk_gphone_x86_64, Google, 30]
+11-24 17:45:42.249  4194  4194 I DefaultRenderersFactory: Loaded FfmpegAudioRenderer.
+11-24 17:45:42.769  4194  4194 I E2TVPlayer: auto tracks: audio auto subtitles last dvb [(fin, 16), (swe, 32)]
+11-24 17:45:42.807  4194  4194 I E2TVPlayer: audio decoder: ffmpegLavc60.3.100-aac (mode pcm)
+11-24 17:45:42.807  4194  4194 I E2TVPlayer: audio format: audio/mp4a-latm sv 1ch
+11-24 17:45:45.050  4194  6477 D AudioTrack: getTimestamp_l(20): device stall time corrected using current time 211711845940
+11-24 17:46:03.495  4194  4194 I E2TVPlayer: auto tracks: audio auto subtitles last dvb [(fin, 16), (swe, 32)]
+11-24 17:46:03.504  4194  4194 I E2TVPlayer: audio decoder: ffmpegLavc60.3.100-aac (mode pcm)
+11-24 17:46:03.504  4194  4194 I E2TVPlayer: audio format: audio/mp4a-latm sv 1ch
+11-24 17:46:06.007  4194  6477 D AudioTrack: getTimestamp_l(21): device stall time corrected using current time 232668896496
+11-24 17:46:11.830  4194  4194 I E2TVPlayer: auto tracks: audio auto subtitles last dvb [(fin, 16), (swe, 32)]
+11-24 17:46:11.836  4194  4194 I E2TVPlayer: audio decoder: ffmpegLavc60.3.100-aac (mode pcm)
+11-24 17:46:11.836  4194  4194 I E2TVPlayer: audio format: audio/mp4a-latm sv 1ch
+11-24 17:46:14.343  4194  6477 D AudioTrack: getTimestamp_l(22): device stall time corrected using current time 241004526503
+11-24 17:46:18.843  4194  4194 I ExoPlayerImpl: Release 71cfc5b [AndroidXMedia3/1.3.1] [generic_x86_64_arm64, sdk_gphone_x86_64, Google, 30] [media3.common, media3.ui, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.decoder.ffmpeg]
+11-24 17:46:44.993  4194  4194 I ExoPlayerImpl: Init e1d6989 [AndroidXMedia3/1.3.1] [generic_x86_64_arm64, sdk_gphone_x86_64, Google, 30]
+11-24 17:46:44.994  4194  4194 I DefaultRenderersFactory: Loaded FfmpegAudioRenderer.
+11-24 17:46:45.525  4194  4194 I E2TVPlayer: auto tracks: audio auto subtitles last dvb [(fin, 16), (swe, 32)]
+11-24 17:46:45.580  4194  4194 I E2TVPlayer: audio decoder: ffmpegLavc60.3.100-aac (mode pcm)
+11-24 17:46:45.580  4194  4194 I E2TVPlayer: audio format: audio/mp4a-latm sv 1ch
+11-24 17:46:47.793  4194  6795 D AudioTrack: getTimestamp_l(23): device stall time corrected using current time 274454687943
+11-24 17:46:50.662  4194  4194 I E2TVPlayer: auto tracks: audio auto subtitles last dvb [(fin, 16), (swe, 32)]
+11-24 17:46:50.669  4194  4194 I E2TVPlayer: audio decoder: ffmpegLavc60.3.100-aac (mode pcm)
+11-24 17:46:50.669  4194  4194 I E2TVPlayer: audio format: audio/mp4a-latm sv 1ch
+11-24 17:46:53.166  4194  6795 D AudioTrack: getTimestamp_l(24): device stall time corrected using current time 279827333723
+11-24 17:47:00.196  4194  4194 I ExoPlayerImpl: Release e1d6989 [AndroidXMedia3/1.3.1] [generic_x86_64_arm64, sdk_gphone_x86_64, Google, 30] [media3.common, media3.ui, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.decoder.ffmpeg]

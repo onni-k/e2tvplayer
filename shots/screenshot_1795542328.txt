@@ -1,0 +1,2 @@
+/e2tvplayer/screenshot?platform=googletv&novideo=1&title=list
+image/png
