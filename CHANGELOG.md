@@ -2,6 +2,9 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 1.1.0
+* First stable release: the 1.0.1–1.0.4 fixes and changes below, GitHub release v1.1.0
+
 ## 1.0.4
 * UPD: Back from live TV to the guide lands on the channel watched last (also after zapping)
 * UPD: Live TV: a second OK hides the programme info and the bar at the bottom

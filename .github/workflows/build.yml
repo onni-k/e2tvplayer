@@ -44,8 +44,8 @@ jobs:
         id: notes
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          # v1.0.0-beta -> "E2TVPlayer 1.0 beta", v1.0.1 -> "E2TVPlayer 1.0.1"
-          echo "name=E2TVPlayer $(echo "${GITHUB_REF_NAME#v}" | sed 's/\.0-/-/; s/-/ /')" >> "$GITHUB_OUTPUT"
+          # v1.0.0-beta -> "E2TVPlayer 1.0 beta", v1.1.0 -> "E2TVPlayer 1.1", v1.0.1 -> "E2TVPlayer 1.0.1"
+          echo "name=E2TVPlayer $(echo "${GITHUB_REF_NAME#v}" | sed -E 's/^([0-9]+\.[0-9]+)\.0($|-)/\1\2/; s/-/ /')" >> "$GITHUB_OUTPUT"
           # docs/releases/<tag>.md if written, otherwise the newest CHANGELOG section
           f="docs/releases/${GITHUB_REF_NAME}.md"
           if [ -f "$f" ]; then cp "$f" release-notes.md
