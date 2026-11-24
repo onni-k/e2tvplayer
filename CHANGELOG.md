@@ -2,6 +2,10 @@
 
 User-visible changes, newest first. `NEW:` feature, `UPD:` change, `FIX:` bug in a released version.
 
+## 1.0.4
+* UPD: Back from live TV to the guide lands on the channel watched last (also after zapping)
+* UPD: Live TV: a second OK hides the programme info and the bar at the bottom
+
 ## 1.0.3
 * FIX: Samsung: a short break in the connection no longer turns live subtitles off until a
   restart; the next channel (or opening it again) uses the box relay again

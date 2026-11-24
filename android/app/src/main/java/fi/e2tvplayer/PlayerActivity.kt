@@ -74,6 +74,11 @@ class PlayerActivity : Activity() {
     private var desc = ""
     private var lengthSec = 0L
     private var refs: Array<String> = emptyArray()
+
+    companion object {
+        /** the live channel watched last: the guide returns to its row */
+        var lastRef: String? = null
+    }
     private var names: Array<String> = emptyArray()
     private var index = 0
     private var epgNow: JSONObject? = null
@@ -332,6 +337,7 @@ class PlayerActivity : Activity() {
     private fun playChannel(i: Int) {
         if (refs.isEmpty()) { finish(); return }
         index = (i + refs.size) % refs.size
+        lastRef = refs[index]
         title = names.getOrElse(index) { "" }
         sub = ""
         desc = ""
@@ -517,10 +523,11 @@ class PlayerActivity : Activity() {
         }
     }
 
-    private fun toggleInfo() {
+    /** OK closes the info together with the bar at the bottom; INFO and BACK leave the bar for a moment */
+    private fun toggleInfo(hideBar: Boolean = false) {
         if (info.visibility == View.VISIBLE) {
             info.visibility = View.GONE
-            showOsd()
+            if (hideBar) { ui.removeCallbacks(hideOsd); osd.visibility = View.GONE } else showOsd()
         } else {
             renderInfo()
             info.visibility = View.VISIBLE
@@ -794,7 +801,7 @@ class PlayerActivity : Activity() {
                     if (okDown && !longFired && (e.isLongPress || e.repeatCount > 0)) { ui.removeCallbacks(longPress); longPress.run() }
                 } else {
                     ui.removeCallbacks(longPress)
-                    if (okDown && !longFired) { if (live) toggleInfo() else togglePause() }
+                    if (okDown && !longFired) { if (live) toggleInfo(hideBar = true) else togglePause() }
                     okDown = false
                 }
                 return true

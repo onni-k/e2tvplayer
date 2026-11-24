@@ -456,7 +456,8 @@ Views.channels = {
 		var ev = (Views.channels.now || {})[it.s.servicereference];
 		var C = Views.channels, id = 'tv' + new Date().getTime();
 		var relay = C.useProxy && new Date().getTime() >= C.relayOffUntil;
-		Player.onStopped = function () { Views.channels.renderServices(Browser.list.index); };
+		/* started from the guide: going back returns to the guide on the channel watched last */
+		if (!C.fromGuide) { Player.onStopped = function () { Views.channels.renderServices(Browser.list.index); }; }
 		Player.play({
 			title: it.s.servicename,
 			sub: ev && ev.title ? ev.title : '',
@@ -507,7 +508,7 @@ Views.channels = {
 			case tvKey.KEY_PLAY:
 				if (!it) { if (!C.bouquets) { C.loadBouquets(); } return true; }
 				if (it.type === 'bouquet') { C.openBouquet(it.b); }
-				else if (it.type === 'service') { C.play(it); }
+				else if (it.type === 'service') { C.fromGuide = false; C.play(it); }
 				return true;
 			case tvKey.KEY_YELLOW: App.go('epg'); return true;
 			case tvKey.KEY_BLUE: App.go('settings'); return true;
@@ -908,8 +909,12 @@ Views.epg = {
 		if (C.epgTimer) { clearInterval(C.epgTimer); }
 		C.epgTimer = setInterval(C.loadEpg, 120000);
 		C.renderServices(E.row);
+		C.fromGuide = true;
+		Player.onStopped = function () {
+			C.fromGuide = false;
+			if (App.view === 'epg') { E.row = Browser.list.index; E.setRow(E.row); }
+		};
 		C.play(Browser.list.current());
-		Player.onStopped = function () { if (App.view === 'epg') { E.row = Browser.list.index; E.setRow(E.row); } };
 	},
 
 	info: function () {

@@ -109,6 +109,19 @@ shot 16c2_guide_timer 2
 key KEYCODE_DPAD_CENTER              # coming programme: info dialog (Delete timer)
 shot 16d_guide_info 1
 key KEYCODE_BACK
+key KEYCODE_DPAD_UP                  # channel 1
+key KEYCODE_DPAD_LEFT
+key KEYCODE_DPAD_LEFT                # back to the running programme
+key KEYCODE_DPAD_CENTER              # watch channel 1
+sleep 4
+key KEYCODE_DPAD_UP                  # ▲ = next channel: channel 2
+sleep 3
+key KEYCODE_DPAD_CENTER              # OK: programme info
+shot 16e_live_info 1
+key KEYCODE_DPAD_CENTER              # OK again: info and the bar hidden
+shot 16f_live_info_closed 1
+key KEYCODE_BACK                     # back to the guide on channel 2
+shot 16g_guide_return 2
 key KEYCODE_BACK                     # guide -> channels
 key KEYCODE_BACK                     # only one bouquet -> recordings
 key KEYCODE_BACK                     # quit dialog

@@ -590,7 +590,11 @@ var Player = {
 				Views.channels.zap((k === tvKey.KEY_UP || k === tvKey.KEY_CH_UP ? -1 : 1) * (Prefs.get('liveArrows') === 'reverse' ? -1 : 1));
 				return true;
 			}
-			if (k === tvKey.KEY_ENTER) { Player.showInfo(); return true; }
+			/* OK opens the programme info; a second OK hides it and the bar at the bottom */
+			if (k === tvKey.KEY_ENTER) {
+				if (Player.infoOpen()) { U.show('info', false); U.show('osd', false); } else { Player.showInfo(); }
+				return true;
+			}
 			for (var d = 0; d <= 9; d++) {
 				if (k === tvKey['KEY_' + d]) { Views.channels.digit(String(d)); return true; }
 			}

@@ -140,7 +140,11 @@ key(K.KEY_UP); key(K.KEY_ENTER); check(w.Player.active && calls.some(c=>c.includ
   check(calls.slice(n1).some(c=>c.startsWith('Init ')&&c.includes('/e2tvplayer/live?')),'after a relay failure the next channel tries the relay again'); w.Views.channels.zap(-1); }
 key(K.KEY_INFO); check(txt('i-title')==='News' && txt('i-meta').includes('remaining'),'guide -> live: INFO shows the running programme: '+txt('i-title'));
 key(K.KEY_INFO);
-key(K.KEY_RETURN); check(!w.Player.active && w.App.view==='epg' && $('epg').style.display==='block','guide: back to the guide after playback');
+key(K.KEY_ENTER); check($('info').style.display==='block','live: OK shows the programme info');
+key(K.KEY_ENTER); check($('info').style.display!=='block' && $('osd').style.display!=='block','live: a second OK hides the info and the bar');
+w.Views.channels.zap(1);
+key(K.KEY_RETURN); check(!w.Player.active && w.App.view==='epg' && $('epg').style.display==='block' && w.Views.epg.row===1 && txt('epg-i-meta').startsWith('Yle TV2'),'guide: back to the guide on the channel watched last: '+txt('epg-i-meta'));
+key(K.KEY_UP);
 key(K.KEY_YELLOW); check(w.App.view==='movies' && $('epg').style.display==='none' && $('browser').style.display==='block','guide: yellow -> recordings');
 // settings
 key(K.KEY_BLUE); check($('settings').style.display==='block','settings');

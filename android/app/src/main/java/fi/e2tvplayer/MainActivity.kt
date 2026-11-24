@@ -156,7 +156,11 @@ class MainActivity : Activity() {
         if (Box.host.isNotEmpty()) refreshStatus()
         // after playback, refresh the progress bars
         if (mode == "movies" && movieData != null) renderMovies(currentIndex())
-        if (mode == "epg") epg.invalidate()
+        if (mode == "epg") {
+            PlayerActivity.lastRef?.let { epg.selectRef(it) }
+            epg.invalidate()
+        }
+        PlayerActivity.lastRef = null
     }
 
     override fun onDestroy() {

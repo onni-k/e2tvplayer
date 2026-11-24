@@ -208,6 +208,14 @@ class EpgGridView @JvmOverloads constructor(ctx: Context, attrs: AttributeSet? =
 
     // ---------------------------------------------------------------- keys
 
+    /** selects the row of a channel, e.g. the one watched last */
+    fun selectRef(ref: String): Boolean {
+        val i = refs.indexOfFirst { it == ref }
+        if (i < 0) return false
+        setRow(i)
+        return true
+    }
+
     private fun setRow(r: Int) {
         if (refs.isEmpty()) return
         row = r.coerceIn(0, refs.size - 1)
